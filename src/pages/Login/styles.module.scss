@@ -1,0 +1,12 @@
+.wrapper {
+  padding: 60px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.picture {
+  width: 100%;
+  max-width: 558px;
+  user-select: none;
+}

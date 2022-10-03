@@ -1,0 +1,25 @@
+@import './src/helpers/colors';
+
+.button {
+  color: #fff;
+  border-radius: 8px;
+  background-color: $ruby1;
+  padding: 18px;
+  font-size: 16px;
+  width: 100%;
+  font-weight: 500;
+  transition: .25s;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    background-color: $ruby2;
+  }
+
+  &.disable {
+    color: $grey3;
+    background-color: $grey2;
+  }
+}

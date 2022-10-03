@@ -1,0 +1,75 @@
+@import "./src/helpers/colors";
+
+.form {
+  margin-top: 5.4%;
+  flex-grow: 1;
+  max-width: 461px  ;
+
+  &__header {
+    margin-bottom: 39px;
+  }
+
+  &__title {
+    color: $black;
+    font-family: 'Geometria', sans-serif;
+    font-weight: 500;
+    font-size: 32px;
+    margin-bottom: 16px;
+  }
+
+  &__subtitle {
+    color: $coal3;
+    font-size: 14px;
+
+    .link {
+      color: $ruby1;
+      text-decoration: none;
+    }
+  }
+
+  .inputs {
+    margin-bottom: 27px;
+  }
+
+  .input {
+    padding: 16px;
+    border: 1px solid #D6D8DA;
+    border-radius: 8px;
+    font-size: 18px;
+    flex-grow: 1;
+    outline: none;
+
+    &::placeholder {
+      color: $coal4;
+    }
+
+    &__container {
+      display: flex;
+      align-items: stretch;
+      max-width: 461px;
+    }
+
+    &__wrapper {
+      margin-bottom: 20px;
+
+      &:first-of-type {
+        margin-bottom: 30px;
+      }
+    }
+
+    &__name {
+      font-size: 14px;
+      color: $coal4;
+      margin-bottom: 8px;
+    }
+  }
+
+  &__notify {
+    align-self: center;
+    font-size: 14px;
+    color: $coal4;
+    line-height: 22px;
+    margin-left: 16px;
+    user-select: none;
+  }
+}
