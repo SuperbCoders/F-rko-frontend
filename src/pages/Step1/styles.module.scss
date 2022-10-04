@@ -1,0 +1,89 @@
+@import "./src/helpers/colors";
+
+.form {
+  display: flex;
+
+  &__left {
+    width: 100%;
+    max-width: 655px;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    position: relative;
+    top: 0;
+    left: 202px;
+  }
+
+  &__notify {
+    align-self: center;
+    font-size: 14px;
+    color: $coal4;
+    line-height: 22px;
+    margin-left: 16px;
+    user-select: none;
+  }
+}
+
+.input {
+  &__name {
+    font-size: 14px;
+    color: $coal4;
+    margin-bottom: 8px;
+  }
+
+  &__container {
+    display: flex;
+  }
+
+  &__wrapper {
+    width: 100%;
+  }
+}
+
+.title {
+  font-family: 'Geometria', sans-serif;
+  font-weight: 500;
+  font-size: 32px;
+  color: #0C0C0D;
+  margin-bottom: 64px;
+}
+
+.checkbox {
+  &__container {
+    display: flex;
+    margin-bottom: 24px;
+  }
+
+  &__name {
+    margin-left: 24px;
+    color: $coal1;
+    user-select: none;
+
+    a {
+      color: $ruby1;
+      text-decoration: none;
+    }
+  }
+}
+
+.buttons {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+
+  & > * {
+    margin-right: 24px;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+.picture {
+  width: 100%;
+  max-width: 558px;
+  user-select: none;
+}

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./styles.module.scss";
 
-const CheckBoxRS = ({ size = "small", title = null }) => {
+const CheckBoxRS = ({ size = "small", ...props }) => {
   const [isActive, setActive] = useState(false);
   const isSmall = size === "small";
   const addClass = isSmall && styles.small;
@@ -14,6 +14,7 @@ const CheckBoxRS = ({ size = "small", title = null }) => {
     <div
       className={styles.checkbox__wrapper}
       onClick={() => setActive((prevState) => !prevState)}
+      {...props}
     >
       <div
         className={`${styles.checkbox} ${addClass} ${
@@ -38,7 +39,6 @@ const CheckBoxRS = ({ size = "small", title = null }) => {
           </svg>
         )}
       </div>
-      {title && <p className={styles.checkbox__name}>{title}</p>}
     </div>
   );
 };

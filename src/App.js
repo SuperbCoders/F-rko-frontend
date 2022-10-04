@@ -1,12 +1,20 @@
 import "./App.scss";
 import Header from "./components/Header";
-import Login from "./pages/Login/Login";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Step1 from "./pages/Step1";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Step1 />,
+  },
+]);
 
 function App() {
   return (
     <div className={"container"}>
       <Header />
-      <Login />
+      <RouterProvider router={router} />
     </div>
   );
 }

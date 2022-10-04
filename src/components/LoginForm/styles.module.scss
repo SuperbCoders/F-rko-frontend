@@ -3,7 +3,7 @@
 .form {
   margin-top: 5.4%;
   flex-grow: 1;
-  max-width: 461px  ;
+  max-width: 461px;
 
   &__header {
     margin-bottom: 39px;
@@ -11,7 +11,7 @@
 
   &__title {
     color: $black;
-    font-family: 'Geometria', sans-serif;
+    font-family: "Geometria", sans-serif;
     font-weight: 500;
     font-size: 32px;
     margin-bottom: 16px;
@@ -32,17 +32,6 @@
   }
 
   .input {
-    padding: 16px;
-    border: 1px solid #D6D8DA;
-    border-radius: 8px;
-    font-size: 18px;
-    flex-grow: 1;
-    outline: none;
-
-    &::placeholder {
-      color: $coal4;
-    }
-
     &__container {
       display: flex;
       align-items: stretch;

@@ -1,11 +1,11 @@
 @import-normalize;
 
 @font-face {
-  font-family: 'Geometria';
-  src: url('assets/fonts/Geometria/Geometria-Medium.eot');
-  src: url('assets/fonts/Geometria/Geometria-Medium.eot?#iefix') format('embedded-opentype'),
-  url('assets/fonts/Geometria/Geometria-Medium.woff') format('woff'),
-  url('assets/fonts/Geometria/Geometria-Medium.ttf') format('truetype');
+  font-family: "Geometria";
+  src: url("assets/fonts/Geometria/Geometria-Medium.eot");
+  src: url("assets/fonts/Geometria/Geometria-Medium.eot?#iefix") format("embedded-opentype"),
+  url("assets/fonts/Geometria/Geometria-Medium.woff") format("woff"),
+  url("assets/fonts/Geometria/Geometria-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
 }
@@ -21,6 +21,10 @@ p {
 }
 
 * {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   box-sizing: border-box;
+}
+
+#root {
+  overflow: hidden;
 }

@@ -1,4 +1,4 @@
-@import './src/helpers/colors';
+@import "./src/helpers/colors";
 
 .button {
   color: #fff;
@@ -8,7 +8,7 @@
   font-size: 16px;
   width: 100%;
   font-weight: 500;
-  transition: .25s;
+  transition: 0.25s;
   outline: none;
   border: none;
   cursor: pointer;
@@ -21,5 +21,10 @@
   &.disable {
     color: $grey3;
     background-color: $grey2;
+  }
+
+  &.ghost {
+    color: $ruby1;
+    background-color: transparent;
   }
 }

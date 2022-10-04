@@ -1,0 +1,14 @@
+@import "src/helpers/colors";
+
+.input {
+  padding: 16px;
+  border: 1px solid #d6d8da;
+  border-radius: 8px;
+  font-size: 16px;
+  flex-grow: 1;
+  outline: none;
+
+  &::placeholder {
+    color: $coal4;
+  }
+}

@@ -2,6 +2,7 @@ import React from "react";
 import styles from "./styles.module.scss";
 import CheckBoxRS from "../CheckBoxRS";
 import ButtonRS from "../ButtonRS";
+import InputRS from "../InputRS";
 
 const LoginForm = () => {
   return (
@@ -16,16 +17,13 @@ const LoginForm = () => {
           , если нет личного кабинет
         </p>
       </div>
-
       <div className={styles.inputs}>
         <div className={styles.input__wrapper}>
           <p className={styles.input__name}>Номер телефона</p>
           <div className={styles.input__container}>
-            <input
-              className={styles.input}
-              type="text"
+            <InputRS
+              inputStyle={{ maxWidth: "267px" }}
               placeholder={"+7 (__) ___ __ __"}
-              style={{ maxWidth: "267px" }}
             />
             <ButtonRS
               title={"Получить код"}
@@ -40,10 +38,9 @@ const LoginForm = () => {
         <div className={styles.input__wrapper}>
           <p className={styles.input__name}>Код проверки из СМС</p>
           <div className={styles.input__container}>
-            <input
-              className={styles.input}
-              type="text"
-              style={{ maxWidth: "170px" }}
+            <InputRS
+              name={"Код проверки из СМС"}
+              inputStyle={{ maxWidth: "170px" }}
             />
             <p className={styles.form__notify}>
               Повторно можно
