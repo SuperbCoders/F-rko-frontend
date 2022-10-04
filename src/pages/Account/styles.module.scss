@@ -1,0 +1,232 @@
+@import "src/helpers/colors";
+
+.account {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 64px 0;
+}
+
+.content {
+  max-width: 849px;
+  flex-grow: 1;
+}
+
+.aside {
+  background: #FFFFFF;
+  border: 1px solid #F5F5F5;
+  box-shadow: 0 8px 24px rgba(48, 62, 73, 0.08);
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 267px;
+  flex-grow: 1;
+
+  &__menu {
+    display: flex;
+    flex-direction: column;
+
+    .item {
+      font-size: 16px;
+      padding: 16px;
+      color: $coal1;
+      margin-bottom: 16px;
+      transition: 0.25s;
+      cursor: pointer;
+      border-radius: 8px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      &.active {
+        background-color: #F0F2F5;
+      }
+    }
+  }
+}
+
+.tabs {
+  display: flex;
+  align-items: center;
+  margin-bottom: 32px;
+
+  &__item {
+    font-size: 16px;
+    color: $coal4;
+    transition: 0.25s;
+    padding-bottom: 16px;
+    border-bottom: 1px solid transparent;
+    margin-right: 24px;
+    cursor: pointer;
+    user-select: none;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    &.active {
+      color: $ruby1;
+      border-bottom-color: $ruby1;
+    }
+  }
+}
+
+.filters {
+  display: flex;
+  align-items: stretch;
+  margin-bottom: 32px;
+
+  .item {
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid $coal5;
+    border-radius: 8px;
+    outline: none;
+    padding: 16px;
+    color: $coal1;
+
+    &__wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 267px;
+      margin-right: 24px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      &:after {
+        content: '';
+        display: inline-block;
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        top: 13px;
+        right: 13px;
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjUiIHZpZXdCb3g9IjAgMCAyNCAyNSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTExIDE5LjVDMTUuNDE4MyAxOS41IDE5IDE1LjkxODMgMTkgMTEuNUMxOSA3LjA4MTcyIDE1LjQxODMgMy41IDExIDMuNUM2LjU4MTcyIDMuNSAzIDcuMDgxNzIgMyAxMS41QzMgMTUuOTE4MyA2LjU4MTcyIDE5LjUgMTEgMTkuNVoiIHN0cm9rZT0iIzk0OUJBMCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBhdGggZD0iTTIwLjk5OTkgMjEuNUwxNi42NDk5IDE3LjE1IiBzdHJva2U9IiM5NDlCQTAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo=)
+      }
+    }
+
+    &:focus {
+      border-color: $coal3;
+    }
+
+    &::placeholder {
+      color: $coal4;
+    }
+  }
+}
+
+.bids {
+  &__item {
+    background: #FFFFFF;
+    box-shadow: 0 8px 24px rgba(48, 62, 73, 0.08);
+    border-radius: 8px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+    cursor: pointer;
+
+    path {
+      transition: 0.25s;
+    }
+
+    &:hover {
+      path {
+        stroke: $ruby1;
+      }
+    }
+
+
+    .content {
+      display: flex;
+
+      .left {
+        max-width: 318px;
+        margin-right: 32px;
+
+
+        .title {
+          color: $coal1;
+          font-weight: 500;
+          font-size: 18px;
+          letter-spacing: 0.25px;
+        }
+
+        .status {
+          display: inline-block;
+          font-size: 12px;
+          color: $coal4;
+          padding: 8px 12px;
+          border: 1px solid $coal4;
+          border-radius: 16px;
+        }
+
+        .name {
+          color: $coal1;
+          font-size: 14px;
+          font-weight: 500;
+        }
+
+        & > * {
+          margin-bottom: 16px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+
+      .right {
+        flex-grow: 1;
+        max-width: 364px;
+
+        .progress {
+          margin-bottom: 24px;
+
+          &__line {
+            height: 4px;
+            background: $ruby5;
+            border-radius: 8px;
+            margin-bottom: 12px;
+          }
+
+          &__done {
+            background-color: $ruby1;
+            height: 4px;
+          }
+
+          &__text {
+            text-align: center;
+            font-size: 12px;
+            color: $coal1;
+
+            .procent {
+              color: $ruby1;
+            }
+          }
+
+          &__tip {
+            font-size: 14px;
+            line-height: 22px;
+            color: $coal1;
+          }
+        }
+      }
+    }
+
+
+    .black_color {
+      font-size: 14px;
+      color: $coal1;
+    }
+
+    .grey_color {
+      font-size: 14px;
+      color: $coal4;
+    }
+
+
+  }
+}

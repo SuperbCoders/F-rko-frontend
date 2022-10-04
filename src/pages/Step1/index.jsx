@@ -5,12 +5,15 @@ import styles from "./styles.module.scss";
 import ButtonRS from "../../components/ButtonRS";
 import CheckBoxRS from "../../components/CheckBoxRS";
 import cube from "../../assets/img/cube.png";
+import Header from "../../components/Header";
 
 const Step1 = () => {
   return (
-    <>
+    <div className={"container"}>
+      <Header />
       <Paginator
         style={{
+          marginTop: "64px",
           marginBottom: "16px",
         }}
       />
@@ -94,7 +97,7 @@ const Step1 = () => {
           <img src={cube} alt="cube" className={styles.picture} />
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

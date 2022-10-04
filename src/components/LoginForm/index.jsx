@@ -48,8 +48,9 @@ const LoginForm = () => {
             </p>
           </div>
         </div>
-        <div>
-          <CheckBoxRS title={"Запомнить"} />
+        <div className={styles.remember}>
+          <CheckBoxRS />
+          <p className={styles.remember__text}>Запомнить</p>
         </div>
       </div>
       <ButtonRS title={"Войти"} />
