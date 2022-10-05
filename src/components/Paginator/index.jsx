@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styles from "./styles.module.scss";
 import classNames from "classnames";
 
@@ -10,14 +10,12 @@ const PaginatorItem = ({ active }) => {
   );
 };
 
-const Paginator = ({ ...props }) => {
-  const [activeStep, setActiveStep] = useState(1);
-
+const Paginator = ({ activeStep = 1, ...props }) => {
   return (
     <div {...props}>
       <div className={styles.paginator}>
         {[1, 2, 3].map((item) => {
-          return <PaginatorItem active={item === activeStep} />;
+          return <PaginatorItem active={item <= activeStep} />;
         })}
       </div>
       <p className={styles.paginator__text}>Шаг {activeStep} из 3</p>

@@ -1,0 +1,146 @@
+.title {
+  font-family: 'Geometria', sans-serif;
+  font-weight: 500;
+  font-size: 32px;
+  color: #0C0C0D;
+  margin-bottom: 64px;
+}
+
+.content {
+  margin-bottom: 50px;
+}
+
+.cards {
+  display: flex;
+  align-items: stretch;
+  padding-bottom: 64px;
+
+  &__item {
+    background: #FFFFFF;
+    box-shadow: 0 6px 24px rgba(48, 62, 73, 0.12);
+    border-radius: 16px;
+    margin-right: 24px;
+    padding: 24px;
+
+    .name {
+      font-family: 'Geometria', sans-serif;
+      font-weight: 500;
+      font-size: 32px;
+      color: #323E48;
+      margin-bottom: 16px;
+    }
+
+    .desc {
+      font-weight: 500;
+      font-size: 14px;
+      color: #323E48;
+      margin-bottom: 16px;
+    }
+
+    .list {
+      margin-bottom: 16px;
+
+      padding-left: 24px;
+
+      &__item {
+        color: #757F86;
+        font-size: 14px;
+        line-height: 22px;
+        margin-bottom: 16px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    .price {
+      font-family: 'Geometria', sans-serif;
+      font-weight: 500;
+      font-size: 32px;
+      color: #323E48;
+      margin-bottom: 40px;
+    }
+
+    .button {
+      background: #F3F4F4;
+      border-radius: 8px;
+      padding: 16px 32px;
+      border: none;
+      outline: none;
+      color: #5B656D;
+      transition: .25s;
+      cursor: pointer;
+
+      &.active {
+        background-color: #fff;
+        color: #D41367;
+        font-weight: 500;
+      }
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+
+  &__item {
+    background: #FFFFFF;
+    box-shadow: 0 4px 24px rgba(48, 62, 73, 0.1);
+    border-radius: 8px;
+    padding: 30px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    display: flex;
+
+    .text {
+      font-size: 24px;
+      letter-spacing: 0.25px;
+      color: #303E49;
+    }
+  }
+}
+
+.agreement {
+  background: #F5F5F5;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 64px;
+
+  .text {
+    font-size: 16px;
+    line-height: 22px;
+    margin-bottom: 24px;
+    color: #949BA0;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.success {
+  padding: 64px 95px;
+  text-align: center;
+  background-color: #fff;
+  border-radius: 8px;
+
+  .icon {
+    margin-bottom: 32px;
+  }
+
+  .title {
+    margin-bottom: 8px;
+  }
+
+  .desc {
+    font-weight: 300;
+    color: #8E909B;
+  }
+}

@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import styles from "./styles.module.scss";
+import classNames from "classnames";
 
 const CheckBoxRS = ({ size = "small", ...props }) => {
   const [isActive, setActive] = useState(false);
   const isSmall = size === "small";
-  const addClass = isSmall && styles.small;
+  const isMedium = size === "medium";
+  const addClass = isSmall ? styles.small : isMedium ? styles.medium : null;
   const svgSizes = {
     width: "8",
     height: "6",
@@ -17,9 +19,11 @@ const CheckBoxRS = ({ size = "small", ...props }) => {
       {...props}
     >
       <div
-        className={`${styles.checkbox} ${addClass} ${
-          isActive ? styles.active : ""
-        }`}
+        className={classNames(
+          styles.checkbox,
+          addClass,
+          isActive && styles.active
+        )}
       >
         {isActive && (
           <svg
