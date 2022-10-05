@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import Paginator from "../../components/Paginator";
-import HeaderFull from "../../components/HeaderFull";
 import styles from "./styles.module.scss";
 import CheckBoxRS from "../../components/CheckBoxRS";
 import ButtonRS from "../../components/ButtonRS";
 import Modal from "../../components/Modal";
 import classNames from "classnames";
+import HeaderMy from "../../components/HeaderMy";
 
 const TickSymbol = () => {
   return (
@@ -79,8 +79,8 @@ const Step3 = () => {
 
   return (
     <>
+      <HeaderMy />
       <div className={"container"}>
-        <HeaderFull />
         <Paginator
           activeStep={3}
           style={{

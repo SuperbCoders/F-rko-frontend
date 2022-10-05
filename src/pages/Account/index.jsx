@@ -2,8 +2,11 @@ import React from "react";
 import HeaderFull from "../../components/HeaderFull";
 import styles from "./styles.module.scss";
 import classNames from "classnames";
+import { useNavigate } from "react-router-dom";
 
 const Account = () => {
+  let navigate = useNavigate();
+
   return (
     <div>
       <HeaderFull />
@@ -40,7 +43,10 @@ const Account = () => {
               </div>
             </div>
             <div className={styles.bids}>
-              <div className={styles.bids__item}>
+              <div
+                onClick={() => navigate("/step1")}
+                className={styles.bids__item}
+              >
                 <div className={styles.content}>
                   <div className={styles.left}>
                     <p className={styles.title}>
@@ -102,7 +108,10 @@ const Account = () => {
                   </svg>
                 </div>
               </div>
-              <div className={styles.bids__item}>
+              <div
+                onClick={() => navigate("/step1")}
+                className={styles.bids__item}
+              >
                 <div className={styles.content}>
                   <div className={styles.left}>
                     <p className={styles.title}>
@@ -125,12 +134,12 @@ const Account = () => {
                         <div
                           className={styles.progress__done}
                           style={{
-                            width: "15%",
+                            width: "50%",
                           }}
                         />
                       </div>
                       <p className={styles.progress__text}>
-                        Выполенено: <span className={styles.procent}>15%</span>
+                        Выполенено: <span className={styles.procent}>50%</span>
                       </p>
                     </div>
                     <p className={styles.progress__tip}>
@@ -164,7 +173,10 @@ const Account = () => {
                   </svg>
                 </div>
               </div>
-              <div className={styles.bids__item}>
+              <div
+                onClick={() => navigate("/step1")}
+                className={styles.bids__item}
+              >
                 <div className={styles.content}>
                   <div className={styles.left}>
                     <p className={styles.title}>
@@ -187,12 +199,12 @@ const Account = () => {
                         <div
                           className={styles.progress__done}
                           style={{
-                            width: "15%",
+                            width: "90%",
                           }}
                         />
                       </div>
                       <p className={styles.progress__text}>
-                        Выполенено: <span className={styles.procent}>15%</span>
+                        Выполенено: <span className={styles.procent}>90%</span>
                       </p>
                     </div>
                     <p className={styles.progress__tip}>

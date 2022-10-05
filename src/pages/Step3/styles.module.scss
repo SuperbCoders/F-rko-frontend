@@ -27,7 +27,7 @@
       font-weight: 500;
       font-size: 32px;
       color: #323E48;
-      margin-bottom: 16px;
+      margin-bottom: 23px;
     }
 
     .desc {
@@ -59,13 +59,14 @@
       font-weight: 500;
       font-size: 32px;
       color: #323E48;
-      margin-bottom: 40px;
+      margin-bottom: 45px;
     }
 
     .button {
       background: #F3F4F4;
       border-radius: 8px;
       padding: 16px 32px;
+      font-size: 16px;
       border: none;
       outline: none;
       color: #5B656D;
@@ -93,7 +94,7 @@
     background: #FFFFFF;
     box-shadow: 0 4px 24px rgba(48, 62, 73, 0.1);
     border-radius: 8px;
-    padding: 30px;
+    padding: 24px;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 24px;
@@ -116,7 +117,7 @@
   .text {
     font-size: 16px;
     line-height: 22px;
-    margin-bottom: 24px;
+    margin-bottom: 32px;
     color: #949BA0;
 
     &:last-child {

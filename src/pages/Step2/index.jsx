@@ -1,10 +1,11 @@
 import React from "react";
-import HeaderFull from "../../components/HeaderFull";
 import Paginator from "../../components/Paginator";
 import styles from "./styles.module.scss";
 import classNames from "classnames";
 import CheckBoxRS from "../../components/CheckBoxRS";
 import ButtonRS from "../../components/ButtonRS";
+import { useNavigate } from "react-router-dom";
+import HeaderMy from "../../components/HeaderMy";
 
 const IconLock = () => {
   return (
@@ -64,101 +65,109 @@ const InputLock = ({ name, value }) => {
 };
 
 const Step2 = () => {
-  return (
-    <div className={"container"}>
-      <HeaderFull />
-      <Paginator
-        activeStep={2}
-        style={{
-          marginTop: "64px",
-          marginBottom: "16px",
-        }}
-      />
-      <p className={styles.title}>Заполните анкету и прикрепите документы</p>
-      <div className={styles.company}>
-        <p className={styles.title_block}>Реквизиты компании</p>
-        <div className={styles.content}>
-          <div className={styles.column}>
-            <div className={styles.row}>
-              <InputLock
-                name={"Краткое наименование"}
-                value={"ООО «Ромашка»"}
-              />
-            </div>
-            <div className={styles.row}>
-              <InputLock
-                name={"Полное наименование"}
-                value={"Общество с ограниченной ответственностью «Ромашка»"}
-              />
-            </div>
-            <div className={styles.row}>
-              <InputLock name={"Дата регистрации"} value={"01.01.2022"} />
-              <InputLock name={"Дата внесения ОГРН"} value={"01.01.2022"} />
-            </div>
-          </div>
-          <div className={styles.column}>
-            <div className={styles.row}>
-              <InputLock name={"ИНН"} value={"12345677890"} />
-              <InputLock name={"КПП"} value={"12345677890"} />
-              <InputLock name={"ОГРН"} value={"12345677890"} />
-            </div>
-            <div className={styles.row}>
-              <InputLock
-                name={"Наименование регистрирующего органа"}
-                value={"ИНФНС №46 по г. Москва"}
-              />
-            </div>
-            <div className={styles.row}>
-              <InputLock name={"Основной ОКВЭД"} value={"123456778"} />
-              <InputLock name={"ОКТМО"} value={"123456778"} />
-            </div>
-          </div>
-        </div>
-      </div>
+  const navigate = useNavigate();
 
-      <div>
-        <p className={styles.title_block}>Адреса</p>
-        <div className={styles.content}>
-          <div className={styles.row}>
-            <div>
-              <p className={styles.name_option}>Адрес</p>
-              <div className={styles.checks}>
-                <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Юридический</p>
-                </div>
-                <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Фактический</p>
-                </div>
+  return (
+    <>
+      <HeaderMy />
+      <div className={"container"}>
+        <Paginator
+          activeStep={2}
+          style={{
+            marginTop: "105px",
+            marginBottom: "16px",
+          }}
+        />
+        <p className={styles.title}>Заполните анкету и прикрепите документы</p>
+        <div className={styles.company}>
+          <p className={styles.title_block}>Реквизиты компании</p>
+          <div className={styles.content}>
+            <div className={styles.column}>
+              <div className={styles.row}>
+                <InputLock
+                  name={"Краткое наименование"}
+                  value={"ООО «Ромашка»"}
+                />
+              </div>
+              <div className={styles.row}>
+                <InputLock
+                  name={"Полное наименование"}
+                  value={"Общество с ограниченной ответственностью «Ромашка»"}
+                />
+              </div>
+              <div className={styles.row}>
+                <InputLock name={"Дата регистрации"} value={"01.01.2022"} />
+                <InputLock name={"Дата внесения ОГРН"} value={"01.01.2022"} />
+              </div>
+            </div>
+            <div className={styles.column}>
+              <div className={styles.row}>
+                <InputLock name={"ИНН"} value={"12345677890"} />
+                <InputLock name={"КПП"} value={"12345677890"} />
+                <InputLock name={"ОГРН"} value={"12345677890"} />
+              </div>
+              <div className={styles.row}>
+                <InputLock
+                  name={"Наименование регистрирующего органа"}
+                  value={"ИНФНС №46 по г. Москва"}
+                />
+              </div>
+              <div className={styles.row}>
+                <InputLock name={"Основной ОКВЭД"} value={"123456778"} />
+                <InputLock name={"ОКТМО"} value={"123456778"} />
               </div>
             </div>
           </div>
         </div>
-        <div className={styles.content}>
-          <div className={styles.column}>
+
+        <div>
+          <p className={styles.title_block}>Адреса</p>
+          <div className={styles.content}>
             <div className={styles.row}>
-              <Input name={"Адрес"} placeholder={"Напишите адрес"} />
-            </div>
-            <div className={styles.row}>
-              <Input name={"Почтовый адрес"} placeholder={"Напишите адрес"} />
+              <div>
+                <p className={styles.name_option}>Адрес</p>
+                <div className={styles.checks}>
+                  <div className={styles.checks__item}>
+                    <CheckBoxRS />
+                    <p>Юридический</p>
+                  </div>
+                  <div className={styles.checks__item}>
+                    <CheckBoxRS />
+                    <p>Фактический</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div className={styles.column}>
-            <div className={styles.row}>
-              <Input name={"Основание"} placeholder={"Аренда"} />
+          <div className={styles.content}>
+            <div className={styles.column}>
+              <div className={styles.row}>
+                <Input name={"Адрес"} placeholder={"Напишите адрес"} />
+              </div>
+              <div className={styles.row}>
+                <Input name={"Почтовый адрес"} placeholder={"Напишите адрес"} />
+              </div>
             </div>
-            <div className={styles.row}>
-              <Input name={"Основание"} placeholder={"Аренда"} />
+            <div className={styles.column}>
+              <div className={styles.row}>
+                <Input name={"Основание"} placeholder={"Аренда"} />
+              </div>
+              <div className={styles.row}>
+                <Input name={"Основание"} placeholder={"Аренда"} />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div style={{ textAlign: "right", margin: "40px 0" }}>
-        <ButtonRS title={"Продолжить"} style={{ width: "auto" }} />
+        <div style={{ textAlign: "right", margin: "40px 0" }}>
+          <ButtonRS
+            title={"Продолжить"}
+            style={{ width: "auto" }}
+            onClick={() => navigate("/step3")}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -3,8 +3,11 @@ import styles from "./styles.module.scss";
 import CheckBoxRS from "../CheckBoxRS";
 import ButtonRS from "../ButtonRS";
 import InputRS from "../InputRS";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
+  let navigate = useNavigate();
+
   return (
     <div className={styles.form}>
       <div className={styles.form__header}>
@@ -53,7 +56,7 @@ const LoginForm = () => {
           <p className={styles.remember__text}>Запомнить</p>
         </div>
       </div>
-      <ButtonRS title={"Войти"} />
+      <ButtonRS title={"Войти"} onClick={() => navigate("/account")} />
     </div>
   );
 };
