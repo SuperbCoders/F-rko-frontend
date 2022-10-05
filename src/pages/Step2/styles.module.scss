@@ -1,0 +1,113 @@
+.title {
+  font-family: 'Geometria', sans-serif;
+  font-weight: 500;
+  font-size: 32px;
+  color: #0C0C0D;
+  margin-bottom: 64px;
+}
+
+.content {
+  display: flex;
+  justify-content: space-between;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  width: calc(50% - 12px);
+
+  & > * {
+    margin-bottom: 24px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .row {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+
+    & > * {
+      flex-grow: 1;
+      margin-right: 24px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+}
+
+.title_block {
+  text-transform: uppercase;
+  color: #323E48;
+  margin-bottom: 24px;
+}
+
+.company{
+  margin-bottom: 64px;
+}
+
+.input {
+  border: 1px solid #D6D8DA;
+  width: 100%;
+  outline: none;
+  padding: 16px;
+  border-radius: 8px;
+
+  &::placeholder {
+    color: #8E909B;
+  }
+
+  &__wrapper {
+    position: relative;
+
+    .name {
+      color: #8E909B;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+
+    .lock {
+      position: absolute;
+      top: 39px;
+      right: 16px;
+    }
+  }
+
+  &.locked {
+    border: none;
+    background: #F3F4F4;
+    color: #323E48;
+  }
+}
+
+.name_option {
+  color: #8E909B;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.checks {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    margin-right: 24px;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    p {
+      margin-left: 8px;
+      color: #323E48;
+    }
+  }
+}
