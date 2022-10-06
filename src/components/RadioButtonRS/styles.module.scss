@@ -1,0 +1,29 @@
+@import "./src/helpers/colors";
+
+.radio {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #fff;
+  position: relative;
+  border: 2px solid #D31B69;
+  cursor: pointer;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    background-color: #fff;
+    border-radius: 50%;
+    height: 12px;
+    width: 12px;
+  }
+
+  &.active {
+    &::before {
+      background-color: #D31B69;
+    }
+  }
+}
