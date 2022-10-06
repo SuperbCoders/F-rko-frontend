@@ -21,12 +21,11 @@ const HeaderMy = () => {
       <div className={styles.header__right}>
         <a
           className={classNames(styles.text, styles.phone)}
-          href="tel:8-800-900-90-02"
           onClick={() => navigate("/account")}
         >
           +7 903 123-45-67
         </a>
-        <button className={styles.button} onClick={() => navigate("/ ")}>
+        <button className={styles.button} onClick={() => navigate("/")}>
           <svg
             width="24"
             height="24"
