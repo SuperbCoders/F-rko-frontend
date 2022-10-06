@@ -6,6 +6,7 @@ import CheckBoxRS from "../../components/CheckBoxRS";
 import ButtonRS from "../../components/ButtonRS";
 import { useNavigate } from "react-router-dom";
 import HeaderMy from "../../components/HeaderMy";
+import YesOrNo from "../../components/YesOrNo";
 
 const IconLock = () => {
   return (
@@ -138,26 +139,125 @@ const Step2 = () => {
                 </div>
               </div>
             </div>
-          </div>
-          <div className={styles.content}>
-            <div className={styles.column}>
-              <div className={styles.row}>
-                <Input name={"Адрес"} placeholder={"Напишите адрес"} />
+            <div className={styles.row}>
+              <div className={styles.column}>
+                <div className={styles.row}>
+                  <Input name={"Адрес"} placeholder={"Напишите адрес"} />
+                </div>
               </div>
-              <div className={styles.row}>
-                <Input name={"Почтовый адрес"} placeholder={"Напишите адрес"} />
+              <div className={styles.column}>
+                <div className={styles.row}>
+                  <Input name={"Основание"} placeholder={"Аренда"} />
+                </div>
               </div>
             </div>
-            <div className={styles.column}>
-              <div className={styles.row}>
-                <Input name={"Основание"} placeholder={"Аренда"} />
+            <div className={styles.row}>
+              <div>
+                <p className={styles.name_option}>Адрес</p>
+                <div className={styles.checks}>
+                  <div className={styles.checks__item}>
+                    <CheckBoxRS />
+                    <p>Юридический</p>
+                  </div>
+                  <div className={styles.checks__item}>
+                    <CheckBoxRS />
+                    <p>Фактический</p>
+                  </div>
+                </div>
               </div>
-              <div className={styles.row}>
-                <Input name={"Основание"} placeholder={"Аренда"} />
+            </div>
+            <div className={styles.row}>
+              <div className={styles.column}>
+                <div className={styles.row}>
+                  <Input name={"Адрес"} placeholder={"Напишите адрес"} />
+                </div>
+              </div>
+              <div className={styles.column}>
+                <div className={styles.row}>
+                  <Input name={"Основание"} placeholder={"Аренда"} />
+                </div>
+              </div>
+            </div>
+            <div className={styles.row}>
+              <div className={styles.column}>
+                <div className={styles.row}>
+                  <Input
+                    name={"Почтовый адрес"}
+                    placeholder={"Напишите адрес"}
+                  />
+                </div>
+              </div>
+              <div className={styles.column}>
+                <div className={styles.row}>
+                  <Input name={"Основание"} placeholder={"Аренда"} />
+                </div>
               </div>
             </div>
           </div>
         </div>
+
+        <div>
+          <p className={styles.title_block}>Структура органов управления</p>
+          <div className={styles.content}>
+            <div className={styles.row}>
+              <Input
+                name={"Выберете из списка"}
+                placeholder={
+                  "Единственный участник (один учатник с должей 100%) "
+                }
+              />
+            </div>
+            <div className={styles.row}>
+              <Input name={"Руководитель"} placeholder={"Руководитель"} />
+              <Input
+                name={"ИНН"}
+                placeholder={"Введите ИНН или название компании"}
+              />
+            </div>
+            <div className={styles.row}>
+              <div className={styles.column}>
+                <Input
+                  name={"Наименование наблюдательного совета "}
+                  placeholder={"Наименование"}
+                />
+              </div>
+            </div>
+            <div className={styles.row}>
+              <div className={styles.column}>
+                <Input
+                  name={"Наименование коллегиального исполнительного органа"}
+                  placeholder={"Наименование"}
+                />
+              </div>
+            </div>
+            <div className={styles.row}>
+              <div className={styles.column}>
+                <Input
+                  name={"Члены коллегиального исполнительного органа - ФЛ"}
+                  placeholder={"Укажите Физ. Лицо"}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p className={styles.title_block}>Сведения о персонале</p>
+          <div className={styles.content}>
+            <div className={styles.row}>
+              <Input
+                name={"Численность персонала"}
+                placeholder={"Напишите значение"}
+              />
+              <Input
+                name={"Задолженность по з/п"}
+                placeholder={"Укажите сумму"}
+              />
+            </div>
+          </div>
+        </div>
+
+        <YesOrNo />
 
         <div style={{ textAlign: "right", margin: "40px 0" }}>
           <ButtonRS

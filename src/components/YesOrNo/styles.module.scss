@@ -1,0 +1,35 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.item {
+  background: #F0F2F5;
+  font-size: 16px;
+  color: #323E48;
+  font-weight: 500;
+  padding: 16px 24px;
+  transition: .25s;
+  cursor: pointer;
+
+  &.active {
+    color: #fff;
+    background: #D41367;
+
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  &:hover {
+    color: #D41367;
+  }
+
+  &:first-of-type {
+    border-radius: 8px 0 0 8px;
+  }
+
+  &:last-of-type {
+    border-radius: 0 8px 8px 0;
+  }
+}

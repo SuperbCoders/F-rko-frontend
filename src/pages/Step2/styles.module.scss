@@ -8,13 +8,14 @@
 
 .content {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
 }
 
 .column {
   display: flex;
   flex-direction: column;
-  width: calc(50% - 12px);
+  max-width: calc(50% - 12px);
 
   & > * {
     margin-bottom: 24px;
@@ -23,19 +24,22 @@
       margin-bottom: 0;
     }
   }
+}
 
-  .row {
-    display: flex;
-    align-items: stretch;
-    width: 100%;
+.row {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  flex-grow: 1;
 
-    & > * {
-      flex-grow: 1;
-      margin-right: 24px;
+  & > * {
+    flex-grow: 1;
+    margin-right: 24px;
+    margin-bottom: 24px;
 
-      &:last-child {
-        margin-right: 0;
-      }
+    &:last-child {
+      margin-bottom: 0;
+      margin-right: 0;
     }
   }
 }
