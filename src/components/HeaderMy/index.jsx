@@ -2,8 +2,11 @@ import React from "react";
 import logo from "./../../assets/img/logo.svg";
 import styles from "./styles.module.scss";
 import classNames from "classnames";
+import { useNavigate } from "react-router-dom";
 
 const HeaderMy = () => {
+  const navigate = useNavigate();
+
   return (
     <div className={styles.header}>
       <div className={styles.header__left}>
@@ -19,10 +22,11 @@ const HeaderMy = () => {
         <a
           className={classNames(styles.text, styles.phone)}
           href="tel:8-800-900-90-02"
+          onClick={() => navigate("/account")}
         >
           +7 903 123-45-67
         </a>
-        <button className={styles.button}>
+        <button className={styles.button} onClick={() => navigate("/ ")}>
           <svg
             width="24"
             height="24"

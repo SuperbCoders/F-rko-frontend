@@ -13,11 +13,11 @@ const Account = () => {
       <div className="container">
         <div className={styles.account}>
           <div className={styles.aside}>
-            <div
-              className={styles.aside__menu}
-              onClick={() => navigate("/step1")}
-            >
-              <p className={classNames(styles.item, styles.active)}>
+            <div className={styles.aside__menu}>
+              <p
+                className={classNames(styles.item, styles.active)}
+                onClick={() => navigate("/step1")}
+              >
                 Добавить заявку
               </p>
               <p className={styles.item}>Клиенты</p>
