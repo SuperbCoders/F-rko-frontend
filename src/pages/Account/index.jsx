@@ -13,7 +13,10 @@ const Account = () => {
       <div className="container">
         <div className={styles.account}>
           <div className={styles.aside}>
-            <div className={styles.aside__menu}>
+            <div
+              className={styles.aside__menu}
+              onClick={() => navigate("/step1")}
+            >
               <p className={classNames(styles.item, styles.active)}>
                 Добавить заявку
               </p>
@@ -43,10 +46,7 @@ const Account = () => {
               </div>
             </div>
             <div className={styles.bids}>
-              <div
-                onClick={() => navigate("/step1")}
-                className={styles.bids__item}
-              >
+              <div className={styles.bids__item}>
                 <div className={styles.content}>
                   <div className={styles.left}>
                     <p className={styles.title}>
@@ -108,10 +108,7 @@ const Account = () => {
                   </svg>
                 </div>
               </div>
-              <div
-                onClick={() => navigate("/step1")}
-                className={styles.bids__item}
-              >
+              <div className={styles.bids__item}>
                 <div className={styles.content}>
                   <div className={styles.left}>
                     <p className={styles.title}>
@@ -173,10 +170,7 @@ const Account = () => {
                   </svg>
                 </div>
               </div>
-              <div
-                onClick={() => navigate("/step1")}
-                className={styles.bids__item}
-              >
+              <div className={styles.bids__item}>
                 <div className={styles.content}>
                   <div className={styles.left}>
                     <p className={styles.title}>

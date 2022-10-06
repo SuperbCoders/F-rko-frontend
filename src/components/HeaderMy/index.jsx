@@ -20,7 +20,7 @@ const HeaderMy = () => {
           className={classNames(styles.text, styles.phone)}
           href="tel:8-800-900-90-02"
         >
-          8-800-900-90-02
+          +7 903 123-45-67
         </a>
         <button className={styles.button}>
           <svg

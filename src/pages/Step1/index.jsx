@@ -95,6 +95,7 @@ const Step1 = () => {
                   view={"ghost"}
                   title={"Отказаться"}
                   style={{ maxWidth: "152px" }}
+                  onClick={() => navigate("/account")}
                 />
                 <ButtonRS
                   title={"Продолжить"}
