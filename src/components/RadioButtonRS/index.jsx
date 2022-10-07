@@ -1,14 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import styles from "./styles.module.scss";
 import classNames from "classnames";
 
-const RadioButtonRS = ({ ...props }) => {
-  const [isActive, setActive] = useState(false);
-
+const RadioButtonRS = ({ isActive, handleClick, ...props }) => {
   return (
     <div
       className={classNames(styles.radio, isActive && styles.active)}
-      onClick={() => setActive((prevState) => !prevState)}
+      onClick={handleClick}
       {...props}
     />
   );

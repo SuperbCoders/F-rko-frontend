@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
+import styles from "../../pages/Step2/styles.module.scss";
+import { getFormatFile, getSizeMb } from "../../helpers";
 
 const DragDropFile = () => {
-  // drag state
   const [dragActive, setDragActive] = React.useState(false);
-  // ref
   const inputRef = React.useRef(null);
+  const [documentList, setDocumentList] = useState([]);
 
   // handle drag events
   const handleDrag = function (e) {
@@ -17,22 +18,24 @@ const DragDropFile = () => {
     }
   };
 
+  const addToDocumentList = (file) => {
+    if (documentList.length > 4) return;
+    setDocumentList((prevState) => [...documentList, file]);
+  };
+
   // triggers when file is dropped
   const handleDrop = function (e) {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      // handleFiles(e.dataTransfer.files);
+    if (e.dataTransfer?.files[0]) {
+      addToDocumentList(e.dataTransfer.files[0]);
     }
   };
 
   // triggers when file is selected with click
   const handleChange = function (e) {
-    e.preventDefault();
-    if (e.target.files && e.target.files[0]) {
-      // handleFiles(e.target.files);
-    }
+    if (e.target?.files[0]) addToDocumentList(e.target.files[0]);
   };
 
   // triggers the input when the button is clicked
@@ -42,33 +45,52 @@ const DragDropFile = () => {
 
   return (
     <form
-      id="form-file-upload"
+      className="form-file-upload"
       onDragEnter={handleDrag}
+      onClick={onButtonClick}
       onSubmit={(e) => e.preventDefault()}
     >
       <input
         ref={inputRef}
         type="file"
-        id="input-file-upload"
+        className="input-file-upload"
         multiple={true}
         onChange={handleChange}
       />
-      <label
-        id="label-file-upload"
-        htmlFor="input-file-upload"
-        className={dragActive ? "drag-active" : ""}
-      >
-        <div>
-          <p>Перетащите файлы сюда или нажмите,</p>
-          <button className="upload-button" onClick={onButtonClick}>
-            чтобы выбрать файлы для загрузки
-          </button>
-          <p>до 5 файлов или 20мб</p>
-        </div>
+
+      <label className={`${dragActive ? "drag-active" : ""} label-file-upload`}>
+        {documentList.length > 0 ? (
+          <div className={styles.documents}>
+            {documentList.map((document) => {
+              return (
+                <div className={styles.mb24}>
+                  <div className={styles.download__item}>
+                    <div className={styles.icon}>
+                      <p className={styles.format}>
+                        {getFormatFile(document.name)}
+                      </p>
+                      <p className={styles.size}>{getSizeMb(document.size)}</p>
+                    </div>
+                    <p className={styles.name}>{document.name}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div>
+            <p>Перетащите файлы сюда или нажмите,</p>
+            <button className="upload-button">
+              чтобы выбрать файлы для загрузки
+            </button>
+            <p>до 5 файлов или 20мб</p>
+          </div>
+        )}
       </label>
+
       {dragActive && (
         <div
-          id="drag-file-element"
+          className="drag-file-element"
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
           onDragOver={handleDrag}

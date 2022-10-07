@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Paginator from "../../components/Paginator";
 import InputRS from "../../components/InputRS";
 import styles from "./styles.module.scss";
@@ -10,6 +10,10 @@ import HeaderMy from "../../components/HeaderMy";
 
 const Step1 = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <>

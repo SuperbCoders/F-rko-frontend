@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import styles from "./styles.module.scss";
 import classNames from "classnames";
 
-const YesOrNo = () => {
+const YesOrNo = ({ defaultValue, handleChange }) => {
   const [list, setList] = useState([
     { id: 1, value: "Да" },
     { id: 2, value: "Нет" },
   ]);
-  const [active, setActive] = useState();
+  const [active, setActive] = useState(defaultValue ? 1 : 2);
 
   return (
     <div className={styles.wrapper}>
@@ -17,6 +17,7 @@ const YesOrNo = () => {
             key={item.id}
             onClick={() => {
               setActive(item.id);
+              handleChange(item.id === 1);
             }}
             className={classNames(
               styles.item,

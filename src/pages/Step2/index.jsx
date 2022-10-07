@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Paginator from "../../components/Paginator";
 import styles from "./styles.module.scss";
 import classNames from "classnames";
@@ -8,12 +8,35 @@ import { useNavigate } from "react-router-dom";
 import HeaderMy from "../../components/HeaderMy";
 import YesOrNo from "../../components/YesOrNo";
 import RadioButtonRS from "../../components/RadioButtonRS";
-import Select from "react-select";
-import DragDropFile from "../../components/DragAndDrop";
+import AddressItem from "../../components/Step2Components/AdressItem";
+import Input from "../../components/Step2Components/Input";
+import SelectRS from "../../components/Step2Components/SelectRS";
+import { getFormatFile, getSizeMb } from "../../helpers";
+import DateInput from "../../components/Step2Components/DateInput";
+import DocumentItem from "../DocumentItem";
+import ScanOrPhoto from "../../components/Step2Components/ScanOrPhoto";
 
-const DownloadButton = () => {
+const DownloadButton = ({ addFile }) => {
+  const refInput = useRef();
+
   return (
-    <button className={styles.button_add}>
+    <button
+      className={styles.button_add}
+      onClick={() => refInput.current.click()}
+    >
+      <input
+        ref={refInput}
+        type={"file"}
+        style={{
+          height: 0,
+          width: 0,
+        }}
+        onChange={(e) => {
+          if (e.target.files[0]) {
+            addFile(e.target.files[0]);
+          }
+        }}
+      />
       <p>Загрузить документ</p>
       <span className={styles.icon}>
         <svg
@@ -36,9 +59,9 @@ const DownloadButton = () => {
   );
 };
 
-const AddButton = () => {
+const AddButton = ({ ...props }) => {
   return (
-    <button className={styles.button_add}>
+    <button className={styles.button_add} {...props}>
       <p>Добавить</p>
       <span className={styles.icon}>
         <svg
@@ -75,9 +98,9 @@ const AddButton = () => {
   );
 };
 
-const DeleteButton = () => {
+const DeleteButton = ({ ...props }) => {
   return (
-    <div className={styles.delete_button}>
+    <div className={styles.delete_button} {...props}>
       <div className={styles.icon}>
         <svg
           width="24"
@@ -148,23 +171,6 @@ const IconLock = () => {
   );
 };
 
-const Input = ({ name, rightElement = null, value = "", placeholder }) => {
-  return (
-    <div className={styles.input__wrapper}>
-      {rightElement ? (
-        <span className={styles.icon}>{rightElement}</span>
-      ) : null}
-      <p className={styles.name}>{name}</p>
-      <input
-        type="text"
-        placeholder={placeholder}
-        value={value}
-        className={classNames(styles.input)}
-      />
-    </div>
-  );
-};
-
 const InputLock = ({ name, value }) => {
   return (
     <div className={styles.input__wrapper}>
@@ -181,70 +187,53 @@ const InputLock = ({ name, value }) => {
   );
 };
 
-const SelectRS = ({ name, backgroundColor, ...props }) => {
-  const options = [
-    { value: "test1", label: "Тестовое значение #1" },
-    { value: "test2", label: "Тестовое значение #2" },
-    { value: "test3", label: "Тестовое значение #3" },
-  ];
-
-  return (
-    <div className={styles.input__wrapper}>
-      <p className={styles.name}>{name}</p>
-      <Select
-        noOptionsMessage={({ inputValue }) => "Нет результатов"}
-        styles={{
-          placeholder: (provided) => ({
-            ...provided,
-            color: "#c8c8c8",
-          }),
-          indicatorSeparator: () => ({
-            display: "none",
-          }),
-          control: (provided, state) => ({
-            ...provided,
-            borderColor: backgroundColor ? backgroundColor : "#D6D8DA",
-            borderRadius: "8px",
-            backgroundColor,
-            boxShadow: "none",
-            "&:hover": {
-              borderColor: "#D6D8DA",
-            },
-          }),
-          valueContainer: (provided) => ({
-            ...provided,
-            fontSize: "14px",
-            padding: "12px 16px",
-          }),
-        }}
-        options={options}
-        {...props}
-      />
-    </div>
-  );
-};
-
-const ScanOrPhoto = ({ name }) => {
-  return (
-    <div className={styles.mb24}>
-      <p className={styles.scan__name}>{name}</p>
-      <div className={styles.scan__wrapper}>
-        <DragDropFile />
-        <p className={styles.scan__or}>или</p>
-        <div className={styles.scan__right}>
-          <div className={styles.qr} />
-          <p>
-            Наведите камеру телефона на QR код,
-            <br /> чтобы сфотографироваться
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const Step2 = () => {
   const navigate = useNavigate();
+  const [addressList, setAddressList] = useState([{}, {}]);
+  const [documentList, setDocumentList] = useState([{}]);
+  const [collegialExecutiveBody, setCollegialExecutiveBody] = useState(false);
+  const [supervisoryBoard, setSupervisoryBoard] = useState(false);
+  const [gender, setGender] = useState("");
+  const [basisBeneficialOwner, setBasisBeneficialOwner] = useState("");
+  const [addressActualResidence, setAddressActualResidence] = useState("");
+  const [mailingAddress, setMailingAddress] = useState("");
+  const [firstPagePassport, setFirstPagePassport] = useState(null);
+  const [infoAboutMoney, setInfoAboutMoney] = useState({
+    numberNoncashTransactions: "",
+    numberNoncashMoney: "",
+    numberCashTransactions: "",
+    numberCashMoney: "",
+    numberTradeTransactions: "",
+    countHumans: "",
+  });
+
+  const addToAddressList = () => {
+    setAddressList((prevState) => [...prevState, {}]);
+  };
+
+  const removeFromAddressList = () => {
+    const copyState = [...addressList];
+    copyState.pop();
+    setAddressList(copyState);
+  };
+
+  const addToDocumentList = () => {
+    setDocumentList((prevState) => [...prevState, {}]);
+  };
+
+  const removeFromDocumentList = () => {
+    const copyState = [...documentList];
+    copyState.pop();
+    setDocumentList(copyState);
+  };
+
+  const setInfo = (propName, value) => {
+    setInfoAboutMoney((prevState) => ({ ...prevState, [propName]: value }));
+  };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <>
@@ -298,67 +287,15 @@ const Step2 = () => {
             </div>
           </div>
         </div>
-
-        <div>
+        <div className={styles.mb64}>
           <p className={styles.title_block}>Адреса</p>
           <div className={styles.content}>
-            <div className={styles.row}>
-              <div>
-                <p className={styles.name_option}>Адрес</p>
-                <div className={styles.checks}>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS />
-                    <p>Юридический</p>
-                  </div>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS />
-                    <p>Фактический</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className={styles.row}>
-              <div className={styles.column}>
-                <div className={styles.row}>
-                  <Input name={"Адрес"} placeholder={"Напишите адрес"} />
-                </div>
-              </div>
-              <div className={styles.column}>
-                <div className={styles.row}>
-                  <SelectRS name={"Основание"} placeholder={"Аренда"} />
-                </div>
-              </div>
-            </div>
-            <div className={styles.row}>
-              <div>
-                <p className={styles.name_option}>Адрес</p>
-                <div className={styles.checks}>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS />
-                    <p>Юридический</p>
-                  </div>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS />
-                    <p>Фактический</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className={styles.row}>
-              <div className={styles.column}>
-                <div className={styles.row}>
-                  <Input name={"Адрес"} placeholder={"Напишите адрес"} />
-                </div>
-              </div>
-              <div className={styles.column}>
-                <div className={styles.row}>
-                  <SelectRS name={"Основание"} placeholder={"Аренда"} />
-                </div>
-              </div>
-            </div>
+            {addressList.map(() => (
+              <AddressItem />
+            ))}
             <div className={styles.buttons}>
-              <AddButton />
-              <DeleteButton />
+              <AddButton onClick={addToAddressList} />
+              <DeleteButton onClick={removeFromAddressList} />
             </div>
             <div className={styles.row}>
               <div className={styles.column}>
@@ -377,7 +314,6 @@ const Step2 = () => {
             </div>
           </div>
         </div>
-
         <div className={styles.mb40}>
           <p className={styles.title_block}>Структура органов управления</p>
           <div className={styles.content}>
@@ -400,34 +336,45 @@ const Step2 = () => {
                 />
               </div>
             </div>
-            <div className={styles.mb24}>
+            <div className={styles.mb24} style={{ width: "100%" }}>
               <p className={styles.option_title}>
                 Наличие наблюдательного совета
               </p>
-              <YesOrNo />
+              <YesOrNo
+                defaultValue={supervisoryBoard}
+                handleChange={setSupervisoryBoard}
+              />
             </div>
-            <div className={styles.row}>
-              <div className={styles.column}>
-                <Input
-                  name={"Наименование наблюдательного совета "}
-                  placeholder={"Наименование"}
-                />
+            {supervisoryBoard && (
+              <div className={styles.row}>
+                <div className={styles.column}>
+                  <Input
+                    name={"Наименование наблюдательного совета "}
+                    placeholder={"Наименование"}
+                  />
+                </div>
               </div>
-            </div>
-            <div className={styles.mb24}>
+            )}
+            <div className={styles.mb24} style={{ width: "100%" }}>
               <p className={styles.option_title}>
                 Наличие коллегиального исполнительного органа
               </p>
-              <YesOrNo />
+              <YesOrNo
+                defaultValue={collegialExecutiveBody}
+                handleChange={setCollegialExecutiveBody}
+              />
             </div>
-            <div className={styles.row}>
-              <div className={styles.column}>
-                <Input
-                  name={"Наименование коллегиального исполнительного органа"}
-                  placeholder={"Наименование"}
-                />
+            {collegialExecutiveBody && (
+              <div className={styles.row}>
+                <div className={styles.column}>
+                  <Input
+                    name={"Наименование коллегиального исполнительного органа"}
+                    placeholder={"Наименование"}
+                  />
+                </div>
               </div>
-            </div>
+            )}
+
             <div className={styles.row}>
               <div className={styles.column}>
                 <Input
@@ -438,7 +385,6 @@ const Step2 = () => {
             </div>
           </div>
         </div>
-
         <div className={styles.mb40}>
           <p className={styles.title_block}>Сведения о персонале</p>
           <div className={styles.content}>
@@ -493,11 +439,17 @@ const Step2 = () => {
             <div className={styles.checks}>
               <p className={styles.checks__item}>Пол</p>
               <div className={styles.checks__item}>
-                <RadioButtonRS />
+                <RadioButtonRS
+                  isActive={gender === "man"}
+                  handleClick={() => setGender("man")}
+                />
                 <p>Мужской</p>
               </div>
               <div className={styles.checks__item}>
-                <RadioButtonRS />
+                <RadioButtonRS
+                  isActive={gender === "woman"}
+                  handleClick={() => setGender("woman")}
+                />
                 <p>Женский</p>
               </div>
             </div>
@@ -518,11 +470,17 @@ const Step2 = () => {
                 Основание для признания бенефициарным владельцем
               </p>
               <div className={styles.checks__item}>
-                <RadioButtonRS />
+                <RadioButtonRS
+                  isActive={basisBeneficialOwner === "xxx"}
+                  handleClick={() => setBasisBeneficialOwner("xxx")}
+                />
                 <p>xxxxxxx</p>
               </div>
               <div className={styles.checks__item}>
-                <RadioButtonRS />
+                <RadioButtonRS
+                  isActive={basisBeneficialOwner === "yyy"}
+                  handleClick={() => setBasisBeneficialOwner("yyy")}
+                />
                 <p>xxxxxxx</p>
               </div>
             </div>
@@ -556,11 +514,17 @@ const Step2 = () => {
               <p className={styles.mb24}>Адрес фактического проживания</p>
               <div className={styles.row}>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={addressActualResidence === "yes"}
+                    handleClick={() => setAddressActualResidence("yes")}
+                  />
                   <p>Совпадает с адресом регистрации</p>
                 </div>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={addressActualResidence === "no"}
+                    handleClick={() => setAddressActualResidence("no")}
+                  />
                   <p>Не совпадает с адресом регистрации</p>
                 </div>
               </div>
@@ -577,45 +541,62 @@ const Step2 = () => {
               <p className={styles.mb24}>Почтовый адрес</p>
               <div className={styles.checks}>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={mailingAddress === "register"}
+                    handleClick={() => setMailingAddress("register")}
+                  />
                   <p>Совпадает с адресом регистрации</p>
                 </div>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={mailingAddress === "live"}
+                    handleClick={() => setMailingAddress("live")}
+                  />
                   <p>Совпадает с адресом проживания</p>
                 </div>
               </div>
             </div>
             <div className={styles.row}>
               <div className={styles.checks__item}>
-                <RadioButtonRS />
+                <RadioButtonRS
+                  isActive={mailingAddress === "no"}
+                  handleClick={() => setMailingAddress("no")}
+                />
                 <p>Не совпадает с адресом регистрации и адресом проживания</p>
               </div>
             </div>
-            <div className={classNames(styles.row, "bg-grey")}>
-              <div className={styles.column}>
-                <Input
-                  name={"Адрес фактического проживания"}
-                  placeholder={"Введите адрес"}
-                />
-              </div>
-            </div>
-            <div className={styles.mb24}>
-              <p className={styles.mb24}>Загрузить первую страницу паспорта</p>
-              <div className={styles.mb24}>
-                <div className={styles.download__item}>
-                  <div className={styles.icon}>
-                    <p className={styles.format}>PDF</p>
-                    <p className={styles.size}>12 Мб</p>
-                  </div>
-                  <p className={styles.name}>Название файла</p>
+            {mailingAddress === "no" && (
+              <div className={classNames(styles.row, "bg-grey")}>
+                <div className={styles.column}>
+                  <Input
+                    name={"Адрес фактического проживания"}
+                    placeholder={"Введите адрес"}
+                  />
                 </div>
               </div>
-              <DownloadButton />
+            )}
+            <div className={styles.mb24}>
+              <p className={styles.mb24}>Загрузить первую страницу паспорта</p>
+              {firstPagePassport && (
+                <div className={styles.mb24}>
+                  <div className={styles.download__item}>
+                    <div className={styles.icon}>
+                      <p className={styles.format}>
+                        {getFormatFile(firstPagePassport.name)}
+                      </p>
+                      <p className={styles.size}>
+                        {getSizeMb(firstPagePassport.size)}
+                      </p>
+                    </div>
+                    <p className={styles.name}>{firstPagePassport.name}</p>
+                  </div>
+                </div>
+              )}
+              <DownloadButton addFile={setFirstPagePassport} />
             </div>
             <div className={classNames(styles.row, "bg-grey", "form")}>
               <Input name={"Место рождения"} placeholder={"Введите адрес"} />
-              <Input name={"Введите адрес"} placeholder={"Дата"} />
+              <DateInput name={"Дата рождения"} />
               <SelectRS
                 name={"Тип документа, удостоверяющего личность"}
                 placeholder={"Выберите тип"}
@@ -638,8 +619,8 @@ const Step2 = () => {
                 name={"Код подразделения (при наличии)"}
                 placeholder={"Введите код"}
               />
-              <Input name={"Дата выдачи"} placeholder={"Дата"} />
-              <Input name={"Срок действия"} placeholder={"Дата"} />
+              <DateInput name={"Дата выдачи"} />
+              <DateInput name={"Срок действия"} />
             </div>
           </div>
         </div>
@@ -650,33 +631,12 @@ const Step2 = () => {
             <br />
             лица без гражданства на пребывание (проживание) в РФ
           </p>
-          <div className={classNames(styles.row, "bg-grey", "form")}>
-            <SelectRS
-              name={"Тип документа"}
-              placeholder={"Выберите тип"}
-              backgroundColor={"#F0F2F5"}
-            />
-            <Input
-              name={"Серия (если имеется)"}
-              placeholder={"Введите серию"}
-            />
-            <Input name={"Номер"} placeholder={"Введите номер"} />
-          </div>
-          <div className={classNames(styles.row, "bg-grey", "form")}>
-            <Input
-              name={"Дата начала срока действия права пребывания (проживания)"}
-              placeholder={"Дата"}
-            />
-            <Input
-              name={
-                "Дата окончания срока действия права пребывания (проживания)"
-              }
-              placeholder={"Дата"}
-            />
-          </div>
+          {documentList.map(() => (
+            <DocumentItem />
+          ))}
           <div className={styles.buttons}>
-            <DeleteButton />
-            <AddButton />
+            <DeleteButton onClick={removeFromDocumentList} />
+            <AddButton onClick={addToDocumentList} />
           </div>
         </div>
 
@@ -795,15 +755,36 @@ const Step2 = () => {
             <div className={styles.row}>
               <div className={styles.checks}>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={
+                      infoAboutMoney.numberNoncashTransactions === "0-29"
+                    }
+                    handleClick={() =>
+                      setInfo("numberNoncashTransactions", "0-29")
+                    }
+                  />
                   <p>0-29</p>
                 </div>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={
+                      infoAboutMoney.numberNoncashTransactions === "30-100"
+                    }
+                    handleClick={() =>
+                      setInfo("numberNoncashTransactions", "30-100")
+                    }
+                  />
                   <p>30-100</p>
                 </div>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={
+                      infoAboutMoney.numberNoncashTransactions === ">100"
+                    }
+                    handleClick={() =>
+                      setInfo("numberNoncashTransactions", ">100")
+                    }
+                  />
                   <p>более 100</p>
                 </div>
               </div>
@@ -816,15 +797,28 @@ const Step2 = () => {
             <div className={styles.row}>
               <div className={styles.checks}>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={infoAboutMoney.numberNoncashMoney === "0 - 99"}
+                    handleClick={() => setInfo("numberNoncashMoney", "0 - 99")}
+                  />
                   <p>0 - 99 000 руб.</p>
                 </div>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={
+                      infoAboutMoney.numberNoncashMoney === "100000-1000000"
+                    }
+                    handleClick={() =>
+                      setInfo("numberNoncashMoney", "100000-1000000")
+                    }
+                  />
                   <p>100 000 - 1 000 000 руб.</p>
                 </div>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={infoAboutMoney.numberNoncashMoney === "1000000"}
+                    handleClick={() => setInfo("numberNoncashMoney", "1000000")}
+                  />
                   <p>более 1 000 000 руб.</p>
                 </div>
               </div>
@@ -837,15 +831,32 @@ const Step2 = () => {
             <div className={styles.row}>
               <div className={styles.checks}>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={infoAboutMoney.numberCashTransactions === "0-29"}
+                    handleClick={() =>
+                      setInfo("numberCashTransactions", "0-29")
+                    }
+                  />
                   <p>0-29</p>
                 </div>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={
+                      infoAboutMoney.numberCashTransactions === "30-100"
+                    }
+                    handleClick={() =>
+                      setInfo("numberCashTransactions", "30-100")
+                    }
+                  />
                   <p>30-100</p>
                 </div>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={infoAboutMoney.numberCashTransactions === ">100"}
+                    handleClick={() =>
+                      setInfo("numberCashTransactions", ">100")
+                    }
+                  />
                   <p>более 100</p>
                 </div>
               </div>
@@ -858,15 +869,28 @@ const Step2 = () => {
             <div className={styles.row}>
               <div className={styles.checks}>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={infoAboutMoney.numberCashMoney === "0 - 99 000"}
+                    handleClick={() => setInfo("numberCashMoney", "0 - 99 000")}
+                  />
                   <p>0 - 99 000 руб.</p>
                 </div>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={
+                      infoAboutMoney.numberCashMoney === "100 000 - 1 000 000"
+                    }
+                    handleClick={() =>
+                      setInfo("numberCashMoney", "100 000 - 1 000 000")
+                    }
+                  />
                   <p>100 000 - 1 000 000 руб.</p>
                 </div>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={infoAboutMoney.numberCashMoney === ">1 000 000"}
+                    handleClick={() => setInfo("numberCashMoney", ">1 000 000")}
+                  />
                   <p>более 1 000 000 руб.</p>
                 </div>
               </div>
@@ -879,15 +903,32 @@ const Step2 = () => {
             <div className={styles.row}>
               <div className={styles.checks}>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={infoAboutMoney.numberTradeTransactions === "0-29"}
+                    handleClick={() =>
+                      setInfo("numberTradeTransactions", "0-29")
+                    }
+                  />
                   <p>0-29</p>
                 </div>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={
+                      infoAboutMoney.numberTradeTransactions === "30-100"
+                    }
+                    handleClick={() =>
+                      setInfo("numberTradeTransactions", "30-100")
+                    }
+                  />
                   <p>30-100</p>
                 </div>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={infoAboutMoney.numberTradeTransactions === ">100"}
+                    handleClick={() =>
+                      setInfo("numberTradeTransactions", ">100")
+                    }
+                  />
                   <p>более 100</p>
                 </div>
               </div>
@@ -932,15 +973,24 @@ const Step2 = () => {
             <div className={styles.row}>
               <div className={styles.checks}>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={infoAboutMoney.countHumans === "0-29"}
+                    handleClick={() => setInfo("countHumans", "0-29")}
+                  />
                   <p>0-29</p>
                 </div>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={infoAboutMoney.countHumans === "30-100"}
+                    handleClick={() => setInfo("countHumans", "30-100")}
+                  />
                   <p>30-100</p>
                 </div>
                 <div className={styles.checks__item}>
-                  <RadioButtonRS />
+                  <RadioButtonRS
+                    isActive={infoAboutMoney.countHumans === ">100"}
+                    handleClick={() => setInfo("countHumans", ">100")}
+                  />
                   <p>более 100</p>
                 </div>
               </div>
@@ -1031,17 +1081,16 @@ const Step2 = () => {
               "Документы, подтверждающие законное право ЕИО - физ.лица, не являющегося гражданином РФ, на нахождение / пребывание на территории РФ (Миграционная карта, вид на жительство и иные документы подтверждающие такое право\n"
             }
           />
-
           <ScanOrPhoto name={"Прочие документы"} />
         </div>
-      </div>
 
-      <div style={{ textAlign: "right", margin: "40px 0" }}>
-        <ButtonRS
-          title={"Продолжить"}
-          style={{ width: "auto" }}
-          onClick={() => navigate("/step3")}
-        />
+        <div style={{ textAlign: "right", margin: "40px 0" }}>
+          <ButtonRS
+            title={"Продолжить"}
+            style={{ width: "auto" }}
+            onClick={() => navigate("/step3")}
+          />
+        </div>
       </div>
     </>
   );

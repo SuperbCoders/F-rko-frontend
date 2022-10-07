@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Paginator from "../../components/Paginator";
 import styles from "./styles.module.scss";
 import CheckBoxRS from "../../components/CheckBoxRS";
@@ -76,6 +76,10 @@ const Step3 = () => {
       price: 4490,
     },
   ]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <>
