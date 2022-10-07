@@ -15,6 +15,7 @@ import { getFormatFile, getSizeMb } from "../../helpers";
 import DateInput from "../../components/Step2Components/DateInput";
 import DocumentItem from "../DocumentItem";
 import ScanOrPhoto from "../../components/Step2Components/ScanOrPhoto";
+import Wrapper from "../../components/Step2Components/Wrapper";
 
 const DownloadButton = ({ addFile }) => {
   const refInput = useRef();
@@ -189,11 +190,13 @@ const InputLock = ({ name, value }) => {
 
 const Step2 = () => {
   const navigate = useNavigate();
+
   const [addressList, setAddressList] = useState([{}, {}]);
   const [documentList, setDocumentList] = useState([{}]);
   const [collegialExecutiveBody, setCollegialExecutiveBody] = useState(false);
   const [supervisoryBoard, setSupervisoryBoard] = useState(false);
   const [gender, setGender] = useState("");
+  const [haveBeneficial, setHaveBeneficial] = useState("");
   const [basisBeneficialOwner, setBasisBeneficialOwner] = useState("");
   const [addressActualResidence, setAddressActualResidence] = useState("");
   const [mailingAddress, setMailingAddress] = useState("");
@@ -287,32 +290,34 @@ const Step2 = () => {
             </div>
           </div>
         </div>
+
         <div className={styles.mb64}>
-          <p className={styles.title_block}>Адреса</p>
-          <div className={styles.content}>
-            {addressList.map(() => (
-              <AddressItem />
-            ))}
-            <div className={styles.buttons}>
-              <AddButton onClick={addToAddressList} />
-              <DeleteButton onClick={removeFromAddressList} />
-            </div>
-            <div className={styles.row}>
-              <div className={styles.column}>
-                <div className={styles.row}>
-                  <Input
-                    name={"Почтовый адрес"}
-                    placeholder={"Напишите адрес"}
-                  />
+          <Wrapper headElement={<p className={styles.title_block}>Адреса</p>}>
+            <div className={styles.content}>
+              {addressList.map(() => (
+                <AddressItem />
+              ))}
+              <div className={styles.buttons}>
+                <AddButton onClick={addToAddressList} />
+                <DeleteButton onClick={removeFromAddressList} />
+              </div>
+              <div className={styles.row}>
+                <div className={styles.column}>
+                  <div className={styles.row}>
+                    <Input
+                      name={"Почтовый адрес"}
+                      placeholder={"Напишите адрес"}
+                    />
+                  </div>
+                </div>
+                <div className={styles.column}>
+                  <div className={styles.row}>
+                    <SelectRS name={"Основание"} placeholder={"Аренда"} />
+                  </div>
                 </div>
               </div>
-              <div className={styles.column}>
-                <div className={styles.row}>
-                  <SelectRS name={"Основание"} placeholder={"Аренда"} />
-                </div>
-              </div>
             </div>
-          </div>
+          </Wrapper>
         </div>
         <div className={styles.mb40}>
           <p className={styles.title_block}>Структура органов управления</p>
@@ -438,18 +443,18 @@ const Step2 = () => {
             </div>
             <div className={styles.checks}>
               <p className={styles.checks__item}>Пол</p>
-              <div className={styles.checks__item}>
-                <RadioButtonRS
-                  isActive={gender === "man"}
-                  handleClick={() => setGender("man")}
-                />
+              <div
+                className={styles.checks__item}
+                onClick={() => setGender("man")}
+              >
+                <RadioButtonRS isActive={gender === "man"} />
                 <p>Мужской</p>
               </div>
-              <div className={styles.checks__item}>
-                <RadioButtonRS
-                  isActive={gender === "woman"}
-                  handleClick={() => setGender("woman")}
-                />
+              <div
+                className={styles.checks__item}
+                onClick={() => setGender("woman")}
+              >
+                <RadioButtonRS isActive={gender === "woman"} />
                 <p>Женский</p>
               </div>
             </div>
@@ -469,18 +474,18 @@ const Step2 = () => {
               <p className={styles.checks__item}>
                 Основание для признания бенефициарным владельцем
               </p>
-              <div className={styles.checks__item}>
-                <RadioButtonRS
-                  isActive={basisBeneficialOwner === "xxx"}
-                  handleClick={() => setBasisBeneficialOwner("xxx")}
-                />
+              <div
+                className={styles.checks__item}
+                onClick={() => setBasisBeneficialOwner("xxx")}
+              >
+                <RadioButtonRS isActive={basisBeneficialOwner === "xxx"} />
                 <p>xxxxxxx</p>
               </div>
-              <div className={styles.checks__item}>
-                <RadioButtonRS
-                  isActive={basisBeneficialOwner === "yyy"}
-                  handleClick={() => setBasisBeneficialOwner("yyy")}
-                />
+              <div
+                className={styles.checks__item}
+                onClick={() => setBasisBeneficialOwner("yyy")}
+              >
+                <RadioButtonRS isActive={basisBeneficialOwner === "yyy"} />
                 <p>xxxxxxx</p>
               </div>
             </div>
@@ -513,18 +518,18 @@ const Step2 = () => {
             <div>
               <p className={styles.mb24}>Адрес фактического проживания</p>
               <div className={styles.row}>
-                <div className={styles.checks__item}>
-                  <RadioButtonRS
-                    isActive={addressActualResidence === "yes"}
-                    handleClick={() => setAddressActualResidence("yes")}
-                  />
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setAddressActualResidence("yes")}
+                >
+                  <RadioButtonRS isActive={addressActualResidence === "yes"} />
                   <p>Совпадает с адресом регистрации</p>
                 </div>
-                <div className={styles.checks__item}>
-                  <RadioButtonRS
-                    isActive={addressActualResidence === "no"}
-                    handleClick={() => setAddressActualResidence("no")}
-                  />
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setAddressActualResidence("no")}
+                >
+                  <RadioButtonRS isActive={addressActualResidence === "no"} />
                   <p>Не совпадает с адресом регистрации</p>
                 </div>
               </div>
@@ -540,28 +545,28 @@ const Step2 = () => {
             <div>
               <p className={styles.mb24}>Почтовый адрес</p>
               <div className={styles.checks}>
-                <div className={styles.checks__item}>
-                  <RadioButtonRS
-                    isActive={mailingAddress === "register"}
-                    handleClick={() => setMailingAddress("register")}
-                  />
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setMailingAddress("register")}
+                >
+                  <RadioButtonRS isActive={mailingAddress === "register"} />
                   <p>Совпадает с адресом регистрации</p>
                 </div>
-                <div className={styles.checks__item}>
-                  <RadioButtonRS
-                    isActive={mailingAddress === "live"}
-                    handleClick={() => setMailingAddress("live")}
-                  />
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setMailingAddress("live")}
+                >
+                  <RadioButtonRS isActive={mailingAddress === "live"} />
                   <p>Совпадает с адресом проживания</p>
                 </div>
               </div>
             </div>
             <div className={styles.row}>
-              <div className={styles.checks__item}>
-                <RadioButtonRS
-                  isActive={mailingAddress === "no"}
-                  handleClick={() => setMailingAddress("no")}
-                />
+              <div
+                className={styles.checks__item}
+                onClick={() => setMailingAddress("no")}
+              >
+                <RadioButtonRS isActive={mailingAddress === "no"} />
                 <p>Не совпадает с адресом регистрации и адресом проживания</p>
               </div>
             </div>
@@ -696,12 +701,18 @@ const Step2 = () => {
               <p className={styles.checks__item}>
                 Имеются ли выгодоприобретатели
               </p>
-              <div className={styles.checks__item}>
-                <RadioButtonRS />
+              <div
+                className={styles.checks__item}
+                onClick={() => setHaveBeneficial("no")}
+              >
+                <RadioButtonRS isActive={haveBeneficial === "no"} />
                 <p>Отсутствуют</p>
               </div>
-              <div className={styles.checks__item}>
-                <RadioButtonRS />
+              <div
+                className={styles.checks__item}
+                onClick={() => setHaveBeneficial("yes")}
+              >
+                <RadioButtonRS isActive={haveBeneficial === "yes"} />
                 <p>Имеются</p>
               </div>
             </div>
@@ -754,35 +765,35 @@ const Step2 = () => {
             </p>
             <div className={styles.row}>
               <div className={styles.checks}>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setInfo("numberNoncashTransactions", "0-29")}
+                >
                   <RadioButtonRS
                     isActive={
                       infoAboutMoney.numberNoncashTransactions === "0-29"
                     }
-                    handleClick={() =>
-                      setInfo("numberNoncashTransactions", "0-29")
-                    }
                   />
                   <p>0-29</p>
                 </div>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setInfo("numberNoncashTransactions", "30-100")}
+                >
                   <RadioButtonRS
                     isActive={
                       infoAboutMoney.numberNoncashTransactions === "30-100"
                     }
-                    handleClick={() =>
-                      setInfo("numberNoncashTransactions", "30-100")
-                    }
                   />
                   <p>30-100</p>
                 </div>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setInfo("numberNoncashTransactions", ">100")}
+                >
                   <RadioButtonRS
                     isActive={
                       infoAboutMoney.numberNoncashTransactions === ">100"
-                    }
-                    handleClick={() =>
-                      setInfo("numberNoncashTransactions", ">100")
                     }
                   />
                   <p>более 100</p>
@@ -796,28 +807,34 @@ const Step2 = () => {
             </p>
             <div className={styles.row}>
               <div className={styles.checks}>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setInfo("numberNoncashMoney", "0 - 99")}
+                >
                   <RadioButtonRS
                     isActive={infoAboutMoney.numberNoncashMoney === "0 - 99"}
-                    handleClick={() => setInfo("numberNoncashMoney", "0 - 99")}
                   />
                   <p>0 - 99 000 руб.</p>
                 </div>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() =>
+                    setInfo("numberNoncashMoney", "100000-1000000")
+                  }
+                >
                   <RadioButtonRS
                     isActive={
                       infoAboutMoney.numberNoncashMoney === "100000-1000000"
                     }
-                    handleClick={() =>
-                      setInfo("numberNoncashMoney", "100000-1000000")
-                    }
                   />
                   <p>100 000 - 1 000 000 руб.</p>
                 </div>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setInfo("numberNoncashMoney", "1000000")}
+                >
                   <RadioButtonRS
                     isActive={infoAboutMoney.numberNoncashMoney === "1000000"}
-                    handleClick={() => setInfo("numberNoncashMoney", "1000000")}
                   />
                   <p>более 1 000 000 руб.</p>
                 </div>
@@ -830,32 +847,32 @@ const Step2 = () => {
             </p>
             <div className={styles.row}>
               <div className={styles.checks}>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setInfo("numberCashTransactions", "0-29")}
+                >
                   <RadioButtonRS
                     isActive={infoAboutMoney.numberCashTransactions === "0-29"}
-                    handleClick={() =>
-                      setInfo("numberCashTransactions", "0-29")
-                    }
                   />
                   <p>0-29</p>
                 </div>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setInfo("numberCashTransactions", "30-100")}
+                >
                   <RadioButtonRS
                     isActive={
                       infoAboutMoney.numberCashTransactions === "30-100"
                     }
-                    handleClick={() =>
-                      setInfo("numberCashTransactions", "30-100")
-                    }
                   />
                   <p>30-100</p>
                 </div>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setInfo("numberCashTransactions", ">100")}
+                >
                   <RadioButtonRS
                     isActive={infoAboutMoney.numberCashTransactions === ">100"}
-                    handleClick={() =>
-                      setInfo("numberCashTransactions", ">100")
-                    }
                   />
                   <p>более 100</p>
                 </div>
@@ -868,28 +885,34 @@ const Step2 = () => {
             </p>
             <div className={styles.row}>
               <div className={styles.checks}>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setInfo("numberCashMoney", "0 - 99 000")}
+                >
                   <RadioButtonRS
                     isActive={infoAboutMoney.numberCashMoney === "0 - 99 000"}
-                    handleClick={() => setInfo("numberCashMoney", "0 - 99 000")}
                   />
                   <p>0 - 99 000 руб.</p>
                 </div>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() =>
+                    setInfo("numberCashMoney", "100 000 - 1 000 000")
+                  }
+                >
                   <RadioButtonRS
                     isActive={
                       infoAboutMoney.numberCashMoney === "100 000 - 1 000 000"
                     }
-                    handleClick={() =>
-                      setInfo("numberCashMoney", "100 000 - 1 000 000")
-                    }
                   />
                   <p>100 000 - 1 000 000 руб.</p>
                 </div>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setInfo("numberCashMoney", ">1 000 000")}
+                >
                   <RadioButtonRS
                     isActive={infoAboutMoney.numberCashMoney === ">1 000 000"}
-                    handleClick={() => setInfo("numberCashMoney", ">1 000 000")}
                   />
                   <p>более 1 000 000 руб.</p>
                 </div>
@@ -902,32 +925,32 @@ const Step2 = () => {
             </p>
             <div className={styles.row}>
               <div className={styles.checks}>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setInfo("numberTradeTransactions", "0-29")}
+                >
                   <RadioButtonRS
                     isActive={infoAboutMoney.numberTradeTransactions === "0-29"}
-                    handleClick={() =>
-                      setInfo("numberTradeTransactions", "0-29")
-                    }
                   />
                   <p>0-29</p>
                 </div>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setInfo("numberTradeTransactions", "30-100")}
+                >
                   <RadioButtonRS
                     isActive={
                       infoAboutMoney.numberTradeTransactions === "30-100"
                     }
-                    handleClick={() =>
-                      setInfo("numberTradeTransactions", "30-100")
-                    }
                   />
                   <p>30-100</p>
                 </div>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setInfo("numberTradeTransactions", ">100")}
+                >
                   <RadioButtonRS
                     isActive={infoAboutMoney.numberTradeTransactions === ">100"}
-                    handleClick={() =>
-                      setInfo("numberTradeTransactions", ">100")
-                    }
                   />
                   <p>более 100</p>
                 </div>
@@ -972,24 +995,30 @@ const Step2 = () => {
             <p className={styles.mb24}>Штатная численность сотрудников</p>
             <div className={styles.row}>
               <div className={styles.checks}>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setInfo("countHumans", "0-29")}
+                >
                   <RadioButtonRS
                     isActive={infoAboutMoney.countHumans === "0-29"}
-                    handleClick={() => setInfo("countHumans", "0-29")}
                   />
                   <p>0-29</p>
                 </div>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setInfo("countHumans", "30-100")}
+                >
                   <RadioButtonRS
                     isActive={infoAboutMoney.countHumans === "30-100"}
-                    handleClick={() => setInfo("countHumans", "30-100")}
                   />
                   <p>30-100</p>
                 </div>
-                <div className={styles.checks__item}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setInfo("countHumans", ">100")}
+                >
                   <RadioButtonRS
                     isActive={infoAboutMoney.countHumans === ">100"}
-                    handleClick={() => setInfo("countHumans", ">100")}
                   />
                   <p>более 100</p>
                 </div>
@@ -1083,7 +1112,6 @@ const Step2 = () => {
           />
           <ScanOrPhoto name={"Прочие документы"} />
         </div>
-
         <div style={{ textAlign: "right", margin: "40px 0" }}>
           <ButtonRS
             title={"Продолжить"}

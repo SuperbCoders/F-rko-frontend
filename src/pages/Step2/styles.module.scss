@@ -132,6 +132,7 @@
   &__item {
     display: flex;
     align-items: center;
+    cursor: pointer;
     margin-right: 24px;
 
     &:last-child {
