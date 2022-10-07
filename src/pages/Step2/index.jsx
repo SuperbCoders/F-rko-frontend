@@ -320,257 +320,251 @@ const Step2 = () => {
           </Wrapper>
         </div>
         <div className={styles.mb40}>
-          <p className={styles.title_block}>Структура органов управления</p>
-          <div className={styles.content}>
-            <div className={styles.row}>
-              <SelectRS
-                name={"Выберете из списка"}
-                placeholder={
-                  "Единственный участник (один учатник с должей 100%) "
-                }
-              />
-            </div>
-            <div className={styles.row}>
-              <div className={styles.column}>
-                <SelectRS name={"Руководитель"} placeholder={"Руководитель"} />
-              </div>
-              <div className={styles.column}>
+          <Wrapper
+            headElement={
+              <p className={styles.title_block}>Структура органов управления</p>
+            }
+          >
+            <div className={styles.content}>
+              <div className={styles.row}>
                 <SelectRS
-                  name={"ИНН"}
-                  placeholder={"Введите ИНН или название компании"}
+                  name={"Выберете из списка"}
+                  placeholder={
+                    "Единственный участник (один учатник с должей 100%) "
+                  }
                 />
               </div>
-            </div>
-            <div className={styles.mb24} style={{ width: "100%" }}>
-              <p className={styles.option_title}>
-                Наличие наблюдательного совета
-              </p>
-              <YesOrNo
-                defaultValue={supervisoryBoard}
-                handleChange={setSupervisoryBoard}
-              />
-            </div>
-            {supervisoryBoard && (
-              <div className={styles.row}>
-                <div className={styles.column}>
-                  <Input
-                    name={"Наименование наблюдательного совета "}
-                    placeholder={"Наименование"}
-                  />
-                </div>
-              </div>
-            )}
-            <div className={styles.mb24} style={{ width: "100%" }}>
-              <p className={styles.option_title}>
-                Наличие коллегиального исполнительного органа
-              </p>
-              <YesOrNo
-                defaultValue={collegialExecutiveBody}
-                handleChange={setCollegialExecutiveBody}
-              />
-            </div>
-            {collegialExecutiveBody && (
-              <div className={styles.row}>
-                <div className={styles.column}>
-                  <Input
-                    name={"Наименование коллегиального исполнительного органа"}
-                    placeholder={"Наименование"}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className={styles.row}>
-              <div className={styles.column}>
-                <Input
-                  name={"Члены коллегиального исполнительного органа - ФЛ"}
-                  placeholder={"Укажите Физ. Лицо"}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className={styles.mb40}>
-          <p className={styles.title_block}>Сведения о персонале</p>
-          <div className={styles.content}>
-            <div className={styles.row}>
-              <Input
-                name={"Численность персонала"}
-                placeholder={"Напишите значение"}
-              />
-              <Input
-                name={"Задолженность по з/п"}
-                placeholder={"Укажите сумму"}
-                rightElement={<p style={{}}>₽</p>}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <p className={styles.title_block}>
-            Сведения о Связанных физических лицах
-          </p>
-          <div>
-            <p className={styles.name_option}>Роль лица</p>
-            <div className={styles.row}>
-              <div className={styles.checks}>
-                <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Руководитель</p>
-                </div>
-                <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Учредитель</p>
-                </div>
-                <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Бенефициарный владелец</p>
-                </div>
-                <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Подписант</p>
-                </div>
-              </div>
-            </div>
-            <div className={classNames(styles.row, "bg-grey")}>
-              <Input name={"Фамилия"} placeholder={"Введите Фамилию"} />
-              <Input name={"Имя"} placeholder={"Введите Имя"} />
-              <Input
-                name={"Отчество (при наличии)"}
-                placeholder={"Введите Отчество"}
-              />
-            </div>
-            <div className={styles.checks}>
-              <p className={styles.checks__item}>Пол</p>
-              <div
-                className={styles.checks__item}
-                onClick={() => setGender("man")}
-              >
-                <RadioButtonRS isActive={gender === "man"} />
-                <p>Мужской</p>
-              </div>
-              <div
-                className={styles.checks__item}
-                onClick={() => setGender("woman")}
-              >
-                <RadioButtonRS isActive={gender === "woman"} />
-                <p>Женский</p>
-              </div>
-            </div>
-            <div className={classNames(styles.row, "bg-grey")}>
-              <Input name={"ИНН"} placeholder={"Введите ИНН"} />
-              <Input
-                name={"СНИЛС (при наличии)"}
-                placeholder={"Введите СНИЛС"}
-              />
-              <Input name={"Гражданство"} placeholder={"Введите гражданство"} />
-            </div>
-            <div className={classNames(styles.row, "bg-grey")}>
-              <Input name={"Телефон"} placeholder={"+7 (__) ___ __ __"} />
-              <Input name={"Доля владения"} placeholder={"Доля владения"} />
-            </div>
-            <div className={styles.checks}>
-              <p className={styles.checks__item}>
-                Основание для признания бенефициарным владельцем
-              </p>
-              <div
-                className={styles.checks__item}
-                onClick={() => setBasisBeneficialOwner("xxx")}
-              >
-                <RadioButtonRS isActive={basisBeneficialOwner === "xxx"} />
-                <p>xxxxxxx</p>
-              </div>
-              <div
-                className={styles.checks__item}
-                onClick={() => setBasisBeneficialOwner("yyy")}
-              >
-                <RadioButtonRS isActive={basisBeneficialOwner === "yyy"} />
-                <p>xxxxxxx</p>
-              </div>
-            </div>
-            <div className={styles.mb24}>
-              <p className={classNames(styles.mb24)}>
-                Является ли лицо иностранным публичным должностным лицом либо
-                лицом, связанным с таковым родственными, партнерскими или иными
-                отношениями?
-              </p>
-              <YesOrNo />
-            </div>
-            <div>
-              <p className={styles.mb24}>
-                Степень родства либо статус (супруг или супруга) по отношению к
-                публичному должностному лицу
-              </p>
               <div className={styles.row}>
                 <div className={styles.column}>
                   <SelectRS
-                    name={"Выбрать статус"}
-                    placeholder={"Выбрать статус"}
+                    name={"Руководитель"}
+                    placeholder={"Руководитель"}
+                  />
+                </div>
+                <div className={styles.column}>
+                  <SelectRS
+                    name={"ИНН"}
+                    placeholder={"Введите ИНН или название компании"}
+                  />
+                </div>
+              </div>
+              <div className={styles.mb24} style={{ width: "100%" }}>
+                <p className={styles.option_title}>
+                  Наличие наблюдательного совета
+                </p>
+                <YesOrNo
+                  defaultValue={supervisoryBoard}
+                  handleChange={setSupervisoryBoard}
+                />
+              </div>
+              {supervisoryBoard && (
+                <div className={styles.row}>
+                  <div className={styles.column}>
+                    <Input
+                      name={"Наименование наблюдательного совета "}
+                      placeholder={"Наименование"}
+                    />
+                  </div>
+                </div>
+              )}
+              <div className={styles.mb24} style={{ width: "100%" }}>
+                <p className={styles.option_title}>
+                  Наличие коллегиального исполнительного органа
+                </p>
+                <YesOrNo
+                  defaultValue={collegialExecutiveBody}
+                  handleChange={setCollegialExecutiveBody}
+                />
+              </div>
+              {collegialExecutiveBody && (
+                <div className={styles.row}>
+                  <div className={styles.column}>
+                    <Input
+                      name={
+                        "Наименование коллегиального исполнительного органа"
+                      }
+                      placeholder={"Наименование"}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className={styles.row}>
+                <div className={styles.column}>
+                  <Input
+                    name={"Члены коллегиального исполнительного органа - ФЛ"}
+                    placeholder={"Укажите Физ. Лицо"}
                   />
                 </div>
               </div>
             </div>
-            <div className={classNames(styles.row, "bg-grey")}>
-              <Input name={"Адрес регистрации"} placeholder={"Введите адрес"} />
-              <Input name={"Адрес регистрации"} placeholder={"Введите адрес"} />
-            </div>
-            <div>
-              <p className={styles.mb24}>Адрес фактического проживания</p>
+          </Wrapper>
+        </div>
+        <div className={styles.mb40}>
+          <Wrapper
+            headElement={
+              <p className={styles.title_block}>Сведения о персонале</p>
+            }
+          >
+            <div className={styles.content}>
               <div className={styles.row}>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setAddressActualResidence("yes")}
-                >
-                  <RadioButtonRS isActive={addressActualResidence === "yes"} />
-                  <p>Совпадает с адресом регистрации</p>
-                </div>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setAddressActualResidence("no")}
-                >
-                  <RadioButtonRS isActive={addressActualResidence === "no"} />
-                  <p>Не совпадает с адресом регистрации</p>
-                </div>
-              </div>
-            </div>
-            <div className={classNames(styles.row, "bg-grey")}>
-              <div className={styles.column}>
                 <Input
-                  name={"Адрес фактического проживания"}
-                  placeholder={"Введите адрес"}
+                  name={"Численность персонала"}
+                  placeholder={"Напишите значение"}
+                />
+                <Input
+                  name={"Задолженность по з/п"}
+                  placeholder={"Укажите сумму"}
+                  rightElement={<p style={{}}>₽</p>}
                 />
               </div>
             </div>
+          </Wrapper>
+        </div>
+
+        <div>
+          <Wrapper
+            headElement={
+              <p className={styles.title_block}>
+                {" "}
+                Сведения о Связанных физических лицах
+              </p>
+            }
+          >
             <div>
-              <p className={styles.mb24}>Почтовый адрес</p>
+              <p className={styles.name_option}>Роль лица</p>
+              <div className={styles.row}>
+                <div className={styles.checks}>
+                  <div className={styles.checks__item}>
+                    <CheckBoxRS />
+                    <p>Руководитель</p>
+                  </div>
+                  <div className={styles.checks__item}>
+                    <CheckBoxRS />
+                    <p>Учредитель</p>
+                  </div>
+                  <div className={styles.checks__item}>
+                    <CheckBoxRS />
+                    <p>Бенефициарный владелец</p>
+                  </div>
+                  <div className={styles.checks__item}>
+                    <CheckBoxRS />
+                    <p>Подписант</p>
+                  </div>
+                </div>
+              </div>
+              <div className={classNames(styles.row, "bg-grey")}>
+                <Input name={"Фамилия"} placeholder={"Введите Фамилию"} />
+                <Input name={"Имя"} placeholder={"Введите Имя"} />
+                <Input
+                  name={"Отчество (при наличии)"}
+                  placeholder={"Введите Отчество"}
+                />
+              </div>
               <div className={styles.checks}>
+                <p className={styles.checks__item}>Пол</p>
                 <div
                   className={styles.checks__item}
-                  onClick={() => setMailingAddress("register")}
+                  onClick={() => setGender("man")}
                 >
-                  <RadioButtonRS isActive={mailingAddress === "register"} />
-                  <p>Совпадает с адресом регистрации</p>
+                  <RadioButtonRS isActive={gender === "man"} />
+                  <p>Мужской</p>
                 </div>
                 <div
                   className={styles.checks__item}
-                  onClick={() => setMailingAddress("live")}
+                  onClick={() => setGender("woman")}
                 >
-                  <RadioButtonRS isActive={mailingAddress === "live"} />
-                  <p>Совпадает с адресом проживания</p>
+                  <RadioButtonRS isActive={gender === "woman"} />
+                  <p>Женский</p>
                 </div>
               </div>
-            </div>
-            <div className={styles.row}>
-              <div
-                className={styles.checks__item}
-                onClick={() => setMailingAddress("no")}
-              >
-                <RadioButtonRS isActive={mailingAddress === "no"} />
-                <p>Не совпадает с адресом регистрации и адресом проживания</p>
+              <div className={classNames(styles.row, "bg-grey")}>
+                <Input name={"ИНН"} placeholder={"Введите ИНН"} />
+                <Input
+                  name={"СНИЛС (при наличии)"}
+                  placeholder={"Введите СНИЛС"}
+                />
+                <Input
+                  name={"Гражданство"}
+                  placeholder={"Введите гражданство"}
+                />
               </div>
-            </div>
-            {mailingAddress === "no" && (
+              <div className={classNames(styles.row, "bg-grey")}>
+                <Input name={"Телефон"} placeholder={"+7 (__) ___ __ __"} />
+                <Input name={"Доля владения"} placeholder={"Доля владения"} />
+              </div>
+              <div className={styles.checks}>
+                <p className={styles.checks__item}>
+                  Основание для признания бенефициарным владельцем
+                </p>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setBasisBeneficialOwner("xxx")}
+                >
+                  <RadioButtonRS isActive={basisBeneficialOwner === "xxx"} />
+                  <p>xxxxxxx</p>
+                </div>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setBasisBeneficialOwner("yyy")}
+                >
+                  <RadioButtonRS isActive={basisBeneficialOwner === "yyy"} />
+                  <p>xxxxxxx</p>
+                </div>
+              </div>
+              <div className={styles.mb24}>
+                <p className={classNames(styles.mb24)}>
+                  Является ли лицо иностранным публичным должностным лицом либо
+                  лицом, связанным с таковым родственными, партнерскими или
+                  иными отношениями?
+                </p>
+                <YesOrNo />
+              </div>
+              <div>
+                <p className={styles.mb24}>
+                  Степень родства либо статус (супруг или супруга) по отношению
+                  к публичному должностному лицу
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.column}>
+                    <SelectRS
+                      name={"Выбрать статус"}
+                      placeholder={"Выбрать статус"}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className={classNames(styles.row, "bg-grey")}>
+                <Input
+                  name={"Адрес регистрации"}
+                  placeholder={"Введите адрес"}
+                />
+                <Input
+                  name={"Адрес регистрации"}
+                  placeholder={"Введите адрес"}
+                />
+              </div>
+              <div>
+                <p className={styles.mb24}>Адрес фактического проживания</p>
+                <div className={styles.row}>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setAddressActualResidence("yes")}
+                  >
+                    <RadioButtonRS
+                      isActive={addressActualResidence === "yes"}
+                    />
+                    <p>Совпадает с адресом регистрации</p>
+                  </div>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setAddressActualResidence("no")}
+                  >
+                    <RadioButtonRS isActive={addressActualResidence === "no"} />
+                    <p>Не совпадает с адресом регистрации</p>
+                  </div>
+                </div>
+              </div>
               <div className={classNames(styles.row, "bg-grey")}>
                 <div className={styles.column}>
                   <Input
@@ -579,55 +573,97 @@ const Step2 = () => {
                   />
                 </div>
               </div>
-            )}
-            <div className={styles.mb24}>
-              <p className={styles.mb24}>Загрузить первую страницу паспорта</p>
-              {firstPagePassport && (
-                <div className={styles.mb24}>
-                  <div className={styles.download__item}>
-                    <div className={styles.icon}>
-                      <p className={styles.format}>
-                        {getFormatFile(firstPagePassport.name)}
-                      </p>
-                      <p className={styles.size}>
-                        {getSizeMb(firstPagePassport.size)}
-                      </p>
-                    </div>
-                    <p className={styles.name}>{firstPagePassport.name}</p>
+              <div>
+                <p className={styles.mb24}>Почтовый адрес</p>
+                <div className={styles.checks}>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setMailingAddress("register")}
+                  >
+                    <RadioButtonRS isActive={mailingAddress === "register"} />
+                    <p>Совпадает с адресом регистрации</p>
+                  </div>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setMailingAddress("live")}
+                  >
+                    <RadioButtonRS isActive={mailingAddress === "live"} />
+                    <p>Совпадает с адресом проживания</p>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.row}>
+                <div
+                  className={styles.checks__item}
+                  onClick={() => setMailingAddress("no")}
+                >
+                  <RadioButtonRS isActive={mailingAddress === "no"} />
+                  <p>Не совпадает с адресом регистрации и адресом проживания</p>
+                </div>
+              </div>
+              {mailingAddress === "no" && (
+                <div className={classNames(styles.row, "bg-grey")}>
+                  <div className={styles.column}>
+                    <Input
+                      name={"Адрес фактического проживания"}
+                      placeholder={"Введите адрес"}
+                    />
                   </div>
                 </div>
               )}
-              <DownloadButton addFile={setFirstPagePassport} />
+              <div className={styles.mb24}>
+                <p className={styles.mb24}>
+                  Загрузить первую страницу паспорта
+                </p>
+                {firstPagePassport && (
+                  <div className={styles.mb24}>
+                    <div className={styles.download__item}>
+                      <div className={styles.icon}>
+                        <p className={styles.format}>
+                          {getFormatFile(firstPagePassport.name)}
+                        </p>
+                        <p className={styles.size}>
+                          {getSizeMb(firstPagePassport.size)}
+                        </p>
+                      </div>
+                      <p className={styles.name}>{firstPagePassport.name}</p>
+                    </div>
+                  </div>
+                )}
+                <DownloadButton addFile={setFirstPagePassport} />
+              </div>
+              <div className={classNames(styles.row, "bg-grey", "form")}>
+                <Input name={"Место рождения"} placeholder={"Введите адрес"} />
+                <DateInput name={"Дата рождения"} />
+                <SelectRS
+                  name={"Тип документа, удостоверяющего личность"}
+                  placeholder={"Выберите тип"}
+                  backgroundColor={"#F0F2F5"}
+                />
+              </div>
+              <div className={classNames(styles.row, "bg-grey", "form")}>
+                <Input
+                  name={
+                    "Серия документа, удостоверяющего личность (при наличии)"
+                  }
+                  placeholder={"Введите серию документа"}
+                />
+                <Input
+                  name={"Номер документа, удостоверяющего личность"}
+                  placeholder={"Введите номер документа"}
+                />
+                <Input name={"Кем выдан"} placeholder={"Наименование"} />
+              </div>
+              <div className={classNames(styles.row, "bg-grey", "form")}>
+                <Input
+                  name={"Код подразделения (при наличии)"}
+                  placeholder={"Введите код"}
+                />
+                <DateInput name={"Дата выдачи"} />
+                <DateInput name={"Срок действия"} />
+              </div>
             </div>
-            <div className={classNames(styles.row, "bg-grey", "form")}>
-              <Input name={"Место рождения"} placeholder={"Введите адрес"} />
-              <DateInput name={"Дата рождения"} />
-              <SelectRS
-                name={"Тип документа, удостоверяющего личность"}
-                placeholder={"Выберите тип"}
-                backgroundColor={"#F0F2F5"}
-              />
-            </div>
-            <div className={classNames(styles.row, "bg-grey", "form")}>
-              <Input
-                name={"Серия документа, удостоверяющего личность (при наличии)"}
-                placeholder={"Введите серию документа"}
-              />
-              <Input
-                name={"Номер документа, удостоверяющего личность"}
-                placeholder={"Введите номер документа"}
-              />
-              <Input name={"Кем выдан"} placeholder={"Наименование"} />
-            </div>
-            <div className={classNames(styles.row, "bg-grey", "form")}>
-              <Input
-                name={"Код подразделения (при наличии)"}
-                placeholder={"Введите код"}
-              />
-              <DateInput name={"Дата выдачи"} />
-              <DateInput name={"Срок действия"} />
-            </div>
-          </div>
+          </Wrapper>
         </div>
 
         <div className={styles.mb64}>
@@ -646,53 +682,63 @@ const Step2 = () => {
         </div>
 
         <div className={styles.mb64}>
-          <p className={styles.title_block}>Сведения о лицензии</p>
-          <div className={classNames(styles.row, "form")}>
-            <InputLock name={"Вид"} value={"xxxxxxx"} />
-            <InputLock name={"Номер"} value={"xxxxxxx"} />
-            <InputLock name={"Кем выдана"} value={"xxxxxxx"} />
-          </div>
-          <div className={classNames(styles.row, "form")}>
-            <InputLock name={"Дата выдачи лицензии"} value={"01.01.2022"} />
-            <InputLock name={"Срок действия"} value={"01.01.2022"} />
-            <InputLock
-              name={"Перечень видов лицензируемой деятельности"}
-              value={"xxxxxxx"}
-            />
-          </div>
+          <Wrapper
+            headElement={
+              <p className={styles.title_block}>Сведения о лицензии</p>
+            }
+          >
+            <div className={classNames(styles.row, "form")}>
+              <InputLock name={"Вид"} value={"xxxxxxx"} />
+              <InputLock name={"Номер"} value={"xxxxxxx"} />
+              <InputLock name={"Кем выдана"} value={"xxxxxxx"} />
+            </div>
+            <div className={classNames(styles.row, "form")}>
+              <InputLock name={"Дата выдачи лицензии"} value={"01.01.2022"} />
+              <InputLock name={"Срок действия"} value={"01.01.2022"} />
+              <InputLock
+                name={"Перечень видов лицензируемой деятельности"}
+                value={"xxxxxxx"}
+              />
+            </div>
+          </Wrapper>
         </div>
         <div>
-          <p className={styles.title_block}>
-            Сведения о планируемых операциях по счёту
-          </p>
-          <div className={styles.row}>
-            <div className={styles.checks}>
-              <div className={styles.checks__item}>
-                <CheckBoxRS />
-                <p>Договор купли – продажи (товарный)</p>
-              </div>
-              <div className={styles.checks__item}>
-                <CheckBoxRS />
-                <p>Агентский договор</p>
-              </div>
-              <div className={styles.checks__item}>
-                <CheckBoxRS />
-                <p>Договор комиссии</p>
-              </div>
-            </div>
-          </div>
-          <div className={styles.row}>
-            <div className={styles.checks}>
-              <div className={styles.checks__item}>
-                <CheckBoxRS />
-                <p>Договор купли-продажи ценных бумаг</p>
-              </div>
-              <div className={styles.checks__item}>
-                <CheckBoxRS />
-                <p>Договор аренды</p>
+          <Wrapper
+            headElement={
+              <p className={styles.title_block}>
+                Сведения о планируемых операциях по счёту
+              </p>
+            }
+          >
+            <div className={styles.row}>
+              <div className={styles.checks}>
+                <div className={styles.checks__item}>
+                  <CheckBoxRS />
+                  <p>Договор купли – продажи (товарный)</p>
+                </div>
+                <div className={styles.checks__item}>
+                  <CheckBoxRS />
+                  <p>Агентский договор</p>
+                </div>
+                <div className={styles.checks__item}>
+                  <CheckBoxRS />
+                  <p>Договор комиссии</p>
+                </div>
               </div>
             </div>
-          </div>
+            <div className={styles.row}>
+              <div className={styles.checks}>
+                <div className={styles.checks__item}>
+                  <CheckBoxRS />
+                  <p>Договор купли-продажи ценных бумаг</p>
+                </div>
+                <div className={styles.checks__item}>
+                  <CheckBoxRS />
+                  <p>Договор аренды</p>
+                </div>
+              </div>
+            </div>
+          </Wrapper>
         </div>
         <div className={styles.mb24}>
           <p className={styles.title_block}>Выгодоприобретатели</p>
@@ -719,260 +765,27 @@ const Step2 = () => {
           </div>
         </div>
 
-        <div className={styles.mb64}>
-          <p className={styles.title_block}>
-            Сведения о целях установления деловых отношений с банком
-          </p>
-          <div className={styles.row}>
-            <div className={styles.checks}>
-              <div className={styles.checks__item}>
-                <CheckBoxRS />
-                <p>Расчетно-кассовое обслуживание</p>
-              </div>
-              <div className={styles.checks__item}>
-                <CheckBoxRS />
-                <p>Дистанционное банковское обслуживание</p>
-              </div>
-              <div className={styles.checks__item}>
-                <CheckBoxRS />
-                <p>Внешнеэкономические операции</p>
-              </div>
-            </div>
-          </div>
-          <div className={styles.row}>
-            <div className={styles.checks}>
-              <div className={styles.checks__item}>
-                <CheckBoxRS />
-                <p>Интернет-эквайринг</p>
-              </div>
-              <div className={styles.checks__item}>
-                <CheckBoxRS />
-                <p>Кредитование</p>
-              </div>
-              <div className={styles.checks__item}>
-                <CheckBoxRS />
-                <p>Торговый эквайринг</p>
-              </div>
-              <div className={styles.checks__item}>
-                <CheckBoxRS />
-                <p>Переводы СБП (c2b) </p>
-              </div>
-            </div>
-          </div>
-          <div>
-            <p className={styles.mb24}>
-              Количество операций по безналичным платежам в месяц
-            </p>
-            <div className={styles.row}>
-              <div className={styles.checks}>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setInfo("numberNoncashTransactions", "0-29")}
-                >
-                  <RadioButtonRS
-                    isActive={
-                      infoAboutMoney.numberNoncashTransactions === "0-29"
-                    }
-                  />
-                  <p>0-29</p>
-                </div>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setInfo("numberNoncashTransactions", "30-100")}
-                >
-                  <RadioButtonRS
-                    isActive={
-                      infoAboutMoney.numberNoncashTransactions === "30-100"
-                    }
-                  />
-                  <p>30-100</p>
-                </div>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setInfo("numberNoncashTransactions", ">100")}
-                >
-                  <RadioButtonRS
-                    isActive={
-                      infoAboutMoney.numberNoncashTransactions === ">100"
-                    }
-                  />
-                  <p>более 100</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <p className={styles.mb24}>
-              Сумма операций по безналичным платежам в месяц
-            </p>
-            <div className={styles.row}>
-              <div className={styles.checks}>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setInfo("numberNoncashMoney", "0 - 99")}
-                >
-                  <RadioButtonRS
-                    isActive={infoAboutMoney.numberNoncashMoney === "0 - 99"}
-                  />
-                  <p>0 - 99 000 руб.</p>
-                </div>
-                <div
-                  className={styles.checks__item}
-                  onClick={() =>
-                    setInfo("numberNoncashMoney", "100000-1000000")
-                  }
-                >
-                  <RadioButtonRS
-                    isActive={
-                      infoAboutMoney.numberNoncashMoney === "100000-1000000"
-                    }
-                  />
-                  <p>100 000 - 1 000 000 руб.</p>
-                </div>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setInfo("numberNoncashMoney", "1000000")}
-                >
-                  <RadioButtonRS
-                    isActive={infoAboutMoney.numberNoncashMoney === "1000000"}
-                  />
-                  <p>более 1 000 000 руб.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <p className={styles.mb24}>
-              Количество операций по снятию наличности в месяц
-            </p>
-            <div className={styles.row}>
-              <div className={styles.checks}>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setInfo("numberCashTransactions", "0-29")}
-                >
-                  <RadioButtonRS
-                    isActive={infoAboutMoney.numberCashTransactions === "0-29"}
-                  />
-                  <p>0-29</p>
-                </div>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setInfo("numberCashTransactions", "30-100")}
-                >
-                  <RadioButtonRS
-                    isActive={
-                      infoAboutMoney.numberCashTransactions === "30-100"
-                    }
-                  />
-                  <p>30-100</p>
-                </div>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setInfo("numberCashTransactions", ">100")}
-                >
-                  <RadioButtonRS
-                    isActive={infoAboutMoney.numberCashTransactions === ">100"}
-                  />
-                  <p>более 100</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <p className={styles.mb24}>
-              Сумма операций по снятию наличности в месяц
-            </p>
-            <div className={styles.row}>
-              <div className={styles.checks}>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setInfo("numberCashMoney", "0 - 99 000")}
-                >
-                  <RadioButtonRS
-                    isActive={infoAboutMoney.numberCashMoney === "0 - 99 000"}
-                  />
-                  <p>0 - 99 000 руб.</p>
-                </div>
-                <div
-                  className={styles.checks__item}
-                  onClick={() =>
-                    setInfo("numberCashMoney", "100 000 - 1 000 000")
-                  }
-                >
-                  <RadioButtonRS
-                    isActive={
-                      infoAboutMoney.numberCashMoney === "100 000 - 1 000 000"
-                    }
-                  />
-                  <p>100 000 - 1 000 000 руб.</p>
-                </div>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setInfo("numberCashMoney", ">1 000 000")}
-                >
-                  <RadioButtonRS
-                    isActive={infoAboutMoney.numberCashMoney === ">1 000 000"}
-                  />
-                  <p>более 1 000 000 руб.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <p className={styles.mb24}>
-              Количество операций по внешнеторговым контрактам в месяц
-            </p>
-            <div className={styles.row}>
-              <div className={styles.checks}>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setInfo("numberTradeTransactions", "0-29")}
-                >
-                  <RadioButtonRS
-                    isActive={infoAboutMoney.numberTradeTransactions === "0-29"}
-                  />
-                  <p>0-29</p>
-                </div>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setInfo("numberTradeTransactions", "30-100")}
-                >
-                  <RadioButtonRS
-                    isActive={
-                      infoAboutMoney.numberTradeTransactions === "30-100"
-                    }
-                  />
-                  <p>30-100</p>
-                </div>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setInfo("numberTradeTransactions", ">100")}
-                >
-                  <RadioButtonRS
-                    isActive={infoAboutMoney.numberTradeTransactions === ">100"}
-                  />
-                  <p>более 100</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <p className={styles.mb24}>
-              Источники происхождения денежных средств
-            </p>
+        <div>
+          <Wrapper
+            headElement={
+              <p className={styles.title_block}>
+                Сведения о целях установления деловых отношений с банком
+              </p>
+            }
+          >
             <div className={styles.row}>
               <div className={styles.checks}>
                 <div className={styles.checks__item}>
                   <CheckBoxRS />
-                  <p>
-                    Средства, полученные в рамках осуществляемой хозяйственной
-                    деятельности{" "}
-                  </p>
+                  <p>Расчетно-кассовое обслуживание</p>
                 </div>
                 <div className={styles.checks__item}>
                   <CheckBoxRS />
-                  <p>Собственные средства</p>
+                  <p>Дистанционное банковское обслуживание</p>
+                </div>
+                <div className={styles.checks__item}>
+                  <CheckBoxRS />
+                  <p>Внешнеэкономические операции</p>
                 </div>
               </div>
             </div>
@@ -980,137 +793,388 @@ const Step2 = () => {
               <div className={styles.checks}>
                 <div className={styles.checks__item}>
                   <CheckBoxRS />
-                  <p>
-                    Заемные средства (займы от третьих лиц, учредителей и т.д.)
-                  </p>
+                  <p>Интернет-эквайринг</p>
                 </div>
                 <div className={styles.checks__item}>
                   <CheckBoxRS />
-                  <p>Иные</p>
+                  <p>Кредитование</p>
+                </div>
+                <div className={styles.checks__item}>
+                  <CheckBoxRS />
+                  <p>Торговый эквайринг</p>
+                </div>
+                <div className={styles.checks__item}>
+                  <CheckBoxRS />
+                  <p>Переводы СБП (c2b) </p>
                 </div>
               </div>
             </div>
-          </div>
-          <div>
-            <p className={styles.mb24}>Штатная численность сотрудников</p>
-            <div className={styles.row}>
-              <div className={styles.checks}>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setInfo("countHumans", "0-29")}
-                >
-                  <RadioButtonRS
-                    isActive={infoAboutMoney.countHumans === "0-29"}
-                  />
-                  <p>0-29</p>
-                </div>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setInfo("countHumans", "30-100")}
-                >
-                  <RadioButtonRS
-                    isActive={infoAboutMoney.countHumans === "30-100"}
-                  />
-                  <p>30-100</p>
-                </div>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setInfo("countHumans", ">100")}
-                >
-                  <RadioButtonRS
-                    isActive={infoAboutMoney.countHumans === ">100"}
-                  />
-                  <p>более 100</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <p className={styles.mb24}>Отметьте все верные утверждения</p>
-            <div className={styles.content}>
+            <div>
+              <p className={styles.mb24}>
+                Количество операций по безналичным платежам в месяц
+              </p>
               <div className={styles.row}>
-                <div className={styles.column}>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS />
-                    <p>
-                      Компания является Финансовым институтом в соответствии с
-                      Законом США «О налогообложении иностранных счетов» (FATCA)
-                      и/или главой 20.1 Налогового кодекса РФ
-                    </p>
+                <div className={styles.checks}>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setInfo("numberNoncashTransactions", "0-29")}
+                  >
+                    <RadioButtonRS
+                      isActive={
+                        infoAboutMoney.numberNoncashTransactions === "0-29"
+                      }
+                    />
+                    <p>0-29</p>
                   </div>
-                </div>
-                <div className={styles.column}>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS />
-                    <p>
-                      Компания, выгодоприобретатель или бенефициар компании
-                      является налоговым резидентом США
-                    </p>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() =>
+                      setInfo("numberNoncashTransactions", "30-100")
+                    }
+                  >
+                    <RadioButtonRS
+                      isActive={
+                        infoAboutMoney.numberNoncashTransactions === "30-100"
+                      }
+                    />
+                    <p>30-100</p>
+                  </div>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setInfo("numberNoncashTransactions", ">100")}
+                  >
+                    <RadioButtonRS
+                      isActive={
+                        infoAboutMoney.numberNoncashTransactions === ">100"
+                      }
+                    />
+                    <p>более 100</p>
                   </div>
                 </div>
               </div>
+            </div>
+            <div>
+              <p className={styles.mb24}>
+                Сумма операций по безналичным платежам в месяц
+              </p>
+              <div className={styles.row}>
+                <div className={styles.checks}>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setInfo("numberNoncashMoney", "0 - 99")}
+                  >
+                    <RadioButtonRS
+                      isActive={infoAboutMoney.numberNoncashMoney === "0 - 99"}
+                    />
+                    <p>0 - 99 000 руб.</p>
+                  </div>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() =>
+                      setInfo("numberNoncashMoney", "100000-1000000")
+                    }
+                  >
+                    <RadioButtonRS
+                      isActive={
+                        infoAboutMoney.numberNoncashMoney === "100000-1000000"
+                      }
+                    />
+                    <p>100 000 - 1 000 000 руб.</p>
+                  </div>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setInfo("numberNoncashMoney", "1000000")}
+                  >
+                    <RadioButtonRS
+                      isActive={infoAboutMoney.numberNoncashMoney === "1000000"}
+                    />
+                    <p>более 1 000 000 руб.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p className={styles.mb24}>
+                Количество операций по снятию наличности в месяц
+              </p>
+              <div className={styles.row}>
+                <div className={styles.checks}>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setInfo("numberCashTransactions", "0-29")}
+                  >
+                    <RadioButtonRS
+                      isActive={
+                        infoAboutMoney.numberCashTransactions === "0-29"
+                      }
+                    />
+                    <p>0-29</p>
+                  </div>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setInfo("numberCashTransactions", "30-100")}
+                  >
+                    <RadioButtonRS
+                      isActive={
+                        infoAboutMoney.numberCashTransactions === "30-100"
+                      }
+                    />
+                    <p>30-100</p>
+                  </div>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setInfo("numberCashTransactions", ">100")}
+                  >
+                    <RadioButtonRS
+                      isActive={
+                        infoAboutMoney.numberCashTransactions === ">100"
+                      }
+                    />
+                    <p>более 100</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p className={styles.mb24}>
+                Сумма операций по снятию наличности в месяц
+              </p>
+              <div className={styles.row}>
+                <div className={styles.checks}>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setInfo("numberCashMoney", "0 - 99 000")}
+                  >
+                    <RadioButtonRS
+                      isActive={infoAboutMoney.numberCashMoney === "0 - 99 000"}
+                    />
+                    <p>0 - 99 000 руб.</p>
+                  </div>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() =>
+                      setInfo("numberCashMoney", "100 000 - 1 000 000")
+                    }
+                  >
+                    <RadioButtonRS
+                      isActive={
+                        infoAboutMoney.numberCashMoney === "100 000 - 1 000 000"
+                      }
+                    />
+                    <p>100 000 - 1 000 000 руб.</p>
+                  </div>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setInfo("numberCashMoney", ">1 000 000")}
+                  >
+                    <RadioButtonRS
+                      isActive={infoAboutMoney.numberCashMoney === ">1 000 000"}
+                    />
+                    <p>более 1 000 000 руб.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p className={styles.mb24}>
+                Количество операций по внешнеторговым контрактам в месяц
+              </p>
+              <div className={styles.row}>
+                <div className={styles.checks}>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setInfo("numberTradeTransactions", "0-29")}
+                  >
+                    <RadioButtonRS
+                      isActive={
+                        infoAboutMoney.numberTradeTransactions === "0-29"
+                      }
+                    />
+                    <p>0-29</p>
+                  </div>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setInfo("numberTradeTransactions", "30-100")}
+                  >
+                    <RadioButtonRS
+                      isActive={
+                        infoAboutMoney.numberTradeTransactions === "30-100"
+                      }
+                    />
+                    <p>30-100</p>
+                  </div>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setInfo("numberTradeTransactions", ">100")}
+                  >
+                    <RadioButtonRS
+                      isActive={
+                        infoAboutMoney.numberTradeTransactions === ">100"
+                      }
+                    />
+                    <p>более 100</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p className={styles.mb24}>
+                Источники происхождения денежных средств
+              </p>
+              <div className={styles.row}>
+                <div className={styles.checks}>
+                  <div className={styles.checks__item}>
+                    <CheckBoxRS />
+                    <p>
+                      Средства, полученные в рамках осуществляемой хозяйственной
+                      деятельности{" "}
+                    </p>
+                  </div>
+                  <div className={styles.checks__item}>
+                    <CheckBoxRS />
+                    <p>Собственные средства</p>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.row}>
+                <div className={styles.checks}>
+                  <div className={styles.checks__item}>
+                    <CheckBoxRS />
+                    <p>
+                      Заемные средства (займы от третьих лиц, учредителей и
+                      т.д.)
+                    </p>
+                  </div>
+                  <div className={styles.checks__item}>
+                    <CheckBoxRS />
+                    <p>Иные</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p className={styles.mb24}>Штатная численность сотрудников</p>
+              <div className={styles.row}>
+                <div className={styles.checks}>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setInfo("countHumans", "0-29")}
+                  >
+                    <RadioButtonRS
+                      isActive={infoAboutMoney.countHumans === "0-29"}
+                    />
+                    <p>0-29</p>
+                  </div>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setInfo("countHumans", "30-100")}
+                  >
+                    <RadioButtonRS
+                      isActive={infoAboutMoney.countHumans === "30-100"}
+                    />
+                    <p>30-100</p>
+                  </div>
+                  <div
+                    className={styles.checks__item}
+                    onClick={() => setInfo("countHumans", ">100")}
+                  >
+                    <RadioButtonRS
+                      isActive={infoAboutMoney.countHumans === ">100"}
+                    />
+                    <p>более 100</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Wrapper>
+        </div>
+        <div>
+          <p className={styles.mb24}>Отметьте все верные утверждения</p>
+          <div className={styles.content}>
+            <div className={styles.row}>
+              <div className={styles.column}>
+                <div className={styles.checks__item}>
+                  <CheckBoxRS />
+                  <p>
+                    Компания является Финансовым институтом в соответствии с
+                    Законом США «О налогообложении иностранных счетов» (FATCA)
+                    и/или главой 20.1 Налогового кодекса РФ
+                  </p>
+                </div>
+              </div>
+              <div className={styles.column}>
+                <div className={styles.checks__item}>
+                  <CheckBoxRS />
+                  <p>
+                    Компания, выгодоприобретатель или бенефициар компании
+                    является налоговым резидентом США
+                  </p>
+                </div>
+              </div>
+            </div>
 
-              <div className={styles.row}>
-                <div className={styles.column}>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS />
-                    <p>
-                      Компания является хозяйственным обществом, имеющим
-                      стратегическое значение для оборонно-промышленного
-                      комплекса и безопасности РФ либо обществом, находящимся
-                      под его прямым или косвенным контролем, которые указаны в
-                      Федеральном законе от 21.07.2014 N 213-ФЗ
-                    </p>
-                  </div>
-                </div>
-                <div className={styles.column}>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS />
-                    <p>
-                      Компания осуществляет виды деятельности, которые могут
-                      иметь стратегическое значение для оборонно-промышленного
-                      комплекса и безопасности РФ
-                    </p>
-                  </div>
+            <div className={styles.row}>
+              <div className={styles.column}>
+                <div className={styles.checks__item}>
+                  <CheckBoxRS />
+                  <p>
+                    Компания является хозяйственным обществом, имеющим
+                    стратегическое значение для оборонно-промышленного комплекса
+                    и безопасности РФ либо обществом, находящимся под его прямым
+                    или косвенным контролем, которые указаны в Федеральном
+                    законе от 21.07.2014 N 213-ФЗ
+                  </p>
                 </div>
               </div>
-              <div className={styles.row}>
-                <div className={styles.column}>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS />
-                    <p>
-                      Компания не относится к указанным в настоящем пункте
-                      юридическим лицам
-                    </p>
-                  </div>
+              <div className={styles.column}>
+                <div className={styles.checks__item}>
+                  <CheckBoxRS />
+                  <p>
+                    Компания осуществляет виды деятельности, которые могут иметь
+                    стратегическое значение для оборонно-промышленного комплекса
+                    и безопасности РФ
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className={styles.row}>
+              <div className={styles.column}>
+                <div className={styles.checks__item}>
+                  <CheckBoxRS />
+                  <p>
+                    Компания не относится к указанным в настоящем пункте
+                    юридическим лицам
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
         <div>
-          <p className={styles.title_block}>Документы</p>
-          <ScanOrPhoto name={"Устав юридического лица"} />
-          <ScanOrPhoto
-            name={"Решение и/или приказ о назначении на должность ЕИО"}
-          />
-          <ScanOrPhoto
-            name={
-              "Паспорт исполнительного органа Клиента/лица, действующего по доверенности, а также паспорт каждого бенефициарного владельца\n"
-            }
-          />
-          <ScanOrPhoto
-            name={
-              "Доверенность лица, действующего по доверенности, в случаи если подписантом будет выступать не единоличный исполнительный орган\n"
-            }
-          />
-          <ScanOrPhoto
-            name={
-              "Документы, подтверждающие законное право ЕИО - физ.лица, не являющегося гражданином РФ, на нахождение / пребывание на территории РФ (Миграционная карта, вид на жительство и иные документы подтверждающие такое право\n"
-            }
-          />
-          <ScanOrPhoto name={"Прочие документы"} />
+          <Wrapper
+            headElement={<p className={styles.title_block}>Документы</p>}
+          >
+            <ScanOrPhoto name={"Устав юридического лица"} />
+            <ScanOrPhoto
+              name={"Решение и/или приказ о назначении на должность ЕИО"}
+            />
+            <ScanOrPhoto
+              name={
+                "Паспорт исполнительного органа Клиента/лица, действующего по доверенности, а также паспорт каждого бенефициарного владельца\n"
+              }
+            />
+            <ScanOrPhoto
+              name={
+                "Доверенность лица, действующего по доверенности, в случаи если подписантом будет выступать не единоличный исполнительный орган\n"
+              }
+            />
+            <ScanOrPhoto
+              name={
+                "Документы, подтверждающие законное право ЕИО - физ.лица, не являющегося гражданином РФ, на нахождение / пребывание на территории РФ (Миграционная карта, вид на жительство и иные документы подтверждающие такое право\n"
+              }
+            />
+            <ScanOrPhoto name={"Прочие документы"} />
+          </Wrapper>
         </div>
         <div style={{ textAlign: "right", margin: "40px 0" }}>
           <ButtonRS

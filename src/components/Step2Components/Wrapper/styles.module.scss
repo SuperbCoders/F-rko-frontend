@@ -1,0 +1,22 @@
+.name {
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+
+  & > p {
+    margin-bottom: 0;
+  }
+
+  & .icon {
+    transition: .25s;
+    margin-left: 8px;
+    width: 24px;
+    height: 24px;
+
+    &.active {
+      transform: rotate(180deg)
+    }
+  }
+}
