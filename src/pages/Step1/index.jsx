@@ -7,6 +7,7 @@ import CheckBoxRS from "../../components/CheckBoxRS";
 import cube from "../../assets/img/cube.png";
 import { useNavigate } from "react-router-dom";
 import HeaderMy from "../../components/HeaderMy";
+import DaDataSelect from "../../components/DaDataSelect";
 
 const Step1 = () => {
   const navigate = useNavigate();
@@ -39,12 +40,9 @@ const Step1 = () => {
                   inputStyle={{ width: "100%", marginBottom: "35px" }}
                 />
               </div>
-              <div>
+              <div style={{ marginBottom: "35px" }}>
                 <p className={styles.input__name}>Компания или ИП</p>
-                <InputRS
-                  placeholder={"Введите название или ИНН"}
-                  inputStyle={{ width: "100%", marginBottom: "32px" }}
-                />
+                <DaDataSelect placeholder={"Введите название или ИНН"} />
               </div>
               <div
                 className={styles.input__wrapper}
