@@ -76,6 +76,8 @@ const Step3 = () => {
       price: 4490,
     },
   ]);
+  const [overdraft, setOverdraft] = useState(false);
+  const [acquire, setAcquire] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -131,13 +133,23 @@ const Step3 = () => {
             Выберите дополнительные продукты к подключению
           </p>
           <div className={styles.options}>
-            <div className={styles.options__item}>
+            <div
+              className={styles.options__item}
+              onClick={() => {
+                setOverdraft((prevState) => !prevState);
+              }}
+            >
               <p className={styles.text}>Овердрафт</p>
-              <CheckBoxRS size={"medium"} />
+              <CheckBoxRS isChecked={overdraft} size={"medium"} />
             </div>
-            <div className={styles.options__item}>
+            <div
+              className={styles.options__item}
+              onClick={() => {
+                setAcquire((prevState) => !prevState);
+              }}
+            >
               <p className={styles.text}>Интернет-Эквайринг</p>
-              <CheckBoxRS size={"medium"} />
+              <CheckBoxRS isChecked={acquire} size={"medium"} />
             </div>
           </div>
           <div className={styles.agreement}>

@@ -40,7 +40,7 @@ const Wrapper = ({ headElement, children, ...props }) => {
         style={{
           overflow: "hidden",
           transition: ".9s",
-          maxHeight: showContent ? 1500 : 0,
+          maxHeight: showContent ? 2000 : 0,
         }}
       >
         {children}

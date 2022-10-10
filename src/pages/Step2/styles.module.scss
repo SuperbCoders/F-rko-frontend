@@ -84,7 +84,8 @@
   border: 1px solid #D6D8DA;
   width: 100%;
   outline: none;
-  padding: 16px;
+  padding: 20px 16px;
+  font-size: 16px;
   border-radius: 8px;
 
   &::placeholder {
@@ -105,7 +106,7 @@
 
     .lock, .icon {
       position: absolute;
-      top: 39px;
+      top: 46px;
       right: 16px;
 
       & > * {

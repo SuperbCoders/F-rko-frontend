@@ -245,7 +245,7 @@ const Step2 = () => {
         <Paginator
           activeStep={2}
           style={{
-            marginTop: "105px",
+            marginTop: "64px",
             marginBottom: "16px",
           }}
         />
@@ -436,20 +436,24 @@ const Step2 = () => {
               <div className={styles.row}>
                 <div className={styles.checks}>
                   <div className={styles.checks__item}>
-                    <CheckBoxRS />
-                    <p>Руководитель</p>
+                    <CheckBoxRS>
+                      <p>Руководитель</p>
+                    </CheckBoxRS>
                   </div>
                   <div className={styles.checks__item}>
-                    <CheckBoxRS />
-                    <p>Учредитель</p>
+                    <CheckBoxRS>
+                      <p>Учредитель</p>
+                    </CheckBoxRS>
                   </div>
                   <div className={styles.checks__item}>
-                    <CheckBoxRS />
-                    <p>Бенефициарный владелец</p>
+                    <CheckBoxRS>
+                      <p>Бенефициарный владелец</p>
+                    </CheckBoxRS>
                   </div>
                   <div className={styles.checks__item}>
-                    <CheckBoxRS />
-                    <p>Подписант</p>
+                    <CheckBoxRS>
+                      <p>Подписант</p>
+                    </CheckBoxRS>
                   </div>
                 </div>
               </div>
@@ -702,7 +706,7 @@ const Step2 = () => {
             </div>
           </Wrapper>
         </div>
-        <div>
+        <div className={styles.mb24}>
           <Wrapper
             headElement={
               <p className={styles.title_block}>
@@ -713,34 +717,39 @@ const Step2 = () => {
             <div className={styles.row}>
               <div className={styles.checks}>
                 <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Договор купли – продажи (товарный)</p>
+                  <CheckBoxRS>
+                    <p>Договор купли – продажи (товарный)</p>
+                  </CheckBoxRS>
                 </div>
                 <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Агентский договор</p>
+                  <CheckBoxRS>
+                    <p>Агентский договор</p>
+                  </CheckBoxRS>
                 </div>
                 <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Договор комиссии</p>
+                  <CheckBoxRS>
+                    <p>Договор комиссии</p>
+                  </CheckBoxRS>
                 </div>
               </div>
             </div>
             <div className={styles.row}>
               <div className={styles.checks}>
                 <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Договор купли-продажи ценных бумаг</p>
+                  <CheckBoxRS>
+                    <p>Договор купли-продажи ценных бумаг</p>
+                  </CheckBoxRS>
                 </div>
                 <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Договор аренды</p>
+                  <CheckBoxRS>
+                    <p>Договор аренды</p>
+                  </CheckBoxRS>
                 </div>
               </div>
             </div>
           </Wrapper>
         </div>
-        <div className={styles.mb24}>
+        <div className={styles.mb40}>
           <p className={styles.title_block}>Выгодоприобретатели</p>
           <div className={styles.row}>
             <div className={styles.checks}>
@@ -765,7 +774,7 @@ const Step2 = () => {
           </div>
         </div>
 
-        <div>
+        <div className={styles.mb24}>
           <Wrapper
             headElement={
               <p className={styles.title_block}>
@@ -776,40 +785,47 @@ const Step2 = () => {
             <div className={styles.row}>
               <div className={styles.checks}>
                 <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Расчетно-кассовое обслуживание</p>
+                  <CheckBoxRS>
+                    <p>Расчетно-кассовое обслуживание</p>
+                  </CheckBoxRS>
                 </div>
                 <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Дистанционное банковское обслуживание</p>
+                  <CheckBoxRS>
+                    <p>Дистанционное банковское обслуживание</p>
+                  </CheckBoxRS>
                 </div>
                 <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Внешнеэкономические операции</p>
+                  <CheckBoxRS>
+                    <p>Внешнеэкономические операции</p>
+                  </CheckBoxRS>
                 </div>
               </div>
             </div>
-            <div className={styles.row}>
+            <div className={styles.row} style={{ marginBottom: "40px" }}>
               <div className={styles.checks}>
                 <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Интернет-эквайринг</p>
+                  <CheckBoxRS>
+                    <p>Интернет-эквайринг</p>
+                  </CheckBoxRS>
                 </div>
                 <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Кредитование</p>
+                  <CheckBoxRS>
+                    <p>Кредитование</p>
+                  </CheckBoxRS>
                 </div>
                 <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Торговый эквайринг</p>
+                  <CheckBoxRS>
+                    <p>Торговый эквайринг</p>
+                  </CheckBoxRS>
                 </div>
                 <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>Переводы СБП (c2b) </p>
+                  <CheckBoxRS>
+                    <p>Переводы СБП (c2b) </p>
+                  </CheckBoxRS>
                 </div>
               </div>
             </div>
-            <div>
+            <div className={styles.mb40}>
               <p className={styles.mb24}>
                 Количество операций по безналичным платежам в месяц
               </p>
@@ -853,7 +869,7 @@ const Step2 = () => {
                 </div>
               </div>
             </div>
-            <div>
+            <div className={styles.mb40}>
               <p className={styles.mb24}>
                 Сумма операций по безналичным платежам в месяц
               </p>
@@ -893,7 +909,7 @@ const Step2 = () => {
                 </div>
               </div>
             </div>
-            <div>
+            <div className={styles.mb40}>
               <p className={styles.mb24}>
                 Количество операций по снятию наличности в месяц
               </p>
@@ -935,7 +951,7 @@ const Step2 = () => {
                 </div>
               </div>
             </div>
-            <div>
+            <div className={styles.mb40}>
               <p className={styles.mb24}>
                 Сумма операций по снятию наличности в месяц
               </p>
@@ -975,7 +991,7 @@ const Step2 = () => {
                 </div>
               </div>
             </div>
-            <div>
+            <div className={styles.mb40}>
               <p className={styles.mb24}>
                 Количество операций по внешнеторговым контрактам в месяц
               </p>
@@ -1017,42 +1033,46 @@ const Step2 = () => {
                 </div>
               </div>
             </div>
-            <div>
+            <div className={styles.mb40}>
               <p className={styles.mb24}>
                 Источники происхождения денежных средств
               </p>
               <div className={styles.row}>
                 <div className={styles.checks}>
                   <div className={styles.checks__item}>
-                    <CheckBoxRS />
-                    <p>
-                      Средства, полученные в рамках осуществляемой хозяйственной
-                      деятельности{" "}
-                    </p>
+                    <CheckBoxRS>
+                      <p>
+                        Средства, полученные в рамках осуществляемой
+                        хозяйственной деятельности{" "}
+                      </p>
+                    </CheckBoxRS>
                   </div>
                   <div className={styles.checks__item}>
-                    <CheckBoxRS />
-                    <p>Собственные средства</p>
+                    <CheckBoxRS>
+                      <p>Собственные средства</p>
+                    </CheckBoxRS>
                   </div>
                 </div>
               </div>
               <div className={styles.row}>
                 <div className={styles.checks}>
                   <div className={styles.checks__item}>
-                    <CheckBoxRS />
-                    <p>
-                      Заемные средства (займы от третьих лиц, учредителей и
-                      т.д.)
-                    </p>
+                    <CheckBoxRS>
+                      <p>
+                        Заемные средства (займы от третьих лиц, учредителей и
+                        т.д.)
+                      </p>
+                    </CheckBoxRS>
                   </div>
                   <div className={styles.checks__item}>
-                    <CheckBoxRS />
-                    <p>Иные</p>
+                    <CheckBoxRS>
+                      <p>Иные</p>
+                    </CheckBoxRS>
                   </div>
                 </div>
               </div>
             </div>
-            <div>
+            <div className={styles.mb40}>
               <p className={styles.mb24}>Штатная численность сотрудников</p>
               <div className={styles.row}>
                 <div className={styles.checks}>
@@ -1088,27 +1108,29 @@ const Step2 = () => {
             </div>
           </Wrapper>
         </div>
-        <div>
+        <div className={styles.mb24}>
           <p className={styles.mb24}>Отметьте все верные утверждения</p>
           <div className={styles.content}>
             <div className={styles.row}>
               <div className={styles.column}>
                 <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>
-                    Компания является Финансовым институтом в соответствии с
-                    Законом США «О налогообложении иностранных счетов» (FATCA)
-                    и/или главой 20.1 Налогового кодекса РФ
-                  </p>
+                  <CheckBoxRS isCheckStart>
+                    <p>
+                      Компания является Финансовым институтом в соответствии с
+                      Законом США «О налогообложении иностранных счетов» (FATCA)
+                      и/или главой 20.1 Налогового кодекса РФ
+                    </p>
+                  </CheckBoxRS>
                 </div>
               </div>
               <div className={styles.column}>
                 <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>
-                    Компания, выгодоприобретатель или бенефициар компании
-                    является налоговым резидентом США
-                  </p>
+                  <CheckBoxRS isCheckStart>
+                    <p>
+                      Компания, выгодоприобретатель или бенефициар компании
+                      является налоговым резидентом США
+                    </p>
+                  </CheckBoxRS>
                 </div>
               </div>
             </div>
@@ -1116,35 +1138,38 @@ const Step2 = () => {
             <div className={styles.row}>
               <div className={styles.column}>
                 <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>
-                    Компания является хозяйственным обществом, имеющим
-                    стратегическое значение для оборонно-промышленного комплекса
-                    и безопасности РФ либо обществом, находящимся под его прямым
-                    или косвенным контролем, которые указаны в Федеральном
-                    законе от 21.07.2014 N 213-ФЗ
-                  </p>
+                  <CheckBoxRS isCheckStart>
+                    <p>
+                      Компания является хозяйственным обществом, имеющим
+                      стратегическое значение для оборонно-промышленного
+                      комплекса и безопасности РФ либо обществом, находящимся
+                      под его прямым или косвенным контролем, которые указаны в
+                      Федеральном законе от 21.07.2014 N 213-ФЗ
+                    </p>
+                  </CheckBoxRS>
                 </div>
               </div>
               <div className={styles.column}>
                 <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>
-                    Компания осуществляет виды деятельности, которые могут иметь
-                    стратегическое значение для оборонно-промышленного комплекса
-                    и безопасности РФ
-                  </p>
+                  <CheckBoxRS isCheckStart>
+                    <p>
+                      Компания осуществляет виды деятельности, которые могут
+                      иметь стратегическое значение для оборонно-промышленного
+                      комплекса и безопасности РФ
+                    </p>
+                  </CheckBoxRS>
                 </div>
               </div>
             </div>
             <div className={styles.row}>
               <div className={styles.column}>
                 <div className={styles.checks__item}>
-                  <CheckBoxRS />
-                  <p>
-                    Компания не относится к указанным в настоящем пункте
-                    юридическим лицам
-                  </p>
+                  <CheckBoxRS isCheckStart>
+                    <p>
+                      Компания не относится к указанным в настоящем пункте
+                      юридическим лицам
+                    </p>
+                  </CheckBoxRS>
                 </div>
               </div>
             </div>

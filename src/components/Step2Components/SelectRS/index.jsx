@@ -34,8 +34,8 @@ const SelectRS = ({ name, backgroundColor, ...props }) => {
           }),
           valueContainer: (provided) => ({
             ...provided,
-            fontSize: "14px",
-            padding: "12px 16px",
+            fontSize: "16px",
+            padding: "17px 14px",
           }),
         }}
         options={options}

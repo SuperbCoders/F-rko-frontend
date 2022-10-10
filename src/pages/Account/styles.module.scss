@@ -158,10 +158,34 @@
         .status {
           display: inline-block;
           font-size: 12px;
-          color: $coal4;
           padding: 8px 12px;
-          border: 1px solid $coal4;
+          border: 1px solid transparent;
           border-radius: 16px;
+
+          &.wait {
+            color: $coal4;
+            border-color: $coal4;
+          }
+
+          &.work {
+            color: #7DA8CC;
+            border-color: #7DA8CC;
+          }
+
+          &.cancel {
+            color: #EB5757;
+            border-color: #EB5757;
+          }
+
+          &.done {
+            color: #27AE60;
+            border-color: #27AE60;
+          }
+
+          &.check {
+            color: #F5A631;
+            border-color: #F5A631;
+          }
         }
 
         .name {

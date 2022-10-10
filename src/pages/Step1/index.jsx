@@ -83,14 +83,15 @@ const Step1 = () => {
                 </div>
               </div>
               <div className={styles.checkbox__container}>
-                <CheckBoxRS />
-                <p className={styles.checkbox__name}>
-                  Я ознакомился и согласен с условиями{" "}
-                  <a href="#">резервирования счёта</a>,<br /> а также с{" "}
-                  <a href="#">
-                    условиями обработки и хранения персональных данных
-                  </a>
-                </p>
+                <CheckBoxRS>
+                  <p className={styles.checkbox__name}>
+                    Я ознакомился и согласен с условиями{" "}
+                    <a href="#">резервирования счёта</a>,<br /> а также с{" "}
+                    <a href="#">
+                      условиями обработки и хранения персональных данных
+                    </a>
+                  </p>
+                </CheckBoxRS>
               </div>
               <div className={styles.buttons}>
                 <ButtonRS

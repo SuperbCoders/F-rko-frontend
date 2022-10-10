@@ -12,12 +12,14 @@ const AddressItem = () => {
           <p className={styles.name_option}>Адрес</p>
           <div className={styles.checks} style={{ marginBottom: 0 }}>
             <div className={styles.checks__item}>
-              <CheckBoxRS />
-              <p>Юридический</p>
+              <CheckBoxRS>
+                <p>Юридический</p>
+              </CheckBoxRS>
             </div>
             <div className={styles.checks__item}>
-              <CheckBoxRS />
-              <p>Фактический</p>
+              <CheckBoxRS>
+                <p>Фактический</p>
+              </CheckBoxRS>
             </div>
           </div>
         </div>

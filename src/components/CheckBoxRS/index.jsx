@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./styles.module.scss";
 import classNames from "classnames";
 
-const CheckBoxRS = ({ size = "small", ...props }) => {
-  const [isActive, setActive] = useState(false);
+const CheckBoxRS = ({
+  size = "small",
+  children,
+  isChecked = false,
+  isCheckStart = false,
+  ...props
+}) => {
+  const [isActive, setActive] = useState(isChecked);
   const isSmall = size === "small";
   const isMedium = size === "medium";
   const addClass = isSmall ? styles.small : isMedium ? styles.medium : null;
@@ -12,9 +18,16 @@ const CheckBoxRS = ({ size = "small", ...props }) => {
     height: "6",
   };
 
+  useEffect(() => {
+    setActive(isChecked);
+  }, [isChecked]);
+
   return (
     <div
-      className={styles.checkbox__wrapper}
+      className={classNames(
+        styles.checkbox__wrapper,
+        isCheckStart && styles.start_check
+      )}
       onClick={() => setActive((prevState) => !prevState)}
       {...props}
     >
@@ -43,6 +56,7 @@ const CheckBoxRS = ({ size = "small", ...props }) => {
           </svg>
         )}
       </div>
+      {children}
     </div>
   );
 };

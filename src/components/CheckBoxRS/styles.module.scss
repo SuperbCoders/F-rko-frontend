@@ -18,11 +18,20 @@
   &__wrapper {
     display: flex;
     align-items: center;
+
+    &.start_check {
+      align-items: flex-start;
+    }
+
+    & * {
+      cursor: pointer;
+    }
   }
 
   &.small {
     width: 16px;
     height: 16px;
+    min-width: 16px;
   }
 
   &.medium {
@@ -36,3 +45,4 @@
     }
   }
 }
+
