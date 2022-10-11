@@ -5,6 +5,12 @@
   align-items: center;
   margin-bottom: 24px;
 
+  &:hover {
+    path {
+      stroke: #D41367;
+    }
+  }
+
   & > p {
     margin-bottom: 0;
   }
@@ -14,6 +20,10 @@
     margin-left: 8px;
     width: 24px;
     height: 24px;
+
+    path {
+      transition: .25s;
+    }
 
     &.active {
       transform: rotate(180deg)

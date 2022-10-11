@@ -8,6 +8,7 @@ import cube from "../../assets/img/cube.png";
 import { useNavigate } from "react-router-dom";
 import HeaderMy from "../../components/HeaderMy";
 import DaDataSelect from "../../components/DaDataSelect";
+import PhoneInput from "../../components/PhoneInput";
 
 const Step1 = () => {
   const navigate = useNavigate();
@@ -51,15 +52,13 @@ const Step1 = () => {
               >
                 <p className={styles.input__name}>Номер телефона</p>
                 <div className={styles.input__container}>
-                  <InputRS
+                  <PhoneInput
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
-                    inputStyle={{ maxWidth: "364px" }}
-                    placeholder={"+7 (__) ___ __ __"}
                   />
                   <ButtonRS
                     title={"Получить код"}
-                    disable={!code}
+                    disable={!/[0-9]+/.test(code[17])}
                     style={{
                       marginLeft: "24px",
                       maxWidth: "267px",
