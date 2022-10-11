@@ -27,7 +27,12 @@ const AddressItem = () => {
       <div className={styles.row}>
         <div className={styles.column}>
           <div className={styles.row}>
-            <Input name={"Адрес"} placeholder={"Напишите адрес"} />
+            <Input
+              error
+              value={"Пример ошибки"}
+              name={"Адрес"}
+              placeholder={"Напишите адрес"}
+            />
           </div>
         </div>
         <div className={styles.column}>

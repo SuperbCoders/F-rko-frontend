@@ -87,9 +87,24 @@
   padding: 20px 16px;
   font-size: 16px;
   border-radius: 8px;
+  transition: .25s;
+
+  &:hover {
+    border-color: #757F86;
+  }
+
+  &:focus {
+    border-color: #757F86;
+    color: #323E48;
+  }
 
   &::placeholder {
     color: #8E909B;
+  }
+
+  &.error {
+    border-color: #EB5757;
+    color: #EB5757;
   }
 
   &__wrapper {

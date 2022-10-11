@@ -2,7 +2,13 @@ import React from "react";
 import styles from "../../../pages/Step2/styles.module.scss";
 import classNames from "classnames";
 
-const Input = ({ name, rightElement = null, value = "", placeholder }) => {
+const Input = ({
+  name,
+  error = false,
+  rightElement = null,
+  value = "",
+  placeholder,
+}) => {
   return (
     <div className={styles.input__wrapper}>
       {rightElement ? (
@@ -13,7 +19,7 @@ const Input = ({ name, rightElement = null, value = "", placeholder }) => {
         type="text"
         placeholder={placeholder}
         value={value}
-        className={classNames(styles.input)}
+        className={classNames(styles.input, error && styles.error)}
       />
     </div>
   );
