@@ -28,8 +28,10 @@ const SelectRS = ({ name, backgroundColor, ...props }) => {
             borderRadius: "8px",
             backgroundColor,
             boxShadow: "none",
+            cursor: "text",
+            transition: ".25s",
             "&:hover": {
-              borderColor: "#D6D8DA",
+              borderColor: "#757F86",
             },
           }),
           valueContainer: (provided) => ({

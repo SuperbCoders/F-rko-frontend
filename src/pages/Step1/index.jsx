@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Paginator from "../../components/Paginator";
 import InputRS from "../../components/InputRS";
 import styles from "./styles.module.scss";
@@ -11,6 +11,7 @@ import DaDataSelect from "../../components/DaDataSelect";
 
 const Step1 = () => {
   const navigate = useNavigate();
+  const [code, setCode] = useState("");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -51,12 +52,14 @@ const Step1 = () => {
                 <p className={styles.input__name}>Номер телефона</p>
                 <div className={styles.input__container}>
                   <InputRS
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
                     inputStyle={{ maxWidth: "364px" }}
                     placeholder={"+7 (__) ___ __ __"}
                   />
                   <ButtonRS
                     title={"Получить код"}
-                    disable={true}
+                    disable={!code}
                     style={{
                       marginLeft: "24px",
                       maxWidth: "267px",
