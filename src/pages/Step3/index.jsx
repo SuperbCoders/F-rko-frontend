@@ -19,7 +19,7 @@ const TickSymbol = () => {
       >
         <path
           d="M17 1L6 12L1 7"
-          stroke="#D41367"
+          stroke="#fff"
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -103,7 +103,10 @@ const Step3 = () => {
               const isActiveCard = card.id === activeCard;
 
               return (
-                <div className={styles.cards__item}>
+                <div
+                  className={styles.cards__item}
+                  onClick={() => setActiveCard(card.id)}
+                >
                   <p className={styles.name}>{card.name}</p>
                   <p className={styles.desc}>{card.desc}</p>
 
@@ -120,7 +123,6 @@ const Step3 = () => {
                       styles.button,
                       isActiveCard && styles.active
                     )}
-                    onClick={() => setActiveCard(card.id)}
                   >
                     {isActiveCard ? "Выбрано" : "Выбрать"}
                     {isActiveCard && <TickSymbol />}

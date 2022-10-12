@@ -21,11 +21,12 @@
     border-radius: 16px;
     margin-right: 24px;
     padding: 24px;
+    cursor: pointer;
 
     &:hover {
       .button:not(.active) {
-        color: #323E48;
-        box-shadow: 0 3px 12px rgba(50, 62, 72, 0.12);
+        background-color: #E88AB2;
+        color: #fff;
       }
     }
 
@@ -82,9 +83,8 @@
       font-weight: 500;
 
       &.active {
-        background-color: #fff;
-        color: #D41367;
-        font-weight: 500;
+        background: #D41367;
+        color: #fff;
       }
     }
 
