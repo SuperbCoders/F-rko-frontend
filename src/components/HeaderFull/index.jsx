@@ -2,8 +2,11 @@ import React from "react";
 import logo from "./../../assets/img/logo.svg";
 import styles from "./styles.module.scss";
 import classNames from "classnames";
+import { useNavigate } from "react-router-dom";
 
 const HeaderFull = () => {
+  const navigate = useNavigate();
+
   return (
     <div className={styles.header}>
       <div className={styles.header__left}>
@@ -55,7 +58,7 @@ const HeaderFull = () => {
           </svg>
           Настройка
         </button>
-        <button className={styles.button}>
+        <button className={styles.button} onClick={() => navigate("/")}>
           <svg
             width="24"
             height="24"
