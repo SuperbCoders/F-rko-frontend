@@ -38,8 +38,6 @@ const Wrapper = ({ headElement, children, ...props }) => {
       <div
         ref={refDiv}
         style={{
-          overflow: "hidden",
-          transition: ".9s",
           height: showContent ? "auto" : 0,
         }}
       >
