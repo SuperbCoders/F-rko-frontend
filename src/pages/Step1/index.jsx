@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Paginator from "../../components/Paginator";
 import InputRS from "../../components/InputRS";
 import styles from "./styles.module.scss";
@@ -8,9 +8,11 @@ import cube from "../../assets/img/cube.png";
 import { useNavigate } from "react-router-dom";
 import HeaderMy from "../../components/HeaderMy";
 import DaDataSelect from "../../components/DaDataSelect";
+import PhoneInput from "../../components/PhoneInput";
 
 const Step1 = () => {
   const navigate = useNavigate();
+  const [code, setCode] = useState("");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -50,13 +52,13 @@ const Step1 = () => {
               >
                 <p className={styles.input__name}>Номер телефона</p>
                 <div className={styles.input__container}>
-                  <InputRS
-                    inputStyle={{ maxWidth: "364px" }}
-                    placeholder={"+7 (__) ___ __ __"}
+                  <PhoneInput
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
                   />
                   <ButtonRS
                     title={"Получить код"}
-                    disable={true}
+                    disable={!/[0-9]+/.test(code[17])}
                     style={{
                       marginLeft: "24px",
                       maxWidth: "267px",

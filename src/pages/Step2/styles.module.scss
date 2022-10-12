@@ -71,6 +71,11 @@
   letter-spacing: 0.25px;
   color: #323E48;
   margin-bottom: 24px;
+  transition: .25s;
+
+  &:hover{
+    color: #D41367;
+  }
 }
 
 .company {
@@ -134,6 +139,7 @@
     border: none;
     background: #F3F4F4;
     color: #323E48;
+    padding-right: 40px;
   }
 }
 

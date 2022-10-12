@@ -122,7 +122,7 @@ const Step3 = () => {
                     )}
                     onClick={() => setActiveCard(card.id)}
                   >
-                    Выбрать
+                    {isActiveCard ? "Выбрано" : "Выбрать"}
                     {isActiveCard && <TickSymbol />}
                   </button>
                 </div>

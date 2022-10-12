@@ -53,14 +53,15 @@ const DaDataSelect = ({
             borderRadius: "8px",
             backgroundColor,
             boxShadow: "none",
+            transition: ".25s",
             "&:hover": {
-              borderColor: "#D6D8DA",
+              borderColor: "#757F86",
             },
           }),
           valueContainer: (provided) => ({
             ...provided,
-            fontSize: "14px",
-            padding: "12px 16px",
+            fontSize: "16px",
+            padding: "16px",
           }),
         }}
         options={optionsList}

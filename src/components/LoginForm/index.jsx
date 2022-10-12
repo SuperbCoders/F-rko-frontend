@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "./styles.module.scss";
 import CheckBoxRS from "../CheckBoxRS";
 import ButtonRS from "../ButtonRS";
 import InputRS from "../InputRS";
 import { useNavigate } from "react-router-dom";
+import PhoneInput from "../PhoneInput";
 
 const LoginForm = () => {
   let navigate = useNavigate();
+  const [code, setCode] = useState("");
 
   return (
     <div className={styles.form}>
@@ -24,13 +26,13 @@ const LoginForm = () => {
         <div className={styles.input__wrapper}>
           <p className={styles.input__name}>Номер телефона</p>
           <div className={styles.input__container}>
-            <InputRS
-              inputStyle={{ maxWidth: "267px" }}
-              placeholder={"+7 (__) ___ __ __"}
+            <PhoneInput
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
             />
             <ButtonRS
               title={"Получить код"}
-              disable={true}
+              disable={!/[0-9]+/.test(code[17])}
               style={{
                 marginLeft: "8px",
                 maxWidth: "186px",
