@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "../../../pages/Step2/styles.module.scss";
 import classNames from "classnames";
 
@@ -9,6 +9,8 @@ const Input = ({
   value = "",
   placeholder,
 }) => {
+  const [defaultValue, setDefaultValue] = useState(value);
+
   return (
     <div className={styles.input__wrapper}>
       {rightElement ? (
@@ -18,7 +20,8 @@ const Input = ({
       <input
         type="text"
         placeholder={placeholder}
-        value={value}
+        value={defaultValue}
+        onChange={(e) => setDefaultValue(e.target.value)}
         className={classNames(styles.input, error && styles.error)}
       />
     </div>
