@@ -10,9 +10,7 @@ const Wrapper = ({ headElement, children, ...props }) => {
     <div {...props}>
       <span
         className={styles.name}
-        onClick={() => {
-          setShowContent((prevState) => !prevState);
-        }}
+        onClick={() => setShowContent((prevState) => !prevState)}
       >
         {headElement}
         <span
@@ -37,9 +35,7 @@ const Wrapper = ({ headElement, children, ...props }) => {
       </span>
       <div
         ref={refDiv}
-        style={{
-          height: showContent ? "auto" : 0,
-        }}
+        className={showContent ? "" : styles.hidden}
       >
         {children}
       </div>

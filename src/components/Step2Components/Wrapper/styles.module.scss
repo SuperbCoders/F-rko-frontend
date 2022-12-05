@@ -1,7 +1,7 @@
 .name {
   cursor: pointer;
   position: relative;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   margin-bottom: 24px;
 
@@ -29,4 +29,9 @@
       transform: rotate(180deg)
     }
   }
+}
+
+.hidden {
+  height: 0;
+  overflow: hidden;
 }

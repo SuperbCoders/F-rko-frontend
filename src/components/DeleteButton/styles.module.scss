@@ -1,0 +1,35 @@
+.delete_button {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 16px;
+  transition: .25s;
+
+  path {
+    transition: .25s;
+  }
+
+  .icon {
+    margin-right: 8px;
+  }
+
+  p {
+    color: #8E909B;
+    font-weight: 500;
+    transition: .25s;
+    font-size: 16px;
+  }
+
+  &:hover {
+    path {
+      stroke: #D41367;
+
+    }
+
+    p {
+      color: #D41367;
+
+    }
+
+  }
+}

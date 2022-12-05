@@ -9,3 +9,11 @@ export const getSizeMb = (totalBytes) => {
   }
   return Math.floor(totalBytes / 1000000) + "Мб";
 };
+
+export const ROUTES = {
+  ACCOUNT: "/account/",
+  STEP1: "/step1/",
+  STEP2: "/step2/",
+  STEP3: "/step3/",
+  MAIN: "/",
+}

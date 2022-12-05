@@ -1,0 +1,41 @@
+.button_add {
+  background: #F3F4F4;
+  border-radius: 8px;
+  padding: 16px 32px;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  outline: none;
+  cursor: pointer;
+  transition: .25s;
+
+  path {
+    transition: .25s;
+  }
+
+  &:hover {
+    box-shadow: 0 4px 10px rgba(102, 102, 102, 0.2);
+    color: #323E48;
+
+    p {
+      color: #323E48;
+    }
+
+    path {
+      stroke: #323E48;
+    }
+  }
+
+  p {
+    transition: .25s;
+    font-weight: 500;
+    color: #5B656D;
+    font-size: 16px;
+  }
+
+  .icon {
+    margin-left: 16px;
+    height: 24px;
+    width: 24px;
+  }
+}

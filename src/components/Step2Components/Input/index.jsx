@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styles from "../../../pages/Step2/styles.module.scss";
 import classNames from "classnames";
 
@@ -7,22 +7,21 @@ const Input = ({
   error = false,
   rightElement = null,
   value = "",
+  type="text",
   placeholder,
+  onChange
 }) => {
-  const [defaultValue, setDefaultValue] = useState(value);
 
   return (
     <div className={styles.input__wrapper}>
-      {rightElement ? (
-        <span className={styles.icon}>{rightElement}</span>
-      ) : null}
+      {rightElement ? <span className={styles.icon}>{rightElement}</span> : null}
       <p className={styles.name}>{name}</p>
       <input
-        type="text"
-        placeholder={placeholder}
-        value={defaultValue}
-        onChange={(e) => setDefaultValue(e.target.value)}
+        value={value}
+        type={type}
         className={classNames(styles.input, error && styles.error)}
+        placeholder={placeholder}
+        onChange={onChange}
       />
     </div>
   );

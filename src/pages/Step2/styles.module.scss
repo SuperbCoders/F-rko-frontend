@@ -82,7 +82,15 @@
   margin-bottom: 64px;
 }
 
-.select {
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+    -moz-appearance:textfield; /* Firefox */
 }
 
 .input {
@@ -171,90 +179,12 @@
   }
 }
 
-.button_add {
-  background: #F3F4F4;
-  border-radius: 8px;
-  padding: 16px 32px;
-  border: none;
-  display: flex;
-  align-items: center;
-  outline: none;
-  cursor: pointer;
-  transition: .25s;
-
-  path {
-    transition: .25s;
-  }
-
-  &:hover {
-    box-shadow: 0 4px 10px rgba(102, 102, 102, 0.2);
-    color: #323E48;
-
-    p {
-      color: #323E48;
-    }
-
-    path {
-      stroke: #323E48;
-    }
-  }
-
-  p {
-    transition: .25s;
-    font-weight: 500;
-    color: #5B656D;
-    font-size: 16px;
-  }
-
-  .icon {
-    margin-left: 16px;
-    height: 24px;
-    width: 24px;
-  }
-}
-
 .buttons {
   display: flex;
   margin-bottom: 24px;
 
   & > * {
     margin-right: 24px;
-  }
-}
-
-.delete_button {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  padding: 16px;
-  transition: .25s;
-
-  path {
-    transition: .25s;
-  }
-
-  .icon {
-    margin-right: 8px;
-  }
-
-  p {
-    color: #8E909B;
-    font-weight: 500;
-    transition: .25s;
-    font-size: 16px;
-  }
-
-  &:hover {
-    path {
-      stroke: #D41367;
-
-    }
-
-    p {
-      color: #D41367;
-
-    }
-
   }
 }
 
@@ -311,7 +241,6 @@
       color: #8E909B;
       text-wrap: none;
       text-overflow: ellipsis;
-
     }
   }
 

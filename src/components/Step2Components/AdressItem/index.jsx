@@ -4,7 +4,8 @@ import CheckBoxRS from "../../CheckBoxRS";
 import Input from "../Input";
 import SelectRS from "../SelectRS";
 
-const AddressItem = () => {
+const AddressItem = ({ id, type, address, onCheckbox, onChange }) => {
+
   return (
     <>
       <div className={styles.row}>
@@ -12,13 +13,27 @@ const AddressItem = () => {
           <p className={styles.name_option}>Адрес</p>
           <div className={styles.checks} style={{ marginBottom: 0 }}>
             <div className={styles.checks__item}>
-              <CheckBoxRS>
+              <CheckBoxRS
+                isChecked={type === "Юридический"}
+                onChange={onCheckbox("Юридический", id)}
+              >
                 <p>Юридический</p>
               </CheckBoxRS>
             </div>
             <div className={styles.checks__item}>
-              <CheckBoxRS>
+              <CheckBoxRS
+                isChecked={type === "Фактический"}
+                onChange={onCheckbox("Фактический", id)}
+              >
                 <p>Фактический</p>
+              </CheckBoxRS>
+            </div>
+            <div className={styles.checks__item}>
+              <CheckBoxRS
+                isChecked={type === "Почтовый"}
+                onChange={onCheckbox("Почтовый", id)}
+              >
+                <p>Почтовый</p>
               </CheckBoxRS>
             </div>
           </div>
@@ -28,16 +43,23 @@ const AddressItem = () => {
         <div className={styles.column}>
           <div className={styles.row}>
             <Input
-              error
-              value={"Пример ошибки"}
-              name={"Адрес"}
-              placeholder={"Напишите адрес"}
+              value={address}
+              name="Адрес"
+              inputName={id}
+              placeholder="Напишите адрес"
+              onChange={onChange(id)}
             />
           </div>
         </div>
         <div className={styles.column}>
           <div className={styles.row}>
-            <SelectRS name={"Основание"} placeholder={"Аренда"} />
+            <SelectRS 
+              value={{ value: "Аренда", label: "Аренда" }}
+              defaultValue={{ value: "Аренда", label: "Аренда" }}
+              name="Основание"
+              options={[ { value: "Аренда", label: "Аренда" } ]}
+              placeholder="Аренда"
+            />
           </div>
         </div>
       </div>
