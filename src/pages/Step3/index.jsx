@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Paginator from "../../components/Paginator";
 import styles from "./styles.module.scss";
 import CheckBoxRS from "../../components/CheckBoxRS";
@@ -6,6 +6,9 @@ import ButtonRS from "../../components/ButtonRS";
 import Modal from "../../components/Modal";
 import classNames from "classnames";
 import HeaderMy from "../../components/HeaderMy";
+import { initData, RequisitesContext } from "../../contexts/companyRequisits";
+import { userApi } from "../../api";
+import { statementsTexts } from "../Step2";
 
 const TickSymbol = () => {
   return (
@@ -30,9 +33,7 @@ const TickSymbol = () => {
 };
 
 const Step3 = () => {
-  const [isShowModal, setShowModal] = useState(false);
-  const [activeCard, setActiveCard] = useState(null);
-  const [cardList, setCardList] = useState([
+  const cardList = [
     {
       id: 1,
       name: "Простой",
@@ -75,18 +76,52 @@ const Step3 = () => {
       ],
       price: 4490,
     },
-  ]);
+  ]
+
+  const { data, setData } = React.useContext(RequisitesContext)
+
+  const [isShowModal, setShowModal] = useState(false);
+  const [activeCard, setActiveCard] = useState(null);
   const [overdraft, setOverdraft] = useState(false);
   const [acquire, setAcquire] = useState(false);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  React.useEffect(() => window.scrollTo(0, 0), []);
+
+  const onSubmit = async () => {
+    const { start_date, end_date } = data
+
+    if (!start_date || !end_date) {
+      return
+    }
+
+    const dto = {
+      ...data,
+      addresses: data.addresses.map(({ type_adress, basis, address }) => ({ 
+        type_adress, 
+        legal_address: type_adress === "Юридический" ? address : "", 
+        physic_address: type_adress === "Фактический" ? address : "",
+        mail_address: type_adress === "Почтовый" ? address : "",
+        basis,
+        address
+      })),
+
+      start_date: typeof start_date === "object" ? `${start_date.getFullYear()}-${start_date.getMonth()}-${start_date.getDate()}` : start_date,
+      end_date: typeof end_date === "object" ? `${end_date.getFullYear()}-${end_date.getMonth()}-${end_date.getDate()}` : end_date,
+      is_finished: true
+    }
+
+    await userApi.postInfo(dto, data?.contact_number)
+    localStorage.removeItem("rko_phone")
+    localStorage.removeItem("rko_name")
+    localStorage.removeItem("rko_active_step")
+    setData(initData)
+    setShowModal(true)
+  }
 
   return (
     <>
       <HeaderMy />
-      <div className={"container"}>
+      <div className="container">
         <Paginator
           activeStep={3}
           style={{
@@ -99,37 +134,31 @@ const Step3 = () => {
             Тарифы на расчетно-кассовое обслуживание
           </p>
           <div className={styles.cards}>
-            {cardList.map((card) => {
-              const isActiveCard = card.id === activeCard;
+            {cardList.map(({ id, name, desc, price, list }) => 
+              <div
+                key={id}
+                className={styles.cards__item}
+                onClick={() => setActiveCard(id)}
+              >
+                <p className={styles.name}>{name}</p>
+                <p className={styles.desc}>{desc}</p>
 
-              return (
-                <div
-                  className={styles.cards__item}
-                  onClick={() => setActiveCard(card.id)}
+                <ul className={styles.list}>
+                  {list.map(({ id, text }) => 
+                    <li key={id} className={styles.list__item}>
+                      {text}
+                    </li>
+                  )}
+                </ul>
+                <p className={styles.price}>{price} руб/мес</p>
+                <button
+                  className={classNames(styles.button, id === activeCard && styles.active)}
                 >
-                  <p className={styles.name}>{card.name}</p>
-                  <p className={styles.desc}>{card.desc}</p>
-
-                  <ul className={styles.list}>
-                    {card.list.map((listItem) => (
-                      <li key={listItem.id} className={styles.list__item}>
-                        {listItem.text}
-                      </li>
-                    ))}
-                  </ul>
-                  <p className={styles.price}>{card.price} руб/мес</p>
-                  <button
-                    className={classNames(
-                      styles.button,
-                      isActiveCard && styles.active
-                    )}
-                  >
-                    {isActiveCard ? "Выбрано" : "Выбрать"}
-                    {isActiveCard && <TickSymbol />}
-                  </button>
-                </div>
-              );
-            })}
+                  {id === activeCard ? "Выбрано" : "Выбрать"}
+                  {id === activeCard && <TickSymbol />}
+                </button>
+              </div>
+            )}
           </div>
           <p className={styles.title}>
             Выберите дополнительные продукты к подключению
@@ -137,21 +166,23 @@ const Step3 = () => {
           <div className={styles.options}>
             <div
               className={styles.options__item}
-              onClick={() => {
-                setOverdraft((prevState) => !prevState);
-              }}
             >
               <p className={styles.text}>Овердрафт</p>
-              <CheckBoxRS isChecked={overdraft} size={"medium"} />
+              <CheckBoxRS
+                isChecked={overdraft} 
+                size="medium" 
+                onChange={() => setOverdraft((prevState) => !prevState)}
+              />
             </div>
             <div
               className={styles.options__item}
-              onClick={() => {
-                setAcquire((prevState) => !prevState);
-              }}
             >
               <p className={styles.text}>Интернет-Эквайринг</p>
-              <CheckBoxRS isChecked={acquire} size={"medium"} />
+              <CheckBoxRS 
+                isChecked={acquire} 
+                size="medium" 
+                onChange={() => setAcquire((prevState) => !prevState)}
+              />
             </div>
           </div>
           <div className={styles.agreement}>
@@ -177,11 +208,9 @@ const Step3 = () => {
           </div>
           <div style={{ textAlign: "right" }}>
             <ButtonRS
-              title={"Отправить"}
-              style={{
-                width: "auto",
-              }}
-              onClick={() => setShowModal(true)}
+              title="Отправить"
+              style={{ width: "auto" }}
+              onClick={onSubmit}
             />
           </div>
         </div>

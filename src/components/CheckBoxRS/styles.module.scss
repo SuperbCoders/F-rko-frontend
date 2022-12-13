@@ -15,6 +15,10 @@
     border-color: $ruby1;
   }
 
+  &.error {
+    border: 1px solid red;
+  }
+
   &__wrapper {
     display: flex;
     align-items: center;
@@ -26,6 +30,14 @@
     & * {
       cursor: pointer;
     }
+  }
+
+  &__real {
+    width: 1px;
+    height: 1px;
+    position: absolute;
+    opacity: 0;
+    appearance: none;
   }
 
   &.small {

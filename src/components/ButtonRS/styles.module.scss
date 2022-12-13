@@ -21,6 +21,8 @@
   &.disable {
     color: $grey3;
     background-color: $grey2;
+    cursor: default;
+    touch-action: none;
   }
 
   &.ghost {
