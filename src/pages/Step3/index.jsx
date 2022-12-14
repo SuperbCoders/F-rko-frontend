@@ -90,10 +90,6 @@ const Step3 = () => {
   const onSubmit = async () => {
     const { start_date, end_date } = data
 
-    if (!start_date || !end_date) {
-      return
-    }
-
     const dto = {
       ...data,
       addresses: data.addresses.map(({ type_adress, basis, address }) => ({ 
