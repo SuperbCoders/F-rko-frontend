@@ -9,7 +9,7 @@ const PhoneInput = ({ value, className, ...props }) => {
       placeholder={"+7 (__) ___ __ __"}
       mask="+7 (999) 999 99 99"
       className={`${styles.input} ${className}`}
-      maskChar={"_"}
+      maskChar="_"
       {...props}
     />
   );

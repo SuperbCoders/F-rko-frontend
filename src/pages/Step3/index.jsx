@@ -8,7 +8,8 @@ import classNames from "classnames";
 import HeaderMy from "../../components/HeaderMy";
 import { initData, RequisitesContext } from "../../contexts/companyRequisits";
 import { userApi } from "../../api";
-import { statementsTexts } from "../Step2";
+import { Navigate } from "react-router-dom";
+import { ROUTES } from "../../helpers";
 
 const TickSymbol = () => {
   return (
@@ -31,6 +32,17 @@ const TickSymbol = () => {
     </span>
   );
 };
+
+export const Protector = ({ children }) => {
+  const activeStep = parseInt(localStorage.getItem("rko_active_step") ?? 1)
+  if (activeStep === 2) {
+    return <Navigate to={ROUTES.STEP2} replace />
+  } else if (activeStep !== 3) {
+    return <Navigate to={ROUTES.STEP1} replace />
+  } else {
+    return children
+  }
+}
 
 const Step3 = () => {
   const cardList = [
@@ -107,9 +119,9 @@ const Step3 = () => {
     }
 
     await userApi.postInfo(dto, data?.contact_number)
-    localStorage.removeItem("rko_phone")
+    localStorage.removeItem("contact_number")
     localStorage.removeItem("rko_name")
-    localStorage.removeItem("rko_active_step")
+    localStorage.setItem("rko_active_step", 1)
     setData(initData)
     setShowModal(true)
   }

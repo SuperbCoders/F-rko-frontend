@@ -3,32 +3,74 @@ import { AppRouter } from './router';
 import { initData, RequisitesContext } from './contexts/companyRequisits';
 import "./App.scss";
 import { userApi } from './api';
+import { AuthContext } from './contexts/auth';
+import { statementsTexts } from './pages/Step2';
 
 function App() {
+  const [auth, setAuth] = React.useState({ isAuthed: !!localStorage.getItem("login_number"), phone: localStorage.getItem("login_number") ?? "" })
   const [requisits, setRequisits] = React.useState(initData)
 
   React.useLayoutEffect(() => {
-    const phone = localStorage.getItem("rko_phone") ?? ""
+    const phone = localStorage.getItem("contact_number") ?? ""
+    const loginPhone = localStorage.getItem("login_number") ?? ""
+    if (loginPhone) {
+      setAuth({ isAuthed: true, loginPhone })
+    }
     if (phone) {
-      userApi.getInfo(phone).then(data => {
+      userApi.getInfo(phone.replace(/\(|\)+|-|\s|/g, "")).then(data => {
         data.addresses = data?.addresses?.map((a, idx) => ({ ...a, id: idx })) || []
         if (!data.list_supervisoty_board_persone) {
-          data.list_supervisoty_board_persone = {}
+          data.list_supervisoty_board_persone = {
+            accownt_own_living: "Совпадает",
+            account_own_mail: "Совпадает с адресом регистрации",
+            is_person_a_foreign_public: false
+          }
         }
         if (!data.list_collegial_executive_body) {
-          data.list_collegial_executive_body = {}
+          data.list_collegial_executive_body = {
+            accownt_own_living: "Совпадает",
+            account_own_mail: "Совпадает с адресом регистрации",
+            is_person_a_foreign_public: false
+          }
         }
         if (!data.group_members) {
           data.group_members = []
         }
         if (!data.information_goals) {
-          data.information_goals = []
+          data.information_goals = [...statementsTexts]
+        }
+
+        if (!data.salary_debt) {
+          data.salary_debt = 0
+        }
+
+        if (!data.employers_volume) {
+          data.employers_volume = ""
+        }
+        if (!data.supreme_management_body) {
+          data.supreme_management_body = ""
+        }
+        if (!data.supreme_management_person) {
+          data.supreme_management_person = ""
+        }
+        if (!data.company_group_name) {
+          data.company_group_name = ""
+        }
+        if (!data.supreme_management_inn) {
+          data.supreme_management_inn = ""
         }
 
         //корректные форматы данных для datepicker'a
-        if (data.start_date, data.end_date) {
+        if (data.start_date) {
           data.start_date = new Date(data.start_date?.split("-")[0], data.start_date.split("-")[1], data.start_date?.split("-")[2])
+        } else {
+          data.start_date = ""
+        }
+
+        if (data.end_date) {
           data.end_date = new Date(data.end_date?.split("-")[0], data.end_date?.split("-")[1], data.end_date?.split("-")[2])
+        } else {
+          data.end_date = ""
         }
 
         const { list_collegial_executive_body, list_supervisoty_board_persone: { account_datebirth, date_issue, validity } } = data
@@ -57,11 +99,15 @@ function App() {
   }, [])
 
   return (
-    <RequisitesContext.Provider
-      value={{ data: requisits, setData: setRequisits }}
+    <AuthContext.Provider 
+      value={{ auth, setAuth }}
     >
-      <AppRouter />
-    </RequisitesContext.Provider>
+      <RequisitesContext.Provider
+        value={{ data: requisits, setData: setRequisits }}
+      >
+        <AppRouter />
+      </RequisitesContext.Provider>
+    </AuthContext.Provider>
   )
 }
 

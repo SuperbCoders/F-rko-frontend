@@ -3,9 +3,23 @@ import logo from "./../../assets/img/logo.svg";
 import styles from "./styles.module.scss";
 import classNames from "classnames";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../contexts/auth";
+import { initData, RequisitesContext } from "../../contexts/companyRequisits";
+import { ROUTES } from "../../helpers";
 
 const HeaderMy = () => {
   const navigate = useNavigate();
+  const { auth, setAuth } = React.useContext(AuthContext)
+  const { setData } = React.useContext(RequisitesContext)
+
+  const onLogout = () => {
+    localStorage.removeItem("contact_number")
+    localStorage.removeItem("login_number")
+    localStorage.removeItem("rko_name")
+    setAuth({ isAuthed: false, phone: "" })
+    setData(initData)
+    navigate("/")
+  }
 
   return (
     <div className={styles.header}>
@@ -21,11 +35,11 @@ const HeaderMy = () => {
       <div className={styles.header__right}>
         <a
           className={classNames(styles.text, styles.phone)}
-          onClick={() => navigate("/account")}
+          onClick={() => navigate(ROUTES.ACCOUNT)}
         >
-          +7 903 123-45-67
+          {auth.phone}
         </a>
-        <button className={styles.button} onClick={() => navigate("/")}>
+        <button className={styles.button} onClick={onLogout}>
           <svg
             width="24"
             height="24"

@@ -5,7 +5,10 @@ import { useNavigate } from "react-router-dom";
 
 const PaginatorItem = ({ active, ...props }) => {
   return (
-    <div className={styles.paginator__wrapper} {...props}>
+    <div 
+      className={classNames(styles.paginator__wrapper, !active && styles.disabled)} 
+      {...props}
+    >
       <div
         className={classNames(styles.paginator__item, active && styles.active)}
       />
@@ -13,21 +16,21 @@ const PaginatorItem = ({ active, ...props }) => {
   );
 };
 
-const Paginator = ({ activeStep = 1, ...props }) => {
+const Paginator = ({ activeStep=1 }) => {
   const navigate = useNavigate();
+  // if (!) {}
+  // const activeStep = localStorage.getItem("rko_active_step") ?? 1
 
   return (
-    <div {...props}>
+    <div>
       <div className={styles.paginator}>
-        {[1, 2, 3].map((item) => {
-          return (
-            <PaginatorItem
-              key={item}
-              active={item <= activeStep}
-              onClick={() => navigate(`/step${item}`)}
-            />
-          );
-        })}
+        {[1, 2, 3].map((item) => 
+          <PaginatorItem
+            key={item}
+            active={item <= activeStep}
+            onClick={() => activeStep >= item && navigate(`/step${item}`)}
+          />
+          )}
       </div>
       <p className={styles.paginator__text}>Шаг {activeStep} из 3</p>
     </div>
