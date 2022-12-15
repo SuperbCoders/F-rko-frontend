@@ -7,13 +7,20 @@ const DaDataSelect = ({
   value,
   setValueInput,
   onSelect,
+  nameStyles={ color: "#8E909B", fontSize: "14px", marginBottom: "8px" },
   error,
+  backgroundColor="",
+  message="Введите название или ИНН",
+  formatedOptions,
+  style={},
   ...props
 }) => {
   const [optionsList, setOptionsList] = useState([]);
-  const formatedOptions = optionsList.map((item) => ({ value: item, label: `${item.value} ${item.data.address.unrestricted_value}` }))
+  if (!formatedOptions) {
+    formatedOptions = (list) => list.map((item) => ({ value: item, label: `${item.value} ${item.data.address.unrestricted_value}` }))
+  }
   
-  const noOptionsMessage = ({ inputValue }) => inputValue ? "Нет результатов" : "Введите название или ИНН"
+  const noOptionsMessage = ({ inputValue }) => inputValue ? "Нет результатов" : message
 
   const styles = {
     placeholder: (provided) => ({
@@ -27,6 +34,7 @@ const DaDataSelect = ({
       borderRadius: "8px",
       boxShadow: "none",
       transition: ".25s",
+      backgroundColor,
       "&:hover": {
         borderColor: "#757F86",
       },
@@ -43,14 +51,14 @@ const DaDataSelect = ({
     .then((data) => setOptionsList(data.suggestions));
   }
   return (
-    <div className={styles.input__wrapper}>
-      {name ? <p className={styles.name}>{name}</p> : null}
+    <div className={styles.input__wrapper} style={style}>
+      {name ? <p className={styles.name} style={nameStyles}>{name}</p> : null}
       <Select
         value={{ value, label: value }}
         isClearable
         noOptionsMessage={noOptionsMessage}
         styles={styles}
-        options={formatedOptions}
+        options={formatedOptions(optionsList)}
         onChange={onSelect}
         onInputChange={onChange}
         {...props}

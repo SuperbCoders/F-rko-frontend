@@ -156,7 +156,7 @@ const Account = () => {
               >
                 Добавить заявку
               </p>
-              <p className={styles.item}>Клиенты</p>
+              {/* <p className={styles.item}>Клиенты</p> */}
             </div>
           </div>
           <div className={styles.content}>

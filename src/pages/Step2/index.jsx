@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import Paginator from "../../components/Paginator";
 import styles from "./styles.module.scss";
 import classNames from "classnames";
 import CheckBoxRS from "../../components/CheckBoxRS";
 import ButtonRS from "../../components/ButtonRS";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import HeaderMy from "../../components/HeaderMy";
 import YesOrNo from "../../components/YesOrNo";
 import RadioButtonRS from "../../components/RadioButtonRS";
@@ -23,6 +23,7 @@ import DownloadButton from "../../components/DownloadButton";
 import { passportApi, userApi } from "../../api";
 import { RequisitesContext } from "../../contexts/companyRequisits";
 import PhoneInput from "../../components/PhoneInput";
+import DaDataSelect from "../../components/DaDataSelect";
 
 export const statementsTexts = [
   "Компания является Финансовым институтом в соответствии с Законом США «О налогообложении иностранных счетов» (FATCA) и/или главой 20.1 Налогового кодекса РФ",
@@ -32,7 +33,18 @@ export const statementsTexts = [
   "Компания не относится к указанным в настоящем пункте юридическим лицам",
 ]
 
+export const Protector2 = ({ children }) => {
+  const activeStep = parseInt(localStorage.getItem("rko_active_step") ?? 1)
+  if (activeStep < 2) {
+    return <Navigate to={ROUTES.STEP1} replace />
+  } else {
+    return children
+  }
+}
+
 const Step2 = () => {
+  const navigate = useNavigate();
+
   const planned_operations = [
     'Договор купли-продажи (товарный)',
     'Агентский договор',
@@ -69,7 +81,7 @@ const Step2 = () => {
     "Не совпадает с адресом регистрации и адресом проживания"
   ]
 
-  const navigate = useNavigate();
+  const formatedOptions = (list) => list.map((item) => ({ value: item.data.address.unrestricted_value, label: item.data.address.unrestricted_value }))
 
   const AddressIndex = React.useRef(0)
   const companyGroupMemberIndex = React.useRef(0)
@@ -110,12 +122,7 @@ const Step2 = () => {
     })
   };
 
-  const removeFromAddressList = () => {
-    data.addresses.pop();
-    setData({ ...data })
-  };
-
-  const onCheckbox = (type, id) => () => {
+  const onAddressRadio = (type, id) => () => {
     const curr = data.addresses.find(a => a.id === id)
     curr.type_adress = type
     setData({ ...data })
@@ -133,21 +140,32 @@ const Step2 = () => {
     })
     companyGroupMemberIndex.current = companyGroupMemberIndex.current + 1
   }
-  const deleteCompanyGroupMember = () => {
-    data.group_members.pop()
-    setData({ ...data })
-    companyGroupMemberIndex.current = companyGroupMemberIndex.current - 1
-  }
 
-  const onChangeCompanyGroupMember = (id, key) => (e) => {
+  const deleteCompanyGroupMember = (id) => () => {
+    setData(prev => {
+      prev.group_members = prev.group_members.filter(a => a.id !== id)
+      return {...prev}
+    })
+  };
+
+
+  const onChangeCompanyGroupMember = (id) => (value) => {
     const idx = data.group_members.findIndex(c => c.id === id)
-    data.group_members[idx][key] = e.target.value
+    data.group_members[idx].name = value?.value?.unrestricted_value ?? ""
+    data.group_members[idx].inn = value?.value?.data.inn ?? ""
+    data.group_members[idx].ogrn = value?.value?.data.ogrn ?? ""
     setData({ ...data })  
   }
 
-  const onTypeAddress = (id) => (e) => {
+  const onSelectAddress = (id) => (v) => {
     const idx = data.addresses.findIndex(a => a.id === id)
-    data.addresses[idx].address = e.target.value
+    data.addresses[idx].address = v?.label ?? ""
+    setData({ ...data })
+  }
+
+  const onSelectBasis = (id) => ({ label }) => {
+    const idx = data.addresses.findIndex(a => a.id === id)
+    data.addresses[idx].basis = label
     setData({ ...data })
   }
 
@@ -196,8 +214,8 @@ const Step2 = () => {
         basis,
         address
       })),
-      start_date: start_date ? `${start_date.getFullYear()}-${start_date.getMonth()}-${start_date.getDate()}` : "",
-      end_date: end_date ? `${end_date.getFullYear()}-${end_date.getMonth()}-${end_date.getDate()}` : "",
+      start_date: start_date ? `${start_date.getFullYear()}-${start_date.getMonth()}-${start_date.getDate() + 1}` : "",
+      end_date: end_date ? `${end_date.getFullYear()}-${end_date.getMonth() + 1}-${end_date.getDate()}` : "",
       group_members: data.group_members?.map(({ name, inn, ogrn }) => ({ name, inn, ogrn })), // оставил только нужные поля
     }
 
@@ -253,15 +271,15 @@ const Step2 = () => {
             <div className={styles.column}>
               <div className={styles.row}>
                 <InputLock 
-                  name={"ИНН"} 
+                  name="ИНН"
                   value={data.inn ?? ""}
                 />
                 <InputLock 
-                  name={"КПП"} 
+                  name="КПП" 
                   value={data.kpp ?? ""}
                  />
                 <InputLock 
-                  name={"ОГРН"} 
+                  name="ОГРН"
                   value={data.ogrn ?? ""}
                 />
               </div>
@@ -273,11 +291,11 @@ const Step2 = () => {
               </div>
               <div className={styles.row}>
                 <InputLock 
-                  name={"Основной ОКВЭД"} 
+                  name="Основной ОКВЭД"
                   value={data.okved ?? ""}
                   />
                 <InputLock 
-                  name={"ОКТМО"} 
+                  name="ОКТМО"
                   value={data.oktmo ?? ""}
                 />
               </div>
@@ -291,21 +309,21 @@ const Step2 = () => {
               <div className={styles.content}>
                 {data.addresses.map(({ type_adress, basis, address, id }) => 
                   <AddressItem
+                    key={id}
                     id={id}
                     type={type_adress}
-                    key={id} 
+                    basis={basis}
                     address={address}
-                    onCheckbox={onCheckbox}
-                    onChange={onTypeAddress}
+                    onRadio={onAddressRadio}
+                    onSelectAddress={onSelectAddress}
+                    onSelectBasis={onSelectBasis}
                   /> 
                 )}
-                
-                <div className={styles.buttons}>
+                <div>
                   <AddButton
                     type="button" 
                     onClick={addToAddressList} 
                   />
-                  {!!data.addresses.length && <DeleteButton onClick={removeFromAddressList} />}
                 </div>
               </div>
             </Wrapper>
@@ -337,6 +355,7 @@ const Step2 = () => {
                       value={data.supreme_management_inn}
                       name="ИНН"
                       type="number"
+                      pattern="[0-9]*"
                       placeholder="Введите ИНН"
                       onChange={(e) => setData({ ...data, supreme_management_inn: e.target.value })}
                     />
@@ -395,6 +414,7 @@ const Step2 = () => {
                   <Input
                     value={data.employers_volume}
                     type="number"
+                    pattern="[0-9]*"
                     name="Численность персонала"
                     placeholder="Напишите значение"
                     onChange={(e) => setData({ ...data, employers_volume: e.target.value })}
@@ -403,6 +423,7 @@ const Step2 = () => {
                     value={data.salary_debt}
                     name="Задолженность по з/п"
                     type="number"
+                    pattern="[0-9]*"
                     placeholder="Укажите сумму"
                     rightElement={<p>₽</p>}
                     onChange={(e) => setData({ ...data, salary_debt: e.target.value })}
@@ -445,28 +466,19 @@ const Step2 = () => {
                   <p>Состав группы компаний</p>
                 </div>
                 
-                {data.group_members?.map(({ name, inn, ogrn, id }) => 
-                  <div className={styles.row} key={id}>
-                    <Input
-                      value={name}
+                {data.group_members?.map(({ name, id }) => 
+                  <div className={`${styles.row} ${styles.align_end}`} key={id}>
+                    <DaDataSelect 
+                      backgroundColor="#F0F2F5"
                       name="Название"
-                      placeholder="Введите Название"
-                      onChange={onChangeCompanyGroupMember(id, "name")}
+                      value={name}
+                      style={{ width: "50%" }}
+                      message="Введите название или ИНН"
+                      formatedOptions={(list) => list.map((item) => ({ value: item, label: item.unrestricted_value }) )}
+                      onSelect={onChangeCompanyGroupMember(id)}
                     />
-                    <Input
-                      value={inn}
-                      name="ИНН"
-                      type="number"
-                      placeholder="Введите ИНН"
-                      onChange={onChangeCompanyGroupMember(id, "inn")}
-                    />
-                    <Input
-                      value={ogrn}
-                      name="ОГРН"
-                      type="number"
-                      placeholder="Введите ОГРН"
-                      onChange={onChangeCompanyGroupMember(id, "ogrn")}
-                    />
+
+                    <DeleteButton onClick={deleteCompanyGroupMember(id)} />
                   </div>)}
 
                 <div className={styles.buttons}>
@@ -474,15 +486,13 @@ const Step2 = () => {
                     type="button" 
                     onClick={addCompanyGroupMember} 
                   />
-                  {!!data.group_members?.length && <DeleteButton onClick={deleteCompanyGroupMember} />}
                 </div>
-
               </div>
             </Wrapper>
           </div>
 
           {/* Члены наблюдательного совета */}
-          <div>
+          <div className={styles.mb40}>
             <Wrapper
               headElement={<p className={styles.title_block}>Сведения о Связанных физических лицах (Члены наблюдательного совета)</p>}
             >
@@ -546,6 +556,7 @@ const Step2 = () => {
                     value={watch.account_onw_inn}
                     name="ИНН" 
                     type="number"
+                    pattern="[0-9]*"
                     placeholder="Введите ИНН"
                     onChange={(e) => setData({ ...data, list_supervisoty_board_persone: { ...watch, account_onw_inn: e.target.value } })}
                   />
@@ -553,7 +564,8 @@ const Step2 = () => {
                     value={watch.account_own_snils}
                     name="СНИЛС (при наличии)"
                     type="number"
-                    placeholder={"Введите СНИЛС"}
+                    pattern="[0-9]*"
+                    placeholder="Введите СНИЛС"
                     onChange={(e) => setData({ ...data, list_supervisoty_board_persone: { ...watch, account_own_snils: e.target.value } })}
                   />
                   <Input
@@ -575,8 +587,8 @@ const Step2 = () => {
                 </div>
                   <Input 
                     value={watch.account_own_piece}
-                    name={"Доля владения"} 
-                    placeholder={"Доля владения"} 
+                    name="Доля владения"
+                    placeholder="Доля владения"
                     onChange={(e) => setData({ ...data, list_supervisoty_board_persone: { ...watch, account_own_piece: e.target.value } })}
                   />
                 </div>
@@ -599,7 +611,9 @@ const Step2 = () => {
                   <div className={styles.row}>
                     <div className={styles.column}>
                       <SelectRS
+                        nameStyles={{ color: "#8E909B", fontSize: "14px", marginBottom: "8px" }}
                         value={{ value: watch.assigned_publ_pers_relation, label: watch.assigned_publ_pers_relation }}
+                        defaultValue={{ value: watch.assigned_publ_pers_relation, label: watch.assigned_publ_pers_relation }}
                         name="Выбрать статус"
                         placeholder="Выбрать статус"
                         options={[{ label: 'Супруг', value: 'Супруг' }, { label: 'Супруга', value: 'Супруга' } ]}
@@ -609,11 +623,13 @@ const Step2 = () => {
                   </div>
                 </div>
                 <div className={classNames(styles.row, "bg-grey")}>
-                  <Input
-                    value={watch.account_own_registration}
+                  <DaDataSelect 
+                    backgroundColor="#F0F2F5"
                     name="Адрес регистрации"
-                    placeholder="Введите адрес"
-                    onChange={(e) => setData({ ...data, list_supervisoty_board_persone: { ...watch, account_own_registration: e.target.value } })}
+                    value={watch.account_own_registration}
+                    message="Введите адрес"
+                    formatedOptions={formatedOptions}
+                    onSelect={({ label }) => setData({ ...data, list_supervisoty_board_persone: { ...watch, account_own_registration: label }  })}
                   />
                 </div>
                 <div>
@@ -634,7 +650,7 @@ const Step2 = () => {
                     >
                       <RadioButtonRS 
                         isActive={watch.accownt_own_living !== "Совпадает"}
-              />
+                      />
                       <p>Не совпадает с адресом регистрации</p>
                     </div>
                   </div>
@@ -642,11 +658,13 @@ const Step2 = () => {
                 {watch.accownt_own_living !== "Совпадает" && 
                   <div className={classNames(styles.row, "bg-grey")}>
                     <div className={styles.column}>
-                      <Input
-                        value={watch.accownt_own_living}
+                      <DaDataSelect 
+                        backgroundColor="#F0F2F5"
                         name="Адрес фактического проживания"
-                        placeholder="Введите адрес"
-                        onChange={(e) => setData({ ...data, list_supervisoty_board_persone: { ...watch, accownt_own_living: e.target.value } })}
+                        value={watch.accownt_own_living}
+                        message="Введите адрес"
+                        formatedOptions={formatedOptions}
+                        onSelect={({ label }) => setData({ ...data, list_supervisoty_board_persone: { ...watch, accownt_own_living: label }  })}
                       />
                     </div>
                   </div>
@@ -688,11 +706,13 @@ const Step2 = () => {
                 {watch.account_own_mail !== mailing_addresses[0] && watch.account_own_mail !== mailing_addresses[1] &&
                   <div className={classNames(styles.row, "bg-grey")}>
                     <div className={styles.column}>
-                      <Input
+                      <DaDataSelect 
+                        backgroundColor="#F0F2F5"
+                        name="Почтовый адрес"
                         value={watch.account_own_mail}
-                        name={"Почтовый адрес"}
-                        placeholder="Введите адрес"
-                        onChange={(e) => setData({ ...data, list_supervisoty_board_persone: { ...watch, account_own_mail: e.target.value } })}
+                        message="Введите адрес"
+                        formatedOptions={formatedOptions}
+                        onSelect={({ label }) => setData({ ...data, list_supervisoty_board_persone: { ...watch, account_own_mail: label }  })}
                       />
                     </div>
                   </div>
@@ -721,11 +741,13 @@ const Step2 = () => {
                   />
                 </div>
                 <div className={classNames(styles.row, "bg-grey", "form")}>
-                  <Input 
-                    value={watch.account_birth_place}
+                  <DaDataSelect 
+                    backgroundColor="#F0F2F5"
                     name="Место рождения"
-                    placeholder="Введите адрес"
-                    onChange={(e) => setData({ ...data, list_supervisoty_board_persone: { ...watch, account_birth_place: e.target.value } })}
+                    value={watch.account_birth_place}
+                    message="Введите адрес"
+                    formatedOptions={formatedOptions}
+                    onSelect={({ label }) => setData({ ...data, list_supervisoty_board_persone: { ...watch, account_birth_place: label }  })}
                   />
                   <DateInput 
                     value={watch.account_datebirth}
@@ -749,6 +771,7 @@ const Step2 = () => {
                   <Input
                     value={watch.doc_serial}
                     type="number"
+                    pattern="[0-9]*"
                     name="Серия документа, удостоверяющего личность (при наличии)"
                     placeholder="Введите серию документа"
                     onChange={(e) => setData({ ...data, list_supervisoty_board_persone: { ...watch, doc_serial: e.target.value } })}
@@ -757,6 +780,7 @@ const Step2 = () => {
                   <Input
                     value={watch.doc_number}
                     type="number"
+                    pattern="[0-9]*"
                     name="Номер документа, удостоверяющего личность"
                     placeholder="Введите номер документа"
                     onChange={(e) => setData({ ...data, list_supervisoty_board_persone: { ...watch, doc_number: e.target.value } })}
@@ -790,7 +814,7 @@ const Step2 = () => {
             </Wrapper>
           </div>
           {/* Члены коллегиального исполнительного органа */}
-          <div>
+          <div className={styles.mb40}>
             <Wrapper
               headElement={<p className={styles.title_block}>Сведения о Связанных физических лицах (Члены коллегиального исполнительного органа)</p>}
             >
@@ -854,6 +878,7 @@ const Step2 = () => {
                     value={exec.account_onw_inn}
                     name="ИНН" 
                     type="number"
+                    pattern="[0-9]*"
                     placeholder="Введите ИНН"
                     onChange={(e) => setData({ ...data, list_collegial_executive_body: { ...exec, account_onw_inn: e.target.value } })}
                   />
@@ -861,6 +886,7 @@ const Step2 = () => {
                     value={exec.account_own_snils}
                     name="СНИЛС (при наличии)"
                     type="number"
+                    pattern="[0-9]*"
                     placeholder={"Введите СНИЛС"}
                     onChange={(e) => setData({ ...data, list_collegial_executive_body: { ...exec, account_own_snils: e.target.value } })}
                   />
@@ -907,7 +933,9 @@ const Step2 = () => {
                   <div className={styles.row}>
                     <div className={styles.column}>
                       <SelectRS
+                        nameStyles={{ color: "#8E909B", fontSize: "14px", marginBottom: "8px" }}
                         value={{ value: exec.assigned_publ_pers_relation, label: exec.assigned_publ_pers_relation }}
+                        defaultValue={{ value: exec.assigned_publ_pers_relation, label: exec.assigned_publ_pers_relation }}
                         name="Выбрать статус"
                         placeholder="Выбрать статус"
                         options={[{ label: 'Супруг', value: 'Супруг' }, { label: 'Супруга', value: 'Супруга' } ]}
@@ -917,11 +945,13 @@ const Step2 = () => {
                   </div>
                 </div>
                 <div className={classNames(styles.row, "bg-grey")}>
-                  <Input
-                    value={exec.account_own_registration}
+                  <DaDataSelect 
+                    backgroundColor="#F0F2F5"
                     name="Адрес регистрации"
-                    placeholder="Введите адрес"
-                    onChange={(e) => setData({ ...data, list_collegial_executive_body: { ...exec, account_own_registration: e.target.value } })}
+                    value={exec.account_own_registration}
+                    message="Введите адрес"
+                    formatedOptions={formatedOptions}
+                    onSelect={({ label }) => setData({ ...data, list_collegial_executive_body: { ...watch, account_own_registration: label }  })}
                   />
                 </div>
                 <div>
@@ -950,11 +980,13 @@ const Step2 = () => {
                 {exec.accownt_own_living !== "Совпадает" && 
                   <div className={classNames(styles.row, "bg-grey")}>
                     <div className={styles.column}>
-                      <Input
-                        value={exec.accownt_own_living}
+                      <DaDataSelect 
+                        backgroundColor="#F0F2F5"
                         name="Адрес фактического проживания"
-                        placeholder="Введите адрес"
-                        onChange={(e) => setData({ ...data, list_collegial_executive_body: { ...exec, accownt_own_living: e.target.value } })}
+                        value={exec.accownt_own_living}
+                        message="Введите адрес"
+                        formatedOptions={formatedOptions}
+                        onSelect={({ label }) => setData({ ...data, list_collegial_executive_body: { ...watch, accownt_own_living: label }  })}
                       />
                     </div>
                   </div>
@@ -996,11 +1028,13 @@ const Step2 = () => {
                 {exec.account_own_mail !== mailing_addresses[0] && exec.account_own_mail !== mailing_addresses[1] &&
                   <div className={classNames(styles.row, "bg-grey")}>
                     <div className={styles.column}>
-                      <Input
+                      <DaDataSelect 
+                        name="Почтовый адрес"
                         value={exec.account_own_mail}
-                        name={"Почтовый адрес"}
-                        placeholder="Введите адрес"
-                        onChange={(e) => setData({ ...data, list_collegial_executive_body: { ...exec, account_own_mail: e.target.value } })}
+                        message="Введите адрес"
+                        backgroundColor="#F0F2F5"
+                        formatedOptions={formatedOptions}
+                        onSelect={({ label }) => setData({ ...data, list_collegial_executive_body: { ...watch, account_own_mail: label }  })}
                       />
                     </div>
                   </div>
@@ -1029,11 +1063,13 @@ const Step2 = () => {
                   />
                 </div>
                 <div className={classNames(styles.row, "bg-grey", "form")}>
-                  <Input 
-                    value={exec.account_birth_place}
+                  <DaDataSelect 
                     name="Место рождения"
-                    placeholder="Введите адрес"
-                    onChange={(e) => setData({ ...data, list_collegial_executive_body: { ...exec, account_birth_place: e.target.value } })}
+                    value={exec.account_birth_place}
+                    message="Введите адрес"
+                    backgroundColor="#F0F2F5"
+                    formatedOptions={formatedOptions}
+                    onSelect={({ label }) => setData({ ...data, list_collegial_executive_body: { ...watch, account_birth_place: label }  })}
                   />
                   <DateInput 
                     value={exec.account_datebirth}
@@ -1044,6 +1080,7 @@ const Step2 = () => {
                     onChange={(v) => setData({ ...data, list_collegial_executive_body: { ...exec, account_datebirth: v } })}
                   />
                   <SelectRS
+                    nameStyles={{ color: "#8E909B", fontSize: "14px", marginBottom: "8px" }}
                     value={{ label: exec.doc_type, value: exec.doc_type }}
                     name="Тип документа, удостоверяющего личность"
                     placeholder="Выберите тип"
@@ -1056,6 +1093,7 @@ const Step2 = () => {
                   <Input
                     value={exec.doc_serial}
                     type="number"
+                    pattern="[0-9]*"
                     name="Серия документа, удостоверяющего личность (при наличии)"
                     placeholder="Введите серию документа"
                     onChange={(e) => setData({ ...data, list_collegial_executive_body: { ...exec, doc_serial: e.target.value } })}
@@ -1064,6 +1102,7 @@ const Step2 = () => {
                   <Input
                     value={exec.doc_number}
                     type="number"
+                    pattern="[0-9]*"
                     name="Номер документа, удостоверяющего личность"
                     placeholder="Введите номер документа"
                     onChange={(e) => setData({ ...data, list_collegial_executive_body: { ...exec, doc_number: e.target.value } })}

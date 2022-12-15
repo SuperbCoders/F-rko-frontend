@@ -43,8 +43,8 @@ const Step1 = () => {
       required: true
     },
     agree: {
-      value: false,
-      valid: false,
+      value: true,
+      valid: true,
       required: true
     }
   }
@@ -56,7 +56,6 @@ const Step1 = () => {
 
   React.useEffect(() => {
     const company_name = data?.company_name ?? ""
-    const activeStep = localStorage.getItem("rko_active_step"); // 1| 2 |3
     
     setFields(prev => ({
       ...prev,
@@ -65,17 +64,11 @@ const Step1 = () => {
         value: company_name,
         valid: fields.company_name.validateFn(company_name)
       },
-      agree: {
-        value: activeStep > 1,
-        valid: activeStep > 1,
-        required: true
-      }
     }))
   }, [data.company_name])
   
   React.useEffect(() => {
     const contact_number = data?.contact_number ?? ""
-    const activeStep = localStorage.getItem("rko_active_step"); // 1| 2 |3
 
     setFields(prev => ({
       ...prev,
@@ -84,13 +77,8 @@ const Step1 = () => {
         value: contact_number,
         valid: contact_number.length ? /[0-9]+/.test(contact_number.charAt(9)) : false
       },
-      agree: {
-        value: activeStep > 1,
-        valid: activeStep > 1,
-        required: true
-      }
     }))
-  }, [data.contact_number, data.company_name])
+  }, [data.contact_number])
 
   const onSubmit = async (e) => {
     e.preventDefault()
@@ -125,7 +113,7 @@ const Step1 = () => {
       // okved: data.okved,
       // oktmo: data.oktmo
     }
-    localStorage.setItem("rko_phone", formattedPhone)
+    localStorage.setItem("contact_number", fields.contact_number.value)
     localStorage.setItem("rko_name", fields.name.value)
     await userApi.postInfo(info, formattedPhone)
     setShowErrors(false)
@@ -190,7 +178,7 @@ const Step1 = () => {
               <br /> счета
             </p>
             <div>
-              <form>
+              <form onSubmit={onSubmit}>
                 <div className={styles.form__field}>
                   <p className={styles.input__name}>Контактное лицо</p>
                   <InputRS
@@ -274,6 +262,7 @@ const Step1 = () => {
                 <div className={styles.buttons}>
                   <ButtonRS
                     view="ghost"
+                    type="button"
                     title="Отказаться"
                     style={{ maxWidth: "152px" }}
                     onClick={() => navigate("/account")}
@@ -282,7 +271,6 @@ const Step1 = () => {
                     title="Продолжить"
                     style={{ maxWidth: "267px" }}
                     type="submit"
-                    onClick={onSubmit}
                   />
                 </div>
               </form>

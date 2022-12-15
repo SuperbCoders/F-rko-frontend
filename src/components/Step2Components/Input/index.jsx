@@ -9,9 +9,9 @@ const Input = ({
   value = "",
   type="text",
   placeholder,
-  onChange
+  onChange,
+  ...props
 }) => {
-
   return (
     <div className={styles.input__wrapper}>
       {rightElement ? <span className={styles.icon}>{rightElement}</span> : null}
@@ -22,6 +22,7 @@ const Input = ({
         className={classNames(styles.input, error && styles.error)}
         placeholder={placeholder}
         onChange={onChange}
+        {...props}
       />
     </div>
   );

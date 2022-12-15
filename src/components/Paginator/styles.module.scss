@@ -19,6 +19,11 @@
     margin-right: 24px;
     cursor: pointer;
 
+    &.disabled {
+      cursor: default;
+      touch-action: none;
+    }
+
     &:last-child {
       margin-right: 0;
     }

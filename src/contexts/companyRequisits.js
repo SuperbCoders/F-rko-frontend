@@ -1,10 +1,24 @@
 import React from 'react';
+import { statementsTexts } from '../pages/Step2';
 
 export const initData = {
-  list_supervisoty_board_persone: {},
-  list_collegial_executive_body: {},
+  list_supervisoty_board_persone: {
+    accownt_own_living: "Совпадает",
+    account_own_mail: "Совпадает с адресом регистрации",
+    is_person_a_foreign_public: false
+  },
+  list_collegial_executive_body: {
+    accownt_own_living: "Совпадает",
+    account_own_mail: "Совпадает с адресом регистрации",
+    is_person_a_foreign_public: false
+  },
   addresses: [],
-  information_goals: []
+  group_members: [],
+  information_goals: [],
+  salary_debt: 0,
+  is_supervisoty: false,
+  is_collegiate_body: false,
+  information_goals: [...statementsTexts]
 }
 
 export const RequisitesContext = React.createContext({

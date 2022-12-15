@@ -1,10 +1,27 @@
 import React from "react";
+import { RequisitesContext } from "../../../contexts/companyRequisits";
 import styles from "../../../pages/Step2/styles.module.scss";
-import CheckBoxRS from "../../CheckBoxRS";
-import Input from "../Input";
+import DaDataSelect from "../../DaDataSelect";
+import DeleteButton from "../../DeleteButton";
+import RadioButtonRS from "../../RadioButtonRS";
 import SelectRS from "../SelectRS";
 
-const AddressItem = ({ id, type, address, onCheckbox, onChange }) => {
+const AddressItem = ({ id, type, address, basis, onRadio, onSelectAddress, onSelectBasis }) => {
+  const { setData } = React.useContext(RequisitesContext)
+
+  const options = [ 
+    { value: "Аренда", label: "Аренда" },
+    { value: "Собственность", label: "Собственность" } 
+  ]
+
+  const removeFromAddressList = (id) => () => {
+    setData(prev => {
+      prev.addresses = prev.addresses.filter(a => a.id !== id)
+      return {...prev}
+    })
+  }
+
+  const formatedOptions = (list) => list.map((item) => ({ value: item.data.address.unrestricted_value, label: item.data.address.unrestricted_value }))
 
   return (
     <>
@@ -12,55 +29,63 @@ const AddressItem = ({ id, type, address, onCheckbox, onChange }) => {
         <div>
           <p className={styles.name_option}>Адрес</p>
           <div className={styles.checks} style={{ marginBottom: 0 }}>
-            <div className={styles.checks__item}>
-              <CheckBoxRS
-                isChecked={type === "Юридический"}
-                onChange={onCheckbox("Юридический", id)}
-              >
-                <p>Юридический</p>
-              </CheckBoxRS>
+            <div 
+              className={styles.checks__item}
+              onClick={onRadio("Юридический", id)}
+            >
+              <RadioButtonRS 
+                isActive={type === "Юридический"} 
+              />
+              <p>Юридический</p>
             </div>
-            <div className={styles.checks__item}>
-              <CheckBoxRS
-                isChecked={type === "Фактический"}
-                onChange={onCheckbox("Фактический", id)}
-              >
-                <p>Фактический</p>
-              </CheckBoxRS>
+            <div 
+              className={styles.checks__item}
+              onClick={onRadio("Фактический", id)}
+            >
+              <RadioButtonRS 
+                isActive={type === "Фактический"} 
+              />
+              <p>Фактический</p>
             </div>
-            <div className={styles.checks__item}>
-              <CheckBoxRS
-                isChecked={type === "Почтовый"}
-                onChange={onCheckbox("Почтовый", id)}
-              >
-                <p>Почтовый</p>
-              </CheckBoxRS>
+            <div 
+              className={styles.checks__item}
+              onClick={onRadio("Почтовый", id)}
+            >
+              <RadioButtonRS 
+                isActive={type === "Почтовый"} 
+              />
+              <p>Почтовый</p>
             </div>
           </div>
         </div>
       </div>
-      <div className={styles.row}>
+      <div className={`${styles.row} ${styles.align_end}`}>
         <div className={styles.column}>
           <div className={styles.row}>
-            <Input
-              value={address}
+            <DaDataSelect 
               name="Адрес"
-              inputName={id}
-              placeholder="Напишите адрес"
-              onChange={onChange(id)}
+              nameStyles={{ color: "#8E909B", fontSize: "14px", marginBottom: "8px" }}
+              value={address}
+              message="Напишите адрес"
+              formatedOptions={formatedOptions}
+              onSelect={onSelectAddress(id)}
             />
           </div>
         </div>
         <div className={styles.column}>
           <div className={styles.row}>
             <SelectRS 
-              value={{ value: "Аренда", label: "Аренда" }}
-              defaultValue={{ value: "Аренда", label: "Аренда" }}
+              nameStyles={{ color: "#8E909B", fontSize: "14px", marginBottom: "8px" }}
+              value={{ value: basis, label: basis }}
               name="Основание"
-              options={[ { value: "Аренда", label: "Аренда" } ]}
+              options={options}
+              onChange={onSelectBasis(id)}
               placeholder="Аренда"
             />
           </div>
+        </div>
+        <div className={styles.column}>
+          <DeleteButton onClick={removeFromAddressList(id)} />
         </div>
       </div>
     </>
