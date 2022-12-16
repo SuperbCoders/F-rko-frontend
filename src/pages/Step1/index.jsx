@@ -12,10 +12,12 @@ import PhoneInput from "../../components/PhoneInput";
 import { userApi } from "../../api";
 import { RequisitesContext } from "../../contexts/companyRequisits";
 import { ROUTES } from "../../helpers"
+import { AuthContext } from "../../contexts/auth";
 
 const Step1 = () => {
   const navigate = useNavigate();
   const { data, setData } = React.useContext(RequisitesContext)
+  const { auth } = React.useContext(AuthContext)
 
   const initFields = {
     name: {
@@ -98,27 +100,27 @@ const Step1 = () => {
 
     const formattedPhone = fields.contact_number.value.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скоблки
 
-    const info = {
+    const dto = {
       company_name: fields.company_name.value,
       contact_number: formattedPhone,
       inn: data.inn,
       is_finished: false,
-      // short_name: data.short_name,
-      // full_name: data.full_name,
-      // registration_date: data.registration_date,
-      // kpp: data.kpp,
-      // ogrn: data.ogrn,
-      // ogrn_date: data.ogrn_date,
-      // registrator_name: data.registrator_name,
-      // okved: data.okved,
-      // oktmo: data.oktmo
+      short_name: data.short_name,
+      full_name: data.full_name,
+      registration_date: data.registration_date,
+      kpp: data.kpp,
+      ogrn: data.ogrn,
+      ogrn_date: data.ogrn_date,
+      registrator_name: data.registrator_name,
+      okved: data.okved,
+      oktmo: data.oktmo
     }
     localStorage.setItem("contact_number", fields.contact_number.value)
     localStorage.setItem("rko_name", fields.name.value)
-    await userApi.postInfo(info, formattedPhone)
+    await userApi.postInfo(dto, formattedPhone)
     setShowErrors(false)
     localStorage.setItem("rko_active_step", 2)
-    setData(prev => ({ ...prev, ...info }))
+    setData(prev => ({ ...prev, ...dto }))
     navigate(ROUTES.STEP2)
   };
   
@@ -131,7 +133,10 @@ const Step1 = () => {
     }
   })
   
-  const onSelect = ({ value: { data, value, unrestricted_value } }) => {
+  const onSelect = (a) => {
+    const { value } = a || {}
+    const { data } = value || {}
+
     setData(prev => ({ 
       ...prev,
       short_name: data?.name.short_with_opf ?? "",

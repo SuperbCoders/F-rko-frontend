@@ -14,7 +14,7 @@ function App() {
     const phone = localStorage.getItem("contact_number") ?? ""
     const loginPhone = localStorage.getItem("login_number") ?? ""
     if (loginPhone) {
-      setAuth({ isAuthed: true, loginPhone })
+      setAuth({ isAuthed: true, phone: loginPhone })
     }
     if (phone) {
       userApi.getInfo(phone.replace(/\(|\)+|-|\s|/g, "")).then(data => {

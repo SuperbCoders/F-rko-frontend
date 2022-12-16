@@ -10,14 +10,14 @@ import { AuthContext } from "../../contexts/auth";
 import { RequisitesContext } from "../../contexts/companyRequisits";
 
 const LoginForm = () => {
-  const { auth: { phone }, setAuth } = React.useContext(AuthContext)
+  const { auth: { phone="" }, setAuth } = React.useContext(AuthContext)
   const { setData } = React.useContext(RequisitesContext)
   const initialFields = {
     phone: {
       value: "",
       valid: false,
       required: true,
-      validationFn: (str) => /[0-9]+/.test(str[17])
+      validationFn: str => /[0-9]+/.test(str?.[17])
     }
   }
 
