@@ -1,12 +1,12 @@
 import React from "react";
 import { RequisitesContext } from "../../../contexts/companyRequisits";
 import styles from "../../../pages/Step2/styles.module.scss";
+import CheckBoxRS from "../../CheckBoxRS";
 import DaDataSelect from "../../DaDataSelect";
 import DeleteButton from "../../DeleteButton";
-import RadioButtonRS from "../../RadioButtonRS";
 import SelectRS from "../SelectRS";
 
-const AddressItem = ({ id, type, address, basis, onRadio, onSelectAddress, onSelectBasis }) => {
+const AddressItem = ({ id, type, address, basis, onSelectType, onSelectAddress, onSelectBasis }) => {
   const { setData } = React.useContext(RequisitesContext)
 
   const options = [ 
@@ -29,32 +29,29 @@ const AddressItem = ({ id, type, address, basis, onRadio, onSelectAddress, onSel
         <div>
           <p className={styles.name_option}>Адрес</p>
           <div className={styles.checks} style={{ marginBottom: 0 }}>
-            <div 
-              className={styles.checks__item}
-              onClick={onRadio("Юридический", id)}
-            >
-              <RadioButtonRS 
-                isActive={type === "Юридический"} 
-              />
-              <p>Юридический</p>
+            <div className={styles.checks__item}>
+              <CheckBoxRS
+                isChecked={type?.includes("Юридический")}
+                onChange={onSelectType("Юридический", id)}
+                >
+                <p>Юридический</p>
+              </CheckBoxRS>
             </div>
-            <div 
-              className={styles.checks__item}
-              onClick={onRadio("Фактический", id)}
-            >
-              <RadioButtonRS 
-                isActive={type === "Фактический"} 
-              />
-              <p>Фактический</p>
+            <div className={styles.checks__item}>
+              <CheckBoxRS
+                isChecked={type?.includes("Фактический")}
+                onChange={onSelectType("Фактический", id)}
+                >
+                <p>Фактический</p>
+              </CheckBoxRS>
             </div>
-            <div 
-              className={styles.checks__item}
-              onClick={onRadio("Почтовый", id)}
-            >
-              <RadioButtonRS 
-                isActive={type === "Почтовый"} 
-              />
-              <p>Почтовый</p>
+            <div className={styles.checks__item}>
+              <CheckBoxRS
+                isChecked={type?.includes("Почтовый")}
+                onChange={onSelectType("Почтовый", id)}
+                >
+                <p>Почтовый</p>
+              </CheckBoxRS>
             </div>
           </div>
         </div>

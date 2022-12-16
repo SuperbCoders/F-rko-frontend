@@ -16,6 +16,7 @@ const HeaderMy = () => {
     localStorage.removeItem("contact_number")
     localStorage.removeItem("login_number")
     localStorage.removeItem("rko_name")
+    localStorage.setItem("rko_active_step", 1)
     setAuth({ isAuthed: false, phone: "" })
     setData(initData)
     navigate("/")

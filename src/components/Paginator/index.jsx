@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 const PaginatorItem = ({ active, ...props }) => {
   return (
     <div 
-      className={classNames(styles.paginator__wrapper, !active && styles.disabled)} 
+      className={classNames(styles.paginator__wrapper, !active && styles.disabled)}
       {...props}
     >
       <div
@@ -18,9 +18,6 @@ const PaginatorItem = ({ active, ...props }) => {
 
 const Paginator = ({ activeStep=1 }) => {
   const navigate = useNavigate();
-  // if (!) {}
-  // const activeStep = localStorage.getItem("rko_active_step") ?? 1
-
   return (
     <div>
       <div className={styles.paginator}>

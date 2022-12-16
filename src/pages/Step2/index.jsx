@@ -93,10 +93,10 @@ const Step2 = () => {
     list_supervisoty_board_persone: watch, // Члены наблюдательного совета
     list_collegial_executive_body: exec } = data // Члены коллегиального исполнительного органа
 
-  const regDate = data?.registration_date ? new Date(data.registration_date) : ""
+  const regDate = data?.registration_date ? new Date(parseInt(data.registration_date)) : ""
   const formatedRegDate = regDate ? `${regDate.getFullYear?.()}-${regDate?.getMonth?.()}-${regDate?.getDate?.()}` : ""
 
-  const orgnDate = data?.ogrn_date ? new Date(data.ogrn_date) : ""
+  const orgnDate = data?.ogrn_date ? new Date(parseInt(data.ogrn_date)) : ""
   const formatedOgrnDate = orgnDate ? `${orgnDate.getFullYear?.()}-${orgnDate.getMonth?.()}-${orgnDate.getDate?.()}` : ""
 
   const [showErrors, setShowErrors] = React.useState(false)
@@ -114,7 +114,7 @@ const Step2 = () => {
         ...data.addresses,
         {
           id: AddressIndex.current,
-          type_adress: "Юридический",
+          type_adress: ["Юридический"],
           basis: "Аренда",
           address: ""
         }
@@ -122,9 +122,9 @@ const Step2 = () => {
     })
   };
 
-  const onAddressRadio = (type, id) => () => {
+  const onSelectAddressType = (type, id) => () => {
     const curr = data.addresses.find(a => a.id === id)
-    curr.type_adress = type
+    curr.type_adress = curr.type_adress.includes(type) ? curr.type_adress.filter(t => t !== type) : [...curr.type_adress, type]
     setData({ ...data })
   }
 
@@ -314,7 +314,7 @@ const Step2 = () => {
                     type={type_adress}
                     basis={basis}
                     address={address}
-                    onRadio={onAddressRadio}
+                    onSelectType={onSelectAddressType}
                     onSelectAddress={onSelectAddress}
                     onSelectBasis={onSelectBasis}
                   /> 
