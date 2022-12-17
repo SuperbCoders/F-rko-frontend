@@ -16,6 +16,7 @@ export const initData = {
   group_members: [],
   information_goals: [],
   salary_debt: 0,
+  contact_number: "",
   is_supervisoty: false,
   is_collegiate_body: false,
   information_goals: [...statementsTexts]

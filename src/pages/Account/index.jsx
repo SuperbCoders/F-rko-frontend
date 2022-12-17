@@ -3,6 +3,7 @@ import HeaderFull from "../../components/HeaderFull";
 import styles from "./styles.module.scss";
 import classNames from "classnames";
 import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../helpers";
 
 const BidItem = ({ item }) => {
   return (
@@ -152,7 +153,7 @@ const Account = () => {
             <div className={styles.aside__menu}>
               <p
                 className={classNames(styles.item, styles.active)}
-                onClick={() => navigate("/step1")}
+                onClick={() => navigate(ROUTES.STEP1)}
               >
                 Добавить заявку
               </p>
@@ -173,7 +174,7 @@ const Account = () => {
               <div className={styles.item__wrapper}>
                 <input
                   type="text"
-                  placeholder={"Поиск по дате"}
+                  placeholder="Поиск по дате"
                   className={styles.item}
                 />
               </div>
@@ -182,9 +183,9 @@ const Account = () => {
               </div>
             </div>
             <div className={styles.bids}>
-              {bidsList.map((item, index) => (
+              {bidsList.map((item, index) =>
                 <BidItem key={index} item={item} />
-              ))}
+              )}
             </div>
           </div>
         </div>
