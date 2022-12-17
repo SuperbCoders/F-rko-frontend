@@ -102,6 +102,8 @@ const Step3 = () => {
   const onSubmit = async () => {
     const { start_date, end_date } = data
 
+    const formattedPhone = data.contact_number.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скоблки
+
     const dto = {
       ...data,
       addresses: data.addresses.map(({ type_adress, basis, address }) => ({ 
@@ -113,14 +115,14 @@ const Step3 = () => {
         address
       })),
 
-      start_date: typeof start_date === "object" ? `${start_date.getFullYear()}-${start_date.getMonth()}-${start_date.getDate()}` : start_date,
-      end_date: typeof end_date === "object" ? `${end_date.getFullYear()}-${end_date.getMonth()}-${end_date.getDate()}` : end_date,
+      start_date: typeof start_date === "object" ? `${start_date.getFullYear()}-${start_date.getMonth() + 1}-${start_date.getDate()}` : start_date,
+      end_date: typeof end_date === "object" ? `${end_date.getFullYear()}-${end_date.getMonth() + 1}-${end_date.getDate()}` : end_date,
       is_finished: true
     }
 
-    await userApi.postInfo(dto, data?.contact_number)
-    localStorage.removeItem("contact_number")
+    await userApi.postInfo(dto, formattedPhone)
     localStorage.removeItem("rko_name")
+    localStorage.removeItem("rko_data")
     localStorage.setItem("rko_active_step", 1)
     setData(initData)
     setShowModal(true)

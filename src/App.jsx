@@ -1,22 +1,39 @@
 import React from 'react';
 import { AppRouter } from './router';
 import { initData, RequisitesContext } from './contexts/companyRequisits';
-import "./App.scss";
 import { userApi } from './api';
 import { AuthContext } from './contexts/auth';
 import { statementsTexts } from './pages/Step2';
+import "./App.scss";
+import { isObject } from './helpers';
 
 function App() {
   const [auth, setAuth] = React.useState({ isAuthed: !!localStorage.getItem("login_number"), phone: localStorage.getItem("login_number") ?? "" })
   const [requisits, setRequisits] = React.useState(initData)
 
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
+    const saveData = () => {
+      setRequisits(prev => {
+        if (isObject(prev)) {
+          localStorage.setItem('rko_data', JSON.stringify(prev));
+        } 
+        return prev
+      })
+    }
+    window.addEventListener('beforeunload', saveData);
+    return () => window.removeEventListener('beforeunload', saveData)
+  }, [])
+
+  React.useEffect(() => {
     const phone = localStorage.getItem("contact_number") ?? ""
     const loginPhone = localStorage.getItem("login_number") ?? ""
+    const prevSavedData = JSON.parse(localStorage.getItem('rko_data'))
+
     if (loginPhone) {
       setAuth({ isAuthed: true, phone: loginPhone })
     }
-    if (phone) {
+
+    if (phone && !prevSavedData) {
       userApi.getInfo(phone.replace(/\(|\)+|-|\s|/g, "")).then(data => {
         data.addresses = data?.addresses?.map((a, idx) => ({ ...a, id: idx })) || []
         if (!data.list_supervisoty_board_persone) {
@@ -95,6 +112,51 @@ function App() {
         }
         setRequisits(prev => ({ ...prev, ...data }))
       })    
+    }
+
+    if (prevSavedData) {
+      setRequisits(prev => {
+        //корректные форматы данных для datepicker'a
+        const { start_date, end_date, list_supervisoty_board_persone, list_collegial_executive_body } = prevSavedData
+        if (start_date) {
+          prevSavedData.start_date = new Date(start_date)
+        } else {
+          prevSavedData.start_date = ""
+        }
+
+        if (end_date) {
+          prevSavedData.end_date = new Date(end_date)
+        } else {
+          prevSavedData.end_date = ""
+        }
+
+        if (list_supervisoty_board_persone.account_datebirth) {
+          prevSavedData.list_supervisoty_board_persone.account_datebirth = new Date(list_supervisoty_board_persone.account_datebirth)
+        }
+        
+        if (list_supervisoty_board_persone.date_issue) {
+          prevSavedData.list_supervisoty_board_persone.date_issue = new Date(list_supervisoty_board_persone.date_issue)
+        }
+
+        if (list_supervisoty_board_persone.validity) {
+          prevSavedData.list_supervisoty_board_persone.validity = new Date(list_supervisoty_board_persone.validity)
+        }
+
+        if (list_collegial_executive_body.account_datebirth) {
+          prevSavedData.list_collegial_executive_body.account_datebirth = new Date(list_collegial_executive_body.account_datebirth)
+        }
+        
+        if (list_collegial_executive_body.date_issue) {
+          prevSavedData.list_collegial_executive_body.date_issue = new Date(list_collegial_executive_body.date_issue)
+        }
+
+        if (list_collegial_executive_body.validity) {
+          prevSavedData.list_collegial_executive_body.validity = new Date(list_collegial_executive_body.validity)
+        }
+        
+        
+        return { ...prev, ...prevSavedData }
+      })
     }
   }, [])
 

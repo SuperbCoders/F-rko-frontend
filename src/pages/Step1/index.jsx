@@ -12,12 +12,10 @@ import PhoneInput from "../../components/PhoneInput";
 import { userApi } from "../../api";
 import { RequisitesContext } from "../../contexts/companyRequisits";
 import { ROUTES } from "../../helpers"
-import { AuthContext } from "../../contexts/auth";
 
 const Step1 = () => {
   const navigate = useNavigate();
   const { data, setData } = React.useContext(RequisitesContext)
-  const { auth } = React.useContext(AuthContext)
 
   const initFields = {
     name: {
@@ -26,23 +24,11 @@ const Step1 = () => {
       validateFn: str => str.length > 0,
       required: true
     },
-    contact_number: {
-      value: "",
-      valid: false,
-      validateFn: str => /[0-9]+/.test(str[17]),
-      required: true
-    },
     code: {
       value: "",
       valid: false,
       validateFn: str => str.length > 0,
       required: false
-    },
-    company_name: {
-      value: "",
-      valid: false,
-      validateFn: str => str.length > 0,
-      required: true
     },
     agree: {
       value: true,
@@ -56,57 +42,22 @@ const Step1 = () => {
 
   React.useEffect(() => window.scrollTo(0, 0), []);
 
-  React.useEffect(() => {
-    const company_name = data?.company_name ?? ""
-    
-    setFields(prev => ({
-      ...prev,
-      company_name: {
-        ...prev.company_name,
-        value: company_name,
-        valid: fields.company_name.validateFn(company_name)
-      },
-    }))
-  }, [data.company_name])
-  
-  React.useEffect(() => {
-    const contact_number = data?.contact_number ?? ""
-
-    setFields(prev => ({
-      ...prev,
-      contact_number: {
-        ...prev.contact_number,
-        value: contact_number,
-        valid: contact_number.length ? /[0-9]+/.test(contact_number.charAt(9)) : false
-      },
-    }))
-  }, [data.contact_number])
-
   const onSubmit = async (e) => {
     e.preventDefault()
     setShowErrors(true)
 
-    let areFieldsValid = true
-
-    Object.keys(fields).forEach(name => {
-      if (fields[name].required && !fields[name].valid) {
-        areFieldsValid = false
-      }
-    })
-
-    if (!areFieldsValid) {
+    if (!/[0-9]+/.test(data.contact_number[17]) || !data.company_name?.length || !fields.name.valid) {
       return
     }
 
-    const formattedPhone = fields.contact_number.value.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скоблки
+    const formattedPhone = data.contact_number.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скоблки
 
     const dto = {
-      company_name: fields.company_name.value,
-      contact_number: formattedPhone,
+      contact_number: data.contact_number,
       inn: data.inn,
       is_finished: false,
       short_name: data.short_name,
-      full_name: data.full_name,
+      company_name: data.company_name,
       registration_date: data.registration_date,
       kpp: data.kpp,
       ogrn: data.ogrn,
@@ -115,8 +66,8 @@ const Step1 = () => {
       okved: data.okved,
       oktmo: data.oktmo
     }
-    localStorage.setItem("contact_number", fields.contact_number.value)
-    localStorage.setItem("rko_name", fields.name.value)
+    localStorage.setItem("contact_number", data.contact_number)
+
     await userApi.postInfo(dto, formattedPhone)
     setShowErrors(false)
     localStorage.setItem("rko_active_step", 2)
@@ -124,14 +75,18 @@ const Step1 = () => {
     navigate(ROUTES.STEP2)
   };
   
-  const onChange = (name) => (e) => setFields({
-    ...fields,
-    [name]: {
-      ...fields[name],
-      value: e.target.value,
-      valid: fields[name].validateFn(e.target.value),
-    }
-  })
+  const onChange = (name) => (e) => {
+    setFields({
+      ...fields,
+      [name]: {
+        ...fields[name],
+        value: e.target.value,
+        valid: fields[name].validateFn(e.target.value),
+      }
+    })
+  
+    name === "name" && localStorage.setItem("rko_name", e.target.value)
+  }
   
   const onSelect = (a) => {
     const { value } = a || {}
@@ -140,7 +95,7 @@ const Step1 = () => {
     setData(prev => ({ 
       ...prev,
       short_name: data?.name.short_with_opf ?? "",
-      full_name: data?.name?.full_with_opf ?? "",
+      company_name: data?.name?.full_with_opf ?? "",
       registration_date: data?.state?.registration_date ?? "",
       inn: data?.inn ?? "",
       kpp: data?.kpp ?? "",
@@ -150,15 +105,6 @@ const Step1 = () => {
       okved: data?.okved ?? "",
       oktmo: data?.oktmo ?? ""
     }))
-
-    setFields({
-      ...fields,
-      company_name: {
-        ...fields.company_name,
-        value: data?.name?.full_with_opf ?? "",
-        valid: fields.company_name.validateFn(data?.name?.full_with_opf ?? ""),
-      }
-    })
   }
   
   const onAgree = () => setFields({
@@ -200,8 +146,8 @@ const Step1 = () => {
                   <DaDataSelect 
                     placeholder="Введите название или ИНН"
                     required={true}
-                    value={fields.company_name.value}
-                    error={!fields.company_name.valid && showErrors}
+                    value={data.company_name}
+                    error={!data.company_name?.length && showErrors}
                     onSelect={onSelect}
                   />
                 </div>
@@ -213,16 +159,16 @@ const Step1 = () => {
                   <div className={styles.input__container}>
                     <div>
                       <PhoneInput
-                        value={fields.contact_number.value}
+                        value={data.contact_number ?? ""}
                         required={true}
-                        className={!fields.contact_number.valid && showErrors ? styles.input__error : ""}
-                        onChange={onChange("contact_number")}
+                        className={!/[0-9]+/.test(data.contact_number?.[17]) && showErrors ? styles.input__error : ""}
+                        onChange={(e) => setData(prev => ({ ...prev, contact_number: e.target.value }))}
                       />
                     </div>
                     <ButtonRS
                       title="Получить код"
                       type="button"
-                      disable={!fields.contact_number.valid}
+                      disable={!/[0-9]+/.test(data.contact_number?.[17])}
                       style={{ marginLeft: "24px", maxWidth: "267px" }}
                     />
                   </div>

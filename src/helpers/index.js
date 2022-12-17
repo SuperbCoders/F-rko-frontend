@@ -17,3 +17,9 @@ export const ROUTES = {
   STEP3: "/step3/",
   MAIN: "/",
 }
+
+export function isObject(val) {
+  if (val === null) { return false }
+  if (typeof val === 'function') { return false }
+  return typeof val === 'object'
+}

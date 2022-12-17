@@ -94,10 +94,10 @@ const Step2 = () => {
     list_collegial_executive_body: exec } = data // Члены коллегиального исполнительного органа
 
   const regDate = data?.registration_date ? new Date(parseInt(data.registration_date)) : ""
-  const formatedRegDate = regDate ? `${regDate.getFullYear?.()}-${regDate?.getMonth?.()}-${regDate?.getDate?.()}` : ""
+  const formatedRegDate = regDate ? `${regDate.getFullYear?.()}-${regDate?.getMonth?.() + 1}-${regDate?.getDate?.()}` : ""
 
   const orgnDate = data?.ogrn_date ? new Date(parseInt(data.ogrn_date)) : ""
-  const formatedOgrnDate = orgnDate ? `${orgnDate.getFullYear?.()}-${orgnDate.getMonth?.()}-${orgnDate.getDate?.()}` : ""
+  const formatedOgrnDate = orgnDate ? `${orgnDate.getFullYear?.()}-${orgnDate.getMonth?.() + 1}-${orgnDate.getDate?.()}` : ""
 
   const [showErrors, setShowErrors] = React.useState(false)
   const [passportPages, setPassportPages] = React.useState([null, null])
@@ -105,6 +105,9 @@ const Step2 = () => {
     ...!data.start_date ? ["start_date"] : [], 
     ...!data.end_date ? ["end_date"] : [], 
   ])
+
+  React.useEffect(() => setErroredFields(prev => prev ? prev.filter(f => f !== "start_date") : [...prev, "start_date"]), [data.start_date])
+  React.useEffect(() => setErroredFields(prev => prev ? prev.filter(f => f !== "end_date") : [...prev, "end_date"]), [data.end_date])
 
   const addToAddressList = () => {
     AddressIndex.current = AddressIndex.current + 1
@@ -147,7 +150,6 @@ const Step2 = () => {
       return {...prev}
     })
   };
-
 
   const onChangeCompanyGroupMember = (id) => (value) => {
     const idx = data.group_members.findIndex(c => c.id === id)
@@ -204,6 +206,8 @@ const Step2 = () => {
       ]))
     }
 
+    const formattedPhone = data.contact_number.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скоблки
+
     const dto = {
       ...data,
       addresses: data.addresses.map(({ type_adress, basis, address }) => ({ 
@@ -214,7 +218,7 @@ const Step2 = () => {
         basis,
         address
       })),
-      start_date: start_date ? `${start_date.getFullYear()}-${start_date.getMonth()}-${start_date.getDate() + 1}` : "",
+      start_date: start_date ? `${start_date.getFullYear()}-${start_date.getMonth() + 1}-${start_date.getDate()}` : "",
       end_date: end_date ? `${end_date.getFullYear()}-${end_date.getMonth() + 1}-${end_date.getDate()}` : "",
       group_members: data.group_members?.map(({ name, inn, ogrn }) => ({ name, inn, ogrn })), // оставил только нужные поля
     }
@@ -226,8 +230,9 @@ const Step2 = () => {
       dto.list_collegial_executive_body.first_passport_page_url = passportPagesUrls.current[1]
     }
 
-    userApi.postInfo(dto, data?.contact_number).then(() => {
+    userApi.postInfo(dto, formattedPhone).then(() => {
       localStorage.setItem("rko_active_step", 3)
+      localStorage.removeItem("rko_data")
       navigate(ROUTES.STEP3)
     })
   }
@@ -254,7 +259,7 @@ const Step2 = () => {
               <div className={styles.row}>
                 <InputLock
                   name="Полное наименование"
-                  value={data.full_name ?? ""}
+                  value={data.company_name ?? ""}
                 />
               </div>
               <div className={styles.row}>

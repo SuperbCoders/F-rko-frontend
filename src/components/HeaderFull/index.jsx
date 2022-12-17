@@ -3,9 +3,26 @@ import logo from "./../../assets/img/logo.svg";
 import styles from "./styles.module.scss";
 import classNames from "classnames";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../contexts/auth";
+import { initData, RequisitesContext } from "../../contexts/companyRequisits";
 
 const HeaderFull = () => {
   const navigate = useNavigate();
+
+  const { setAuth } = React.useContext(AuthContext)
+  const { setData } = React.useContext(RequisitesContext)
+
+  const onLogout = () => {
+    localStorage.removeItem("contact_number")
+    localStorage.removeItem("login_number")
+    localStorage.removeItem("rko_name")
+    localStorage.removeItem("rko_data")
+    localStorage.setItem("rko_active_step", 1)
+    setAuth({ isAuthed: false, phone: "" })
+    setData(initData)
+    navigate("/")
+  }
+
 
   return (
     <div className={styles.header}>
@@ -19,7 +36,7 @@ const HeaderFull = () => {
         />
         <a
           className={classNames(styles.text, styles.phone)}
-          href="tel:8-800-900-90-02"
+          href="tel:88009009002"
         >
           8-800-900-90-02
         </a>
@@ -58,7 +75,7 @@ const HeaderFull = () => {
           </svg>
           Настройка
         </button>
-        <button className={styles.button} onClick={() => navigate("/")}>
+        <button className={styles.button} onClick={onLogout}>
           <svg
             width="24"
             height="24"
