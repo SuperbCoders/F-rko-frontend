@@ -14,12 +14,12 @@ export const initData = {
   },
   addresses: [],
   group_members: [],
-  information_goals: [],
   salary_debt: 0,
   contact_number: "",
   is_supervisoty: false,
   is_collegiate_body: false,
-  information_goals: [...statementsTexts]
+  information_goals: [...statementsTexts],
+  beneficiaries: "Отсутствуют"
 }
 
 export const RequisitesContext = React.createContext({

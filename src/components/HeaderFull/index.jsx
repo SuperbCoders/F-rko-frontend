@@ -5,6 +5,7 @@ import classNames from "classnames";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/auth";
 import { initData, RequisitesContext } from "../../contexts/companyRequisits";
+import { ROUTES } from "../../helpers";
 
 const HeaderFull = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const HeaderFull = () => {
     localStorage.setItem("rko_active_step", 1)
     setAuth({ isAuthed: false, phone: "" })
     setData(initData)
-    navigate("/")
+    navigate(ROUTES.STEP1)
   }
 
 

@@ -26,15 +26,18 @@ import PhoneInput from "../../components/PhoneInput";
 import DaDataSelect from "../../components/DaDataSelect";
 
 export const statementsTexts = [
-  "Компания является Финансовым институтом в соответствии с Законом США «О налогообложении иностранных счетов» (FATCA) и/или главой 20.1 Налогового кодекса РФ",
-  "Компания, выгодоприобретатель или бенефициар компании является налоговым резидентом США",
-  "Компания является хозяйственным обществом, имеющим стратегическое значение для оборонно-промышленного комплекса и безопасности РФ либо обществом, находящимся под его прямым или косвенным контролем, которые указаны в Федеральном законе от 21.07.2014 N 213-ФЗ",
+  "Подтверждаю и гарантирую, что все Выгодоприобретатели/бенефициары индивидуального предпринимателя являются налогоплательщиками исключительно в РФ и, если выгодоприобретателем является юридическое лицо, то оно не имеет признаков Пассивной нефинансовой организации",
+  "Юридическое лицо, или бенефициар, или выгодоприобретатель являются налоговым резидентом иностранного государства и/или у юридического лица, бенефициара или выгодоприобретателя отсутствует налоговое резидентство во всех государствах (территориях)) - Юридическое лицо имеет признаки Пассивной нефинансовой организации",
+  "Компания является хозяйственным обществом, имеющим стратегическое значение для оборонно-промышленного комплекса и безопасности РФ либо обществом, находящимся под его прямым или косвенным контролем, которые указаны в Федеральном законе от 21.07.2014 № 213-ФЗ ",
+  "Юридическое лицо является Финансовым институтом в соответствии с Законом США «О налогообложении иностранных счетов» (FATCA) и/или главой 20.1 Налогового кодекса РФ",
   "Компания осуществляет виды деятельности, которые могут иметь стратегическое значение для оборонно-промышленного комплекса и безопасности РФ",
-  "Компания не относится к указанным в настоящем пункте юридическим лицам",
+  "Юридическое лицо, выгодоприобретатель или бенефициар являются налоговым резидентом США",
+  "Компания не относится к указанным в настоящем пункте юридическим лицам"
 ]
 
 export const Protector2 = ({ children }) => {
   const activeStep = parseInt(localStorage.getItem("rko_active_step") ?? 1)
+
   if (activeStep < 2) {
     return <Navigate to={ROUTES.STEP1} replace />
   } else {
@@ -84,7 +87,7 @@ const Step2 = () => {
   const formatedOptions = (list) => list.map((item) => ({ value: item.data.address.unrestricted_value, label: item.data.address.unrestricted_value }))
 
   const AddressIndex = React.useRef(0)
-  const companyGroupMemberIndex = React.useRef(0)
+  // const companyGroupMemberIndex = React.useRef(0)
   const passportPagesUrls = React.useRef([null, null])
 
   const { data, setData } = React.useContext(RequisitesContext)
@@ -105,9 +108,11 @@ const Step2 = () => {
     ...!data.start_date ? ["start_date"] : [], 
     ...!data.end_date ? ["end_date"] : [], 
   ])
+  const [isBeneficiaries, setIsBeneficiaries] = React.useState(false)
 
   React.useEffect(() => setErroredFields(prev => prev ? prev.filter(f => f !== "start_date") : [...prev, "start_date"]), [data.start_date])
   React.useEffect(() => setErroredFields(prev => prev ? prev.filter(f => f !== "end_date") : [...prev, "end_date"]), [data.end_date])
+  React.useEffect(() => setIsBeneficiaries(data.beneficiaries !== "Отсутствуют"), [data.beneficiaries])
 
   const addToAddressList = () => {
     AddressIndex.current = AddressIndex.current + 1
@@ -132,32 +137,6 @@ const Step2 = () => {
   }
 
   const onSelect = (str) => () => setData({ ...data, information_goals: data.information_goals.includes(str) ? data.information_goals.filter(s => s !== str) : [...data.information_goals, str] })
-
-  const addCompanyGroupMember = () => {
-    setData({
-      ...data,
-      group_members: [
-        ...data.group_members,
-        { id: companyGroupMemberIndex.current, inn: "", name: "", ogrn: "" }
-      ]
-    })
-    companyGroupMemberIndex.current = companyGroupMemberIndex.current + 1
-  }
-
-  const deleteCompanyGroupMember = (id) => () => {
-    setData(prev => {
-      prev.group_members = prev.group_members.filter(a => a.id !== id)
-      return {...prev}
-    })
-  };
-
-  const onChangeCompanyGroupMember = (id) => (value) => {
-    const idx = data.group_members.findIndex(c => c.id === id)
-    data.group_members[idx].name = value?.value?.unrestricted_value ?? ""
-    data.group_members[idx].inn = value?.value?.data.inn ?? ""
-    data.group_members[idx].ogrn = value?.value?.data.ogrn ?? ""
-    setData({ ...data })  
-  }
 
   const onSelectAddress = (id) => (v) => {
     const idx = data.addresses.findIndex(a => a.id === id)
@@ -185,13 +164,48 @@ const Step2 = () => {
     }
   })
 
-  const onChangeStartDate = (v) => {
-    setData({ ...data, start_date: v })
-    setErroredFields(erroredFields.filter(f => f !== "start_date"))
-  }
-  const onChangeEndDate = (v) => {
-    setData({ ...data, end_date: v })
-    setErroredFields(erroredFields.filter(f => f !== "end_date"))
+  // const addCompanyGroupMember = () => {
+  //   setData({
+  //     ...data,
+  //     group_members: [
+  //       ...data.group_members,
+  //       { id: companyGroupMemberIndex.current, inn: "", name: "", ogrn: "" }
+  //     ]
+  //   })
+  //   companyGroupMemberIndex.current = companyGroupMemberIndex.current + 1
+  // }
+
+  // const deleteCompanyGroupMember = (id) => () => {
+  //   setData(prev => {
+  //     prev.group_members = prev.group_members.filter(a => a.id !== id)
+  //     return {...prev}
+  //   })
+  // };
+
+  // const onChangeCompanyGroupMember = (id) => (value) => {
+  //   const idx = data.group_members.findIndex(c => c.id === id)
+  //   data.group_members[idx].name = value?.value?.unrestricted_value ?? ""
+  //   data.group_members[idx].inn = value?.value?.data.inn ?? ""
+  //   data.group_members[idx].ogrn = value?.value?.data.ogrn ?? ""
+  //   setData({ ...data })  
+  // }
+
+  // const onChangeStartDate = (v) => {
+  //   setData({ ...data, start_date: v })
+  //   setErroredFields(erroredFields.filter(f => f !== "start_date"))
+  // }
+  // const onChangeEndDate = (v) => {
+  //   setData({ ...data, end_date: v })
+  //   setErroredFields(erroredFields.filter(f => f !== "end_date"))
+  // }
+
+  const onSelectBenfs = () => {
+    if (isBeneficiaries) {
+      setData({ ...data, beneficiaries: "Отсутствуют" })
+    } else {
+      setData({ ...data, beneficiaries: data.beneficiaries !== "Отсутствуют" ? data.beneficiaries : "" })
+    }
+    setIsBeneficiaries(!isBeneficiaries)
   }
 
   const onSubmit = (e) => {
@@ -438,7 +452,7 @@ const Step2 = () => {
             </Wrapper>
           </div>
 
-          <div className={styles.mb40}>
+          {/* <div className={styles.mb40}>
             <Wrapper
               headElement={<p className={styles.title_block}>Сведения о группе компаний</p>}
             >
@@ -494,7 +508,7 @@ const Step2 = () => {
                 </div>
               </div>
             </Wrapper>
-          </div>
+          </div> */}
 
           {/* Члены наблюдательного совета */}
           <div className={styles.mb40}>
@@ -1238,27 +1252,27 @@ const Step2 = () => {
           </div>
           <div className={styles.mb40}>
             <p className={styles.title_block}>Выгодоприобретатели</p>
-            <div className={styles.row}>
-              <div className={styles.checks}>
-                <p className={styles.checks__item}>
-                  Имеются ли выгодоприобретатели
-                </p>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setData({ ...data, beneficiaries: "Отсутствуют" })}
-                >
-                  <RadioButtonRS isActive={data.beneficiaries === "Отсутствуют"} />
-                  <p>Отсутствуют</p>
-                </div>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setData({ ...data, beneficiaries: "Имеются" })}
-                >
-                  <RadioButtonRS isActive={data.beneficiaries === "Имеются"} />
-                  <p>Имеются</p>
-                </div>
-              </div>
+            <div className={styles.mb24}>
+              <p className={styles.checks__item}>Имеются ли выгодоприобретатели</p>
             </div>
+            <div className={styles.checks}>
+              <YesOrNo
+                value={isBeneficiaries}
+                toggle={onSelectBenfs}
+              />
+            </div>
+
+            {isBeneficiaries && 
+              <div className={styles.row}>
+                <div className={styles.column}>
+                  <Input
+                    value={data.beneficiaries}
+                    name="Выгодоприобретатели"
+                    placeholder=""
+                    onChange={(e) => setData({ ...data, beneficiaries: e.target.value })}
+                  />
+                </div>
+              </div>}
           </div>
 
           <div className={styles.mb24}>
@@ -1525,67 +1539,94 @@ const Step2 = () => {
               </div>
             </Wrapper>
           </div>
-          <div className={styles.mb24}>
-            <p className={styles.mb24}>Отметьте все верные утверждения</p>
-            <div className={styles.content}>
-              <div className={styles.row}>
-                <div className={styles.column}>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS
-                      isChecked={data.information_goals.includes(statementsTexts[0])}
-                      onChange={onSelect(statementsTexts[0])}
-                      >
-                      <p>{statementsTexts[0]}</p>
-                    </CheckBoxRS>
-                  </div>
-                </div>
-                <div className={styles.column}>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS
-                      isChecked={data.information_goals.includes(statementsTexts[1])}
-                      onChange={onSelect(statementsTexts[1])}
-                      >
-                      <p>{statementsTexts[1]}</p>
-                    </CheckBoxRS>
-                  </div>
-                </div>
-              </div>
 
-              <div className={styles.row}>
-                <div className={styles.column}>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS
-                      isChecked={data.information_goals.includes(statementsTexts[2])}
-                      onChange={onSelect(statementsTexts[2])}
-                    >
-                      <p>{statementsTexts[2]}</p>
-                    </CheckBoxRS>
+
+          <div className={styles.mb24}>
+            <Wrapper
+              headElement={<p className={styles.title_block}>Сведения о соответствии FATCA и и стратегическом значении компании (выберите все верные утверждения)</p>}
+            >
+              <div className={styles.content}>
+                <div className={styles.row}>
+                  <div className={styles.column}>
+                    <div className={styles.checks__item}>
+                      <CheckBoxRS
+                        isChecked={data.information_goals.includes(statementsTexts[0])}
+                        onChange={onSelect(statementsTexts[0])}
+                        >
+                        <p>{statementsTexts[0]}</p>
+                      </CheckBoxRS>
+                    </div>
+                  </div>
+                  <div className={styles.column}>
+                    <div className={styles.checks__item}>
+                      <CheckBoxRS
+                        isChecked={data.information_goals.includes(statementsTexts[1])}
+                        onChange={onSelect(statementsTexts[1])}
+                        >
+                        <p>{statementsTexts[1]}</p>
+                      </CheckBoxRS>
+                    </div>
                   </div>
                 </div>
-                <div className={styles.column}>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS 
-                      isChecked={data.information_goals.includes(statementsTexts[3])}
-                      onChange={onSelect(statementsTexts[3])}
-                    >
-                      <p>{statementsTexts[3]}</p>
-                    </CheckBoxRS>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.row}>
-                <div className={styles.column}>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS 
-                      isChecked={data.information_goals.includes(statementsTexts[4])}
-                      onChange={onSelect(statementsTexts[4])}
+
+                <div className={styles.row}>
+                  <div className={styles.column}>
+                    <div className={styles.checks__item}>
+                      <CheckBoxRS
+                        isChecked={data.information_goals.includes(statementsTexts[2])}
+                        onChange={onSelect(statementsTexts[2])}
                       >
-                      <p>{statementsTexts[4]}</p>
-                    </CheckBoxRS>
+                        <p>{statementsTexts[2]}</p>
+                      </CheckBoxRS>
+                    </div>
+                  </div>
+                  <div className={styles.column}>
+                    <div className={styles.checks__item}>
+                      <CheckBoxRS 
+                        isChecked={data.information_goals.includes(statementsTexts[3])}
+                        onChange={onSelect(statementsTexts[3])}
+                      >
+                        <p>{statementsTexts[3]}</p>
+                      </CheckBoxRS>
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.row}>
+                  <div className={styles.column}>
+                    <div className={styles.checks__item}>
+                      <CheckBoxRS 
+                        isChecked={data.information_goals.includes(statementsTexts[4])}
+                        onChange={onSelect(statementsTexts[4])}
+                        >
+                        <p>{statementsTexts[4]}</p>
+                      </CheckBoxRS>
+                    </div>
+                  </div>
+                  <div className={styles.column}>
+                    <div className={styles.checks__item}>
+                      <CheckBoxRS 
+                        isChecked={data.information_goals.includes(statementsTexts[5])}
+                        onChange={onSelect(statementsTexts[5])}
+                        >
+                        <p>{statementsTexts[5]}</p>
+                      </CheckBoxRS>
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.row}>
+                  <div className={styles.column}>
+                    <div className={styles.checks__item}>
+                      <CheckBoxRS 
+                        isChecked={data.information_goals.includes(statementsTexts[6])}
+                        onChange={onSelect(statementsTexts[6])}
+                        >
+                        <p>{statementsTexts[6]}</p>
+                      </CheckBoxRS>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </Wrapper>
           </div>
           {/* <div>
             <Wrapper
