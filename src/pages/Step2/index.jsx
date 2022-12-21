@@ -37,6 +37,7 @@ export const statementsTexts = [
 
 export const Protector2 = ({ children }) => {
   const activeStep = parseInt(localStorage.getItem("rko_active_step") ?? 1)
+
   if (activeStep < 2) {
     return <Navigate to={ROUTES.STEP1} replace />
   } else {
@@ -107,9 +108,11 @@ const Step2 = () => {
     ...!data.start_date ? ["start_date"] : [], 
     ...!data.end_date ? ["end_date"] : [], 
   ])
+  const [isBeneficiaries, setIsBeneficiaries] = React.useState(false)
 
   React.useEffect(() => setErroredFields(prev => prev ? prev.filter(f => f !== "start_date") : [...prev, "start_date"]), [data.start_date])
   React.useEffect(() => setErroredFields(prev => prev ? prev.filter(f => f !== "end_date") : [...prev, "end_date"]), [data.end_date])
+  React.useEffect(() => setIsBeneficiaries(data.beneficiaries !== "Отсутствуют"), [data.beneficiaries])
 
   const addToAddressList = () => {
     AddressIndex.current = AddressIndex.current + 1
@@ -195,6 +198,15 @@ const Step2 = () => {
   //   setData({ ...data, end_date: v })
   //   setErroredFields(erroredFields.filter(f => f !== "end_date"))
   // }
+
+  const onSelectBenfs = () => {
+    if (isBeneficiaries) {
+      setData({ ...data, beneficiaries: "Отсутствуют" })
+    } else {
+      setData({ ...data, beneficiaries: data.beneficiaries !== "Отсутствуют" ? data.beneficiaries : "" })
+    }
+    setIsBeneficiaries(!isBeneficiaries)
+  }
 
   const onSubmit = (e) => {
     e.preventDefault()
@@ -1240,27 +1252,27 @@ const Step2 = () => {
           </div>
           <div className={styles.mb40}>
             <p className={styles.title_block}>Выгодоприобретатели</p>
-            <div className={styles.row}>
-              <div className={styles.checks}>
-                <p className={styles.checks__item}>
-                  Имеются ли выгодоприобретатели
-                </p>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setData({ ...data, beneficiaries: "Отсутствуют" })}
-                >
-                  <RadioButtonRS isActive={data.beneficiaries === "Отсутствуют"} />
-                  <p>Отсутствуют</p>
-                </div>
-                <div
-                  className={styles.checks__item}
-                  onClick={() => setData({ ...data, beneficiaries: "Имеются" })}
-                >
-                  <RadioButtonRS isActive={data.beneficiaries === "Имеются"} />
-                  <p>Имеются</p>
-                </div>
-              </div>
+            <div className={styles.mb24}>
+              <p className={styles.checks__item}>Имеются ли выгодоприобретатели</p>
             </div>
+            <div className={styles.checks}>
+              <YesOrNo
+                value={isBeneficiaries}
+                toggle={onSelectBenfs}
+              />
+            </div>
+
+            {isBeneficiaries && 
+              <div className={styles.row}>
+                <div className={styles.column}>
+                  <Input
+                    value={data.beneficiaries}
+                    name="Выгодоприобретатели"
+                    placeholder=""
+                    onChange={(e) => setData({ ...data, beneficiaries: e.target.value })}
+                  />
+                </div>
+              </div>}
           </div>
 
           <div className={styles.mb24}>
