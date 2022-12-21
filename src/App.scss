@@ -140,3 +140,7 @@ ul {
 .error {
   border: 1px solid red;
 }
+
+.active::after {
+  transform: rotate(180deg);
+}

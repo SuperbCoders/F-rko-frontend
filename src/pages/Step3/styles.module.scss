@@ -154,3 +154,38 @@
     color: #8E909B;
   }
 }
+
+.text_wrap {
+  max-height: 0;
+  overflow-y: hidden;
+  transition: all .2s;
+}
+
+.toggle {
+  position: relative;
+  display: inline-block;
+  font-size: 22px;
+  line-height: 26px;
+  color: #949BA0;
+
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  padding-right: 20px;
+  margin-bottom: 15px;
+  cursor: pointer;
+
+  &::after {
+    position: absolute;
+    content: "";
+    right: 0;
+    top: 9px;
+    width: 12px;
+    height: 8px;
+    background-image: url('../../assets/img/arrow-down.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+}
