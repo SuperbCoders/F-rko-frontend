@@ -86,12 +86,10 @@ const Step2 = () => {
   const formatedOptions = (list) => list.map((item) => ({ value: item.data.address.unrestricted_value, label: item.data.address.unrestricted_value }))
 
   const AddressIndex = React.useRef(0)
-  const companyGroupMemberIndex = React.useRef(0)
+  // const companyGroupMemberIndex = React.useRef(0)
   const passportPagesUrls = React.useRef([null, null])
 
   const { data, setData } = React.useContext(RequisitesContext)
-
-  console.log(data);
 
   const { 
     list_supervisoty_board_persone: watch, // Члены наблюдательного совета
@@ -137,32 +135,6 @@ const Step2 = () => {
 
   const onSelect = (str) => () => setData({ ...data, information_goals: data.information_goals.includes(str) ? data.information_goals.filter(s => s !== str) : [...data.information_goals, str] })
 
-  const addCompanyGroupMember = () => {
-    setData({
-      ...data,
-      group_members: [
-        ...data.group_members,
-        { id: companyGroupMemberIndex.current, inn: "", name: "", ogrn: "" }
-      ]
-    })
-    companyGroupMemberIndex.current = companyGroupMemberIndex.current + 1
-  }
-
-  const deleteCompanyGroupMember = (id) => () => {
-    setData(prev => {
-      prev.group_members = prev.group_members.filter(a => a.id !== id)
-      return {...prev}
-    })
-  };
-
-  const onChangeCompanyGroupMember = (id) => (value) => {
-    const idx = data.group_members.findIndex(c => c.id === id)
-    data.group_members[idx].name = value?.value?.unrestricted_value ?? ""
-    data.group_members[idx].inn = value?.value?.data.inn ?? ""
-    data.group_members[idx].ogrn = value?.value?.data.ogrn ?? ""
-    setData({ ...data })  
-  }
-
   const onSelectAddress = (id) => (v) => {
     const idx = data.addresses.findIndex(a => a.id === id)
     data.addresses[idx].address = v?.label ?? ""
@@ -189,14 +161,40 @@ const Step2 = () => {
     }
   })
 
-  const onChangeStartDate = (v) => {
-    setData({ ...data, start_date: v })
-    setErroredFields(erroredFields.filter(f => f !== "start_date"))
-  }
-  const onChangeEndDate = (v) => {
-    setData({ ...data, end_date: v })
-    setErroredFields(erroredFields.filter(f => f !== "end_date"))
-  }
+  // const addCompanyGroupMember = () => {
+  //   setData({
+  //     ...data,
+  //     group_members: [
+  //       ...data.group_members,
+  //       { id: companyGroupMemberIndex.current, inn: "", name: "", ogrn: "" }
+  //     ]
+  //   })
+  //   companyGroupMemberIndex.current = companyGroupMemberIndex.current + 1
+  // }
+
+  // const deleteCompanyGroupMember = (id) => () => {
+  //   setData(prev => {
+  //     prev.group_members = prev.group_members.filter(a => a.id !== id)
+  //     return {...prev}
+  //   })
+  // };
+
+  // const onChangeCompanyGroupMember = (id) => (value) => {
+  //   const idx = data.group_members.findIndex(c => c.id === id)
+  //   data.group_members[idx].name = value?.value?.unrestricted_value ?? ""
+  //   data.group_members[idx].inn = value?.value?.data.inn ?? ""
+  //   data.group_members[idx].ogrn = value?.value?.data.ogrn ?? ""
+  //   setData({ ...data })  
+  // }
+
+  // const onChangeStartDate = (v) => {
+  //   setData({ ...data, start_date: v })
+  //   setErroredFields(erroredFields.filter(f => f !== "start_date"))
+  // }
+  // const onChangeEndDate = (v) => {
+  //   setData({ ...data, end_date: v })
+  //   setErroredFields(erroredFields.filter(f => f !== "end_date"))
+  // }
 
   const onSubmit = (e) => {
     e.preventDefault()
@@ -442,7 +440,7 @@ const Step2 = () => {
             </Wrapper>
           </div>
 
-          <div className={styles.mb40}>
+          {/* <div className={styles.mb40}>
             <Wrapper
               headElement={<p className={styles.title_block}>Сведения о группе компаний</p>}
             >
@@ -498,7 +496,7 @@ const Step2 = () => {
                 </div>
               </div>
             </Wrapper>
-          </div>
+          </div> */}
 
           {/* Члены наблюдательного совета */}
           <div className={styles.mb40}>
