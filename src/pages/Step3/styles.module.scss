@@ -11,17 +11,19 @@
 }
 
 .cards {
-  display: flex;
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-column-gap: 24px;
   padding-bottom: 64px;
 
   &__item {
     background: #FFFFFF;
     box-shadow: 0 6px 24px rgba(48, 62, 73, 0.12);
     border-radius: 16px;
-    margin-right: 24px;
     padding: 24px;
-    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 
     &:hover {
       .button:not(.active) {
@@ -47,7 +49,6 @@
 
     .list {
       margin-bottom: 16px;
-
       padding-left: 24px;
 
       &__item {
@@ -68,6 +69,7 @@
       font-size: 32px;
       color: #323E48;
       margin-bottom: 45px;
+      margin-top: auto;
     }
 
     .button {
@@ -86,10 +88,6 @@
         background: #D41367;
         color: #fff;
       }
-    }
-
-    &:last-child {
-      margin-right: 0;
     }
   }
 }
@@ -188,4 +186,8 @@
     background-repeat: no-repeat;
     background-size: contain;
   }
+}
+
+.p {
+  color: #303E49;
 }

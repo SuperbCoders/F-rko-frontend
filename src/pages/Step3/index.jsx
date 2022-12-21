@@ -48,45 +48,47 @@ const Step3 = () => {
   const cardList = [
     {
       id: 1,
-      name: "Простой",
-      desc: "Для начинающих предпринимателей",
+      name: "Первый ",
+      desc: "Подойдёт тем, кто неавно зарегистрировал ИП или ООО и только начинает вести бизнес",
       list: [
-        { id: 1, text: "До 400 000 ₽ себе на счет для ИП бесплатно" },
-        { id: 2, text: "Переводы физлицам от 1,5% + 99 ₽" },
-        {
-          id: 3,
-          text: "49 ₽ платеж в другие банки, в Ренессанс — бесплатно",
-        },
+        "Нет бесплатных платежей",
+        "49 ₽ за платеж",
+        "100 000 ₽ бесплатно для снятия наличных и переводов на ФЛ/Card 2 Card Далее 349 ₽ за каждые 50 000 ₽",
+        "59 ₽ минимальная плата в день за использование овердрафта",
+        "50 000 ₽ максимальный кэшбэк по бизнес-карте",
+        "0 ₽ за SMS-уведомления",
+        "0 ₽ за подключение эквайринга и сервисов для бизнеса"
+      ],
+      price: 0,
+    },
+    {
+      id: 2,
+      name: "Второй",
+      desc: "Оптимальный тариф для тех, чей бизнес начал приносить первую прибыль",
+      list: [
+        "5 платежей бесплатно",
+        "29 ₽ за платеж сверх лимита",
+        "200 000 ₽ бесплатно для снятия наличных и переводов на ФЛ/Card 2 Card Далее 349 ₽ за каждые 50 000 ₽",
+        "59 ₽ минимальная плата в день за использование овердрафта",
+        "50 000 ₽ максимальный кэшбэк по бизнес-карте",
+        "0 ₽ за SMS-уведомления",
+        "0 ₽ за подключение эквайринга и сервисов для бизнеса"
       ],
       price: 490,
     },
     {
-      id: 2,
-      name: "Продвинутый",
-      desc: "Для малого бизнеса",
-      list: [
-        { id: 1, text: "До 700 000 ₽ себе на счет для ИП бесплатно" },
-        { id: 2, text: "Переводы физлицам от 1% + 79 ₽" },
-        {
-          id: 3,
-          text: " 29 ₽ платеж в другие банки, в Ренессанс — бесплатно",
-        },
-      ],
-      price: 1990,
-    },
-    {
       id: 3,
-      name: "Профессиональный",
-      desc: "Для бизнеса с большими оборотами",
+      name: "Третий",
+      desc: "Для активно растущего бизнеса, который выходит на новые рынки",
       list: [
-        { id: 1, text: "До 1 млн рублей себе на счет  для ИП бесплатно" },
-        { id: 2, text: "Переводы физлицам от 1% + 59 ₽" },
-        {
-          id: 3,
-          text: "19 ₽ платеж в другие банки, в Ренессанс — бесплатно",
-        },
+        "50 платежей бесплатно",
+        "19 ₽ за платеж сверх лимита 300 000 ₽ бесплатно для снятия наличных и переводов на ФЛ и Card/Card Далее 349 ₽ за каждые 50 000 ₽",
+        "59 ₽ минимальная плата в день за использование овердрафта",
+        "50 000 ₽ максимальный кэшбэк по бизнес-карте",
+        "0 ₽ за SMS-уведомления",
+        "0 ₽ за подключение эквайринга и сервисов для бизнеса"
       ],
-      price: 4490,
+      price: 1490,
     },
   ]
 
@@ -96,6 +98,10 @@ const Step3 = () => {
   const [activeCard, setActiveCard] = useState(null);
   const [overdraft, setOverdraft] = useState(false);
   const [acquire, setAcquire] = useState(false);
+  const [isCommunity, setIsCommunity] = React.useState(false)
+  const [isFinance, setIsFinance] = React.useState(false)
+  const [isSupport, setIsSupport] = React.useState(false)
+  const [isDev, setIsDev] = React.useState(false)
 
   React.useEffect(() => window.scrollTo(0, 0), []);
 
@@ -169,8 +175,8 @@ const Step3 = () => {
                 <p className={styles.desc}>{desc}</p>
 
                 <ul className={styles.list}>
-                  {list.map(({ id, text }) => 
-                    <li key={id} className={styles.list__item}>
+                  {list.map((text, idx) => 
+                    <li key={idx} className={styles.list__item}>
                       {text}
                     </li>
                   )}
@@ -189,24 +195,84 @@ const Step3 = () => {
             Выберите дополнительные продукты к подключению
           </p>
           <div className={styles.options}>
-            <div
-              className={styles.options__item}
-            >
+            <div className={styles.options__item}>
+              <p className={styles.text}>СМС-оповещение</p>
+              <CheckBoxRS
+                isChecked={true} 
+                size="medium" 
+                onChange={() => {}}
+              />
+            </div>
+            <div className={styles.options__item}>
+              <div>
+                <p className={styles.text}>Интернет-эквайринг</p>
+                <p className="p mt10">Торговый-эквайринг - Способ безналичного приема платежей за товары либо услуги банковской картой</p>
+              </div>
+              <CheckBoxRS
+                isChecked={acquire} 
+                size="medium" 
+                onChange={() => setAcquire(!acquire)}
+              />
+            </div>
+            <div className={styles.options__item}>
+              <div>
+                <p className={styles.text}>Комьюнити</p>
+                <p className="p mt10">
+                  Бесплатный онлайн-сервис для поиска бизнес-партнёров. Собирает и обрабатывает информацию о предпринимателях на множестве различных платформ, формирует подборку интересных контактов, представляет и знакомит предпринимателей друг с другом.
+                </p>
+              </div>
+              <CheckBoxRS
+                isChecked={isCommunity} 
+                size="medium" 
+                onChange={() => setIsCommunity(!isCommunity)}
+              />
+            </div>
+            <div className={styles.options__item}>
+              <div>
+                <p className={styles.text}>Бухгалтерия</p>
+                <p className="p mt10">
+                  Онлайн-сервис по ведению бухгалтерского учета и дистанционной сдаче налогов и сборов в ФНС и различные фонды. Сервис интегрирован с интернет-банком и мобильным банком. Стоимость сервиса - от 833 Р/месяц.
+                </p>
+              </div>
+              <CheckBoxRS
+                isChecked={isFinance} 
+                size="medium" 
+                onChange={() => setIsFinance(!isFinance)}
+              />
+            </div>
+            <div className={styles.options__item}>
+              <div>
+                <p className={styles.text}>Юридическая поддержка</p>
+                <p className="p mt10">
+                  Услуги юридической поддержки по бизнесу и личным вопросам. После подключения услуги в режиме 24/7 можно получать консультации профессиональных юристов. Стоимость услуги - от 500 Р/месяц.
+                </p>
+              </div>
+              <CheckBoxRS
+                isChecked={isSupport} 
+                size="medium" 
+                onChange={() => setIsSupport(!isSupport)}
+              />
+            </div>
+            <div className={styles.options__item}>
+              <div>
+                <p className={styles.text}>Продвижение</p>
+                <p className="p mt10">
+                  Услуга продвижения бизнеса на онлайн-площадках. Выдается промо-код, позволяющий увеличить рекламный бюджет. Выдача промо-кода - бесплатно.а продвижения бизнеса на онлайн-площадках. Выдается промо-код, позволяющий увеличить рекламный бюджет. Выдача промо-кода - бесплатно.
+                </p>
+              </div>
+              <CheckBoxRS
+                isChecked={isDev} 
+                size="medium" 
+                onChange={() => setIsDev(!isDev)}
+              />
+            </div>
+
+            <div className={styles.options__item}>
               <p className={styles.text}>Овердрафт</p>
               <CheckBoxRS
                 isChecked={overdraft} 
                 size="medium" 
                 onChange={() => setOverdraft((prevState) => !prevState)}
-              />
-            </div>
-            <div
-              className={styles.options__item}
-            >
-              <p className={styles.text}>Интернет-Эквайринг</p>
-              <CheckBoxRS 
-                isChecked={acquire} 
-                size="medium" 
-                onChange={() => setAcquire((prevState) => !prevState)}
               />
             </div>
           </div>
