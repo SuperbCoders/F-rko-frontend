@@ -26,11 +26,13 @@ import PhoneInput from "../../components/PhoneInput";
 import DaDataSelect from "../../components/DaDataSelect";
 
 export const statementsTexts = [
-  "Компания является Финансовым институтом в соответствии с Законом США «О налогообложении иностранных счетов» (FATCA) и/или главой 20.1 Налогового кодекса РФ",
-  "Компания, выгодоприобретатель или бенефициар компании является налоговым резидентом США",
-  "Компания является хозяйственным обществом, имеющим стратегическое значение для оборонно-промышленного комплекса и безопасности РФ либо обществом, находящимся под его прямым или косвенным контролем, которые указаны в Федеральном законе от 21.07.2014 N 213-ФЗ",
+  "Подтверждаю и гарантирую, что все Выгодоприобретатели/бенефициары индивидуального предпринимателя являются налогоплательщиками исключительно в РФ и, если выгодоприобретателем является юридическое лицо, то оно не имеет признаков Пассивной нефинансовой организации",
+  "Юридическое лицо, или бенефициар, или выгодоприобретатель являются налоговым резидентом иностранного государства и/или у юридического лица, бенефициара или выгодоприобретателя отсутствует налоговое резидентство во всех государствах (территориях)) - Юридическое лицо имеет признаки Пассивной нефинансовой организации",
+  "Компания является хозяйственным обществом, имеющим стратегическое значение для оборонно-промышленного комплекса и безопасности РФ либо обществом, находящимся под его прямым или косвенным контролем, которые указаны в Федеральном законе от 21.07.2014 № 213-ФЗ ",
+  "Юридическое лицо является Финансовым институтом в соответствии с Законом США «О налогообложении иностранных счетов» (FATCA) и/или главой 20.1 Налогового кодекса РФ",
   "Компания осуществляет виды деятельности, которые могут иметь стратегическое значение для оборонно-промышленного комплекса и безопасности РФ",
-  "Компания не относится к указанным в настоящем пункте юридическим лицам",
+  "Юридическое лицо, выгодоприобретатель или бенефициар являются налоговым резидентом США",
+  "Компания не относится к указанным в настоящем пункте юридическим лицам"
 ]
 
 export const Protector2 = ({ children }) => {
@@ -88,6 +90,8 @@ const Step2 = () => {
   const passportPagesUrls = React.useRef([null, null])
 
   const { data, setData } = React.useContext(RequisitesContext)
+
+  console.log(data);
 
   const { 
     list_supervisoty_board_persone: watch, // Члены наблюдательного совета
@@ -1525,67 +1529,94 @@ const Step2 = () => {
               </div>
             </Wrapper>
           </div>
-          <div className={styles.mb24}>
-            <p className={styles.mb24}>Отметьте все верные утверждения</p>
-            <div className={styles.content}>
-              <div className={styles.row}>
-                <div className={styles.column}>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS
-                      isChecked={data.information_goals.includes(statementsTexts[0])}
-                      onChange={onSelect(statementsTexts[0])}
-                      >
-                      <p>{statementsTexts[0]}</p>
-                    </CheckBoxRS>
-                  </div>
-                </div>
-                <div className={styles.column}>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS
-                      isChecked={data.information_goals.includes(statementsTexts[1])}
-                      onChange={onSelect(statementsTexts[1])}
-                      >
-                      <p>{statementsTexts[1]}</p>
-                    </CheckBoxRS>
-                  </div>
-                </div>
-              </div>
 
-              <div className={styles.row}>
-                <div className={styles.column}>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS
-                      isChecked={data.information_goals.includes(statementsTexts[2])}
-                      onChange={onSelect(statementsTexts[2])}
-                    >
-                      <p>{statementsTexts[2]}</p>
-                    </CheckBoxRS>
+
+          <div className={styles.mb24}>
+            <Wrapper
+              headElement={<p className={styles.title_block}>Сведения о соответствии FATCA и и стратегическом значении компании (выберите все верные утверждения)</p>}
+            >
+              <div className={styles.content}>
+                <div className={styles.row}>
+                  <div className={styles.column}>
+                    <div className={styles.checks__item}>
+                      <CheckBoxRS
+                        isChecked={data.information_goals.includes(statementsTexts[0])}
+                        onChange={onSelect(statementsTexts[0])}
+                        >
+                        <p>{statementsTexts[0]}</p>
+                      </CheckBoxRS>
+                    </div>
+                  </div>
+                  <div className={styles.column}>
+                    <div className={styles.checks__item}>
+                      <CheckBoxRS
+                        isChecked={data.information_goals.includes(statementsTexts[1])}
+                        onChange={onSelect(statementsTexts[1])}
+                        >
+                        <p>{statementsTexts[1]}</p>
+                      </CheckBoxRS>
+                    </div>
                   </div>
                 </div>
-                <div className={styles.column}>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS 
-                      isChecked={data.information_goals.includes(statementsTexts[3])}
-                      onChange={onSelect(statementsTexts[3])}
-                    >
-                      <p>{statementsTexts[3]}</p>
-                    </CheckBoxRS>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.row}>
-                <div className={styles.column}>
-                  <div className={styles.checks__item}>
-                    <CheckBoxRS 
-                      isChecked={data.information_goals.includes(statementsTexts[4])}
-                      onChange={onSelect(statementsTexts[4])}
+
+                <div className={styles.row}>
+                  <div className={styles.column}>
+                    <div className={styles.checks__item}>
+                      <CheckBoxRS
+                        isChecked={data.information_goals.includes(statementsTexts[2])}
+                        onChange={onSelect(statementsTexts[2])}
                       >
-                      <p>{statementsTexts[4]}</p>
-                    </CheckBoxRS>
+                        <p>{statementsTexts[2]}</p>
+                      </CheckBoxRS>
+                    </div>
+                  </div>
+                  <div className={styles.column}>
+                    <div className={styles.checks__item}>
+                      <CheckBoxRS 
+                        isChecked={data.information_goals.includes(statementsTexts[3])}
+                        onChange={onSelect(statementsTexts[3])}
+                      >
+                        <p>{statementsTexts[3]}</p>
+                      </CheckBoxRS>
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.row}>
+                  <div className={styles.column}>
+                    <div className={styles.checks__item}>
+                      <CheckBoxRS 
+                        isChecked={data.information_goals.includes(statementsTexts[4])}
+                        onChange={onSelect(statementsTexts[4])}
+                        >
+                        <p>{statementsTexts[4]}</p>
+                      </CheckBoxRS>
+                    </div>
+                  </div>
+                  <div className={styles.column}>
+                    <div className={styles.checks__item}>
+                      <CheckBoxRS 
+                        isChecked={data.information_goals.includes(statementsTexts[5])}
+                        onChange={onSelect(statementsTexts[5])}
+                        >
+                        <p>{statementsTexts[5]}</p>
+                      </CheckBoxRS>
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.row}>
+                  <div className={styles.column}>
+                    <div className={styles.checks__item}>
+                      <CheckBoxRS 
+                        isChecked={data.information_goals.includes(statementsTexts[6])}
+                        onChange={onSelect(statementsTexts[6])}
+                        >
+                        <p>{statementsTexts[6]}</p>
+                      </CheckBoxRS>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </Wrapper>
           </div>
           {/* <div>
             <Wrapper

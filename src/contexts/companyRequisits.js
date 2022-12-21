@@ -14,7 +14,6 @@ export const initData = {
   },
   addresses: [],
   group_members: [],
-  information_goals: [],
   salary_debt: 0,
   contact_number: "",
   is_supervisoty: false,
