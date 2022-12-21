@@ -102,6 +102,9 @@ const Step3 = () => {
   const [isFinance, setIsFinance] = React.useState(false)
   const [isSupport, setIsSupport] = React.useState(false)
   const [isDev, setIsDev] = React.useState(false)
+  const [isSubed, setIsSubed] = React.useState(false)
+
+  console.log("isSubed", isSubed);
 
   React.useEffect(() => window.scrollTo(0, 0), []);
 
@@ -114,9 +117,11 @@ const Step3 = () => {
     if (content.style.maxHeight) {
       content.style.maxHeight = null
       e.target.classList.remove("active")
+      content.style.marginTop = 0
     } else {
       e.target.classList.add("active")
       content.style.maxHeight = content.scrollHeight + "px"
+      content.style.marginTop = "15px"
     }
   }
 
@@ -275,6 +280,33 @@ const Step3 = () => {
                 onChange={() => setOverdraft((prevState) => !prevState)}
               />
             </div>
+
+            <div className={styles.agreement}>
+              <button
+                className={styles.toggle}
+                onClick={toggle}
+              >
+                Согласие на получение информационной рассылки
+              </button>
+              <div className={styles.foldable}>
+                <div className="flex aic">
+                  <label className="mr15">
+                    <input 
+                      type="checkbox"
+                      checked={isSubed}
+                      name="sub"
+                      className="agree__radio-real"
+                      onChange={() => setIsSubed(!isSubed)}
+                    />
+                    <span className="agree__toggle"></span>
+                  </label>
+                  <p className={styles.text}>
+                    Заявитель дает согласие на получение им предложений, информации о продуктах/ услугах, рекламы и иной информации от Банка, Партнеров Банка по почте, по сетям электросвязи, в том числе путем контактов по телефону, электронной почте, с помощью СМС - сообщений и иными способами.
+                  </p>
+                </div>
+              </div>
+            </div>
+
           </div>
           <div className={styles.agreement}>
             <p className={styles.text}>
@@ -287,7 +319,7 @@ const Step3 = () => {
             >
               Согласие на обработку персональных данных
             </button>
-            <div className={styles.text_wrap}>
+            <div className={styles.foldable}>
               <p className={styles.text}>
                 Настоящим Заявитель предоставляет КБ «Ренессанс Кредит» (ООО) (ОГРН 1027739586291, 115114, г. Москва, Кожевническая улица, д.14) (далее – Банк) согласие на обработку (совершение любых действий с использованием средств автоматизации или без, включая сбор, запись, систематизацию, накопление, хранение, уточнение, извлечение, использование, передачу, обезличивание, блокировку, удаление, уничтожение) Банком, Партнерами Банка и иными лицами, с которыми Банк заключит договоры на оказание услуг для исполнения обязательств Банка перед Клиентом в рамках Договоров на предоставление Услуги, путем осуществления контактов с помощью средств связи, всех своих персональных данных и/или своего фото- и/или видео изображения, и/или аудиозапись своего голоса в целях проверки достоверности
                 предоставленных им сведений, комплексной оценки своего финансового состояния, а также в целях продвижения услуг Банка и Партнеров Банка на рынке. Согласие действует в течение сроков хранения документов и сведений, содержащих персональные данные, установленных законодательством Российской Федерации, и может быть отозвано путем предоставления письменного заявления в Банк.
