@@ -20,7 +20,7 @@ const HeaderMy = () => {
     localStorage.setItem("rko_active_step", 1)
     setAuth({ isAuthed: false, phone: "" })
     setData(initData)
-    navigate("/")
+    navigate(ROUTES.STEP1)
   }
 
   return (

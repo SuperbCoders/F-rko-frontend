@@ -104,8 +104,6 @@ const Step3 = () => {
   const [isDev, setIsDev] = React.useState(false)
   const [isSubed, setIsSubed] = React.useState(false)
 
-  console.log("isSubed", isSubed);
-
   React.useEffect(() => window.scrollTo(0, 0), []);
 
   const toggle = (e) => {

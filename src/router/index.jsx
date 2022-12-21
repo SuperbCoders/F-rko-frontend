@@ -1,11 +1,12 @@
 import React from "react";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { AuthContext } from "../contexts/auth";
+import { ROUTES } from "../helpers";
 import { publicRoutes, privateRoutes } from "./routes";
 
 const ProtectedRoute = ({ children, isAuthed=false }) => {
   if (!isAuthed) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={ROUTES.STEP1} replace />;
   }
 
   return children;
@@ -17,7 +18,7 @@ export const AppRouter = () => {
     <BrowserRouter>
       <Routes>
         {publicRoutes.map(({ path, element }) => 
-          <Route key={path} path={path} element={element} />          
+          <Route key={path} path={path} element={element} />
         )}
         {privateRoutes.map(({ path, element }) =>
           <Route key={path} path={path} element={<ProtectedRoute isAuthed={isAuthed}>{element}</ProtectedRoute>} />          

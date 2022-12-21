@@ -11,11 +11,10 @@ export const getSizeMb = (totalBytes) => {
 };
 
 export const ROUTES = {
-  ACCOUNT: "/account/",
+  // ACCOUNT: "/account/",
   STEP1: "/step1/",
   STEP2: "/step2/",
   STEP3: "/step3/",
-  MAIN: "/",
 }
 
 export function isObject(val) {
