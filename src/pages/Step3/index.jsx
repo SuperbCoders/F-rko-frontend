@@ -10,6 +10,7 @@ import { initData, RequisitesContext } from "../../contexts/companyRequisits";
 import { userApi } from "../../api";
 import { Navigate } from "react-router-dom";
 import { ROUTES } from "../../helpers";
+import Input from "../../components/Step2Components/Input";
 
 const TickSymbol = () => {
   return (
@@ -92,13 +93,10 @@ const Step3 = () => {
   const { data, setData } = React.useContext(RequisitesContext)
 
   const [isShowModal, setShowModal] = useState(false);
+  const [additionals, setAdditionals] = React.useState(["СМС-оповещение"])
   const [activeCard, setActiveCard] = useState("");
-  const [overdraft, setOverdraft] = useState(false);
-  const [acquire, setAcquire] = useState(false);
-  const [isCommunity, setIsCommunity] = React.useState(false)
-  const [isFinance, setIsFinance] = React.useState(false)
-  const [isSupport, setIsSupport] = React.useState(false)
-  const [isDev, setIsDev] = React.useState(false)
+  const [disableUI, setDisableUI] = React.useState(false)
+
   const [isSubed, setIsSubed] = React.useState(false)
 
   React.useEffect(() => window.scrollTo(0, 0), []);
@@ -120,6 +118,8 @@ const Step3 = () => {
     }
   }
 
+  const onCheck = (name) => () => setAdditionals(prev => prev.includes(name) ? prev.filter(a => a !== name ) : [...prev, name] ) 
+
   const onSubmit = async () => {
     // const { start_date, end_date } = data
 
@@ -139,14 +139,17 @@ const Step3 = () => {
       // start_date: typeof start_date === "object" ? `${start_date.getFullYear()}-${start_date.getMonth() + 1}-${start_date.getDate()}` : start_date,
       // end_date: typeof end_date === "object" ? `${end_date.getFullYear()}-${end_date.getMonth() + 1}-${end_date.getDate()}` : end_date,
       tariff: activeCard ? activeCard : "",
+      additional_products: additionals,
       is_finished: true
     }
 
+    setDisableUI(true)
     await userApi.postInfo(dto, formattedPhone)
     localStorage.removeItem("rko_name")
     localStorage.removeItem("rko_data")
     localStorage.setItem("rko_active_step", 1)
     setData(initData)
+    setDisableUI(false)
     setShowModal(true)
   }
   
@@ -223,9 +226,9 @@ const Step3 = () => {
                   <p className="p mt10">Торговый-эквайринг - Способ безналичного приема платежей за товары либо услуги банковской картой</p>
                 </div>
                 <CheckBoxRS
-                  isChecked={acquire} 
+                  isChecked={additionals.includes("Интернет-эквайринг")} 
                   size="medium" 
-                  onChange={() => setAcquire(!acquire)}
+                  onChange={onCheck("Интернет-эквайринг")}
                 />
               </div>
               <div className={styles.options__item}>
@@ -236,9 +239,9 @@ const Step3 = () => {
                   </p>
                 </div>
                 <CheckBoxRS
-                  isChecked={isCommunity} 
+                  isChecked={additionals.includes("Комьюнити")} 
                   size="medium" 
-                  onChange={() => setIsCommunity(!isCommunity)}
+                  onChange={onCheck("Комьюнити")}
                 />
               </div>
               <div className={styles.options__item}>
@@ -249,9 +252,9 @@ const Step3 = () => {
                   </p>
                 </div>
                 <CheckBoxRS
-                  isChecked={isFinance} 
+                  isChecked={additionals.includes("Бухгалтерия")} 
                   size="medium" 
-                  onChange={() => setIsFinance(!isFinance)}
+                  onChange={onCheck("Бухгалтерия")}
                 />
               </div>
               <div className={styles.options__item}>
@@ -262,9 +265,9 @@ const Step3 = () => {
                   </p>
                 </div>
                 <CheckBoxRS
-                  isChecked={isSupport} 
+                  isChecked={additionals.includes("Юридическая поддержка")} 
                   size="medium" 
-                  onChange={() => setIsSupport(!isSupport)}
+                  onChange={onCheck("Юридическая поддержка")}
                 />
               </div>
               <div className={styles.options__item}>
@@ -275,18 +278,18 @@ const Step3 = () => {
                   </p>
                 </div>
                 <CheckBoxRS
-                  isChecked={isDev} 
+                  isChecked={additionals.includes("Продвижение")} 
                   size="medium" 
-                  onChange={() => setIsDev(!isDev)}
+                  onChange={onCheck("Продвижение")}
                 />
               </div>
 
               <div className={styles.options__item}>
                 <p className={styles.text}>Овердрафт</p>
                 <CheckBoxRS
-                  isChecked={overdraft} 
+                  isChecked={additionals.includes("Овердрафт")} 
                   size="medium" 
-                  onChange={() => setOverdraft((prevState) => !prevState)}
+                  onChange={onCheck("Овердрафт")}
                 />
               </div>
 
@@ -344,10 +347,22 @@ const Step3 = () => {
               </p>
             </div>
           </div>
-          <div style={{ textAlign: "right" }}>
+
+          <div>
+            <Input
+              value={data.codeword}
+              name="Кодовое слово"
+              maxLength={35}
+              placeholder="Введите кодовое слово"
+              onChange={(e) => setData({ ...data, codeword: e.target.value })}
+            />
+          </div>
+
+          <div className="mt60" style={{ textAlign: "right" }}>
             <ButtonRS
               title="Отправить"
               style={{ width: "auto" }}
+              disable={disableUI}
               onClick={onSubmit}
             />
           </div>

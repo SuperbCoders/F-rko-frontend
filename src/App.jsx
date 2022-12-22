@@ -2,20 +2,21 @@ import React from 'react';
 import { AppRouter } from './router';
 import { initData, RequisitesContext } from './contexts/companyRequisits';
 import { userApi } from './api';
-import { AuthContext } from './contexts/auth';
 import { statementsTexts } from './pages/Step2';
 import "./App.scss";
 import { isObject } from './helpers';
 
 function App() {
-  const [auth, setAuth] = React.useState({ isAuthed: !!localStorage.getItem("login_number"), phone: localStorage.getItem("login_number") ?? "" })
   const [requisits, setRequisits] = React.useState(initData)
+
+  const info = React.useRef({ code: "", full: "" })
 
   React.useEffect(() => {
     const saveData = () => {
       setRequisits(prev => {
         if (isObject(prev)) {
           localStorage.setItem('rko_data', JSON.stringify(prev));
+          localStorage.setItem('rko_info', JSON.stringify(info.current));
         } 
         return prev
       })
@@ -26,11 +27,10 @@ function App() {
 
   React.useEffect(() => {
     const phone = localStorage.getItem("contact_number") ?? ""
-    const loginPhone = localStorage.getItem("login_number") ?? ""
     const prevSavedData = JSON.parse(localStorage.getItem('rko_data'))
-
-    if (loginPhone) {
-      setAuth({ isAuthed: true, phone: loginPhone })
+    const raw = localStorage.getItem('rko_info')
+    if (raw) {
+      info.current = JSON.parse(raw);
     }
 
     if (phone && !prevSavedData) {
@@ -52,6 +52,9 @@ function App() {
         }
         if (!data.group_members) {
           data.group_members = []
+        }
+        if (!data.founders) {
+          data.founders = []
         }
         if (!data.information_goals) {
           data.information_goals = [...statementsTexts]
@@ -78,17 +81,17 @@ function App() {
         }
 
         //корректные форматы данных для datepicker'a
-        if (data.start_date) {
-          data.start_date = new Date(data.start_date?.split("-")[0], data.start_date.split("-")[1], data.start_date?.split("-")[2])
-        } else {
-          data.start_date = ""
-        }
+        // if (data.start_date) {
+        //   data.start_date = new Date(data.start_date?.split("-")[0], data.start_date.split("-")[1], data.start_date?.split("-")[2])
+        // } else {
+        //   data.start_date = ""
+        // }
 
-        if (data.end_date) {
-          data.end_date = new Date(data.end_date?.split("-")[0], data.end_date?.split("-")[1], data.end_date?.split("-")[2])
-        } else {
-          data.end_date = ""
-        }
+        // if (data.end_date) {
+        //   data.end_date = new Date(data.end_date?.split("-")[0], data.end_date?.split("-")[1], data.end_date?.split("-")[2])
+        // } else {
+        //   data.end_date = ""
+        // }
 
         const { list_collegial_executive_body, list_supervisoty_board_persone: { account_datebirth, date_issue, validity } } = data
         if (account_datebirth) {
@@ -117,18 +120,22 @@ function App() {
     if (prevSavedData) {
       setRequisits(prev => {
         //корректные форматы данных для datepicker'a
-        const { start_date, end_date, list_supervisoty_board_persone, list_collegial_executive_body } = prevSavedData
-        if (start_date) {
-          prevSavedData.start_date = new Date(start_date)
-        } else {
-          prevSavedData.start_date = ""
-        }
+        const { 
+          // start_date, 
+          // end_date, 
+          list_supervisoty_board_persone, 
+          list_collegial_executive_body } = prevSavedData
+        // if (start_date) {
+        //   prevSavedData.start_date = new Date(start_date)
+        // } else {
+        //   prevSavedData.start_date = ""
+        // }
 
-        if (end_date) {
-          prevSavedData.end_date = new Date(end_date)
-        } else {
-          prevSavedData.end_date = ""
-        }
+        // if (end_date) {
+        //   prevSavedData.end_date = new Date(end_date)
+        // } else {
+        //   prevSavedData.end_date = ""
+        // }
 
         if (list_supervisoty_board_persone.account_datebirth) {
           prevSavedData.list_supervisoty_board_persone.account_datebirth = new Date(list_supervisoty_board_persone.account_datebirth)
@@ -154,22 +161,17 @@ function App() {
           prevSavedData.list_collegial_executive_body.validity = new Date(list_collegial_executive_body.validity)
         }
         
-        
         return { ...prev, ...prevSavedData }
       })
     }
   }, [])
 
   return (
-    <AuthContext.Provider 
-      value={{ auth, setAuth }}
+    <RequisitesContext.Provider
+      value={{ data: requisits, info, setData: setRequisits }}
     >
-      <RequisitesContext.Provider
-        value={{ data: requisits, setData: setRequisits }}
-      >
-        <AppRouter />
-      </RequisitesContext.Provider>
-    </AuthContext.Provider>
+      <AppRouter />
+    </RequisitesContext.Provider>
   )
 }
 

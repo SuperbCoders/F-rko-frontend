@@ -84,13 +84,20 @@ const Step2 = () => {
     "Не совпадает с адресом регистрации и адресом проживания"
   ]
 
+  const supremeManOpts = [
+    { label: 'Общее собрание участников', value: 'Общее собрание участников' }, 
+    { label: 'Единоличный исполнительный орган', value: 'Единоличный исполнительный орган' }, 
+    { label: 'Иное', value: 'Иное' }, 
+  ]
+
   const formatedOptions = (list) => list.map((item) => ({ value: item.data.address.unrestricted_value, label: item.data.address.unrestricted_value }))
 
   const AddressIndex = React.useRef(0)
+  const FounderIndex = React.useRef(0)
   // const companyGroupMemberIndex = React.useRef(0)
   const passportPagesUrls = React.useRef([null, null])
 
-  const { data, setData } = React.useContext(RequisitesContext)
+  const { data, info, setData } = React.useContext(RequisitesContext)
 
   const { 
     list_supervisoty_board_persone: watch, // Члены наблюдательного совета
@@ -102,13 +109,14 @@ const Step2 = () => {
   const orgnDate = data?.ogrn_date ? new Date(parseInt(data.ogrn_date)) : ""
   const formatedOgrnDate = orgnDate ? `${orgnDate.getFullYear?.()}-${orgnDate.getMonth?.() + 1}-${orgnDate.getDate?.()}` : ""
 
-  const [showErrors, setShowErrors] = React.useState(false)
+  // const [showErrors, setShowErrors] = React.useState(false)
   const [passportPages, setPassportPages] = React.useState([null, null])
   // const [erroredFields, setErroredFields] = React.useState([ 
   //   ...!data.start_date ? ["start_date"] : [], 
   //   ...!data.end_date ? ["end_date"] : [], 
   // ])
   const [isBeneficiaries, setIsBeneficiaries] = React.useState(false)
+  const [disableUI, setDisableUI] = React.useState(false)
 
   // React.useEffect(() => setErroredFields(prev => prev ? prev.filter(f => f !== "start_date") : [...prev, "start_date"]), [data.start_date])
   // React.useEffect(() => setErroredFields(prev => prev ? prev.filter(f => f !== "end_date") : [...prev, "end_date"]), [data.end_date])
@@ -123,8 +131,22 @@ const Step2 = () => {
         {
           id: AddressIndex.current,
           type_adress: ["Юридический"],
-          basis: "Аренда",
           address: ""
+        }
+      ]
+    })
+  };
+
+  const addToFoundersList = () => {
+    FounderIndex.current = FounderIndex.current + 1
+    setData({
+      ...data,
+      founders: [
+        ...data.founders,
+        {
+          id: FounderIndex.current,
+          founder_inn: "",
+          capital: ""
         }
       ]
     })
@@ -141,12 +163,6 @@ const Step2 = () => {
   const onSelectAddress = (id) => (v) => {
     const idx = data.addresses.findIndex(a => a.id === id)
     data.addresses[idx].address = v?.label ?? ""
-    setData({ ...data })
-  }
-
-  const onSelectBasis = (id) => ({ label }) => {
-    const idx = data.addresses.findIndex(a => a.id === id)
-    data.addresses[idx].basis = label
     setData({ ...data })
   }
 
@@ -208,9 +224,30 @@ const Step2 = () => {
     setIsBeneficiaries(!isBeneficiaries)
   }
 
-  const onSubmit = (e) => {
+  const onSelectFounderInn = (id) => (value) => {
+    const curr = data.founders.findIndex(f => f.id === id)
+    console.log(value);
+    // curr.founder_inn = value
+    setData({ ...data })
+  }
+
+  const onChangeFounderCapital = (id) => (e) => {
+    const curr = data.founders.findIndex(f => f.id === id)
+    // curr.capital = e.target.value
+    setData({ ...data })
+  }
+
+  const removeFromFounderList = (id) => () => {
+    setData(prev => {
+      prev.founders = prev.founders.filter(f => f.id !== id)
+      return {...prev}
+    })
+  }
+
+
+  const onSubmit = async (e) => {
     e.preventDefault()
-    setShowErrors(true)
+    // setShowErrors(true)
     // if (!start_date || !end_date) {
     //   return setErroredFields(prev => ([
     //     ...prev, 
@@ -223,12 +260,10 @@ const Step2 = () => {
 
     const dto = {
       ...data,
-      addresses: data.addresses.map(({ type_adress, basis, address }) => ({ 
+      addresses: data.addresses.map(({ type_adress, address }) => ({ 
         type_adress, 
         legal_address: type_adress === "Юридический" ? address : "", 
-        physic_address: type_adress === "Фактический" ? address : "",
         mail_address: type_adress === "Почтовый" ? address : "",
-        basis,
         address
       })),
       // start_date: start_date ? `${start_date.getFullYear()}-${start_date.getMonth() + 1}-${start_date.getDate()}` : "",
@@ -243,13 +278,13 @@ const Step2 = () => {
       dto.list_collegial_executive_body.first_passport_page_url = passportPagesUrls.current[1]
     }
 
-    console.log("dto", dto);
-
-    // userApi.postInfo(dto, formattedPhone).then(() => {
-    //   localStorage.setItem("rko_active_step", 3)
-    //   localStorage.removeItem("rko_data")
-    //   navigate(ROUTES.STEP3)
-    // })
+    setDisableUI(true)
+    await userApi.postInfo(dto, formattedPhone)
+    
+    localStorage.setItem("rko_active_step", 3)
+    localStorage.removeItem("rko_data")
+    setDisableUI(false)
+    navigate(ROUTES.STEP3)
   }
 
   return (
@@ -375,16 +410,14 @@ const Step2 = () => {
           <div className={styles.mb64}>
             <Wrapper headElement={<p className={styles.title_block}>Адреса</p>}>
               <div className={styles.content}>
-                {data.addresses.map(({ type_adress, basis, address, id }) => 
+                {data.addresses.map(({ type_adress, address, id }) => 
                   <AddressItem
                     key={id}
                     id={id}
                     type={type_adress}
-                    basis={basis}
                     address={address}
                     onSelectType={onSelectAddressType}
                     onSelectAddress={onSelectAddress}
-                    onSelectBasis={onSelectBasis}
                   /> 
                 )}
                 <div>
@@ -396,83 +429,26 @@ const Step2 = () => {
               </div>
             </Wrapper>
           </div>
-          <div className={styles.mb40}>
-            <Wrapper
-              headElement={<p className={styles.title_block}>Структура органов управления</p>}
-            >
-              <div className={styles.content}>
-                <div className={styles.row}>
-                  <Input
-                    value={data.supreme_management_body}
-                    name="Высший орган управления"
-                    placeholder="Высший орган управления"
-                    onChange={(e) => setData({ ...data, supreme_management_body: e.target.value })}
-                  />
-                </div>
-                <div className={styles.row}>
-                  <div className={styles.column}>
-                    <Input
-                      value={data.supreme_management_person}
-                      name="Руководитель"
-                      placeholder="Руководитель"
-                      onChange={(e) => setData({ ...data, supreme_management_person: e.target.value })}
-                    />
-                  </div>
-                  <div className={styles.column}>
-                    <Input
-                      value={data.supreme_management_inn}
-                      name="ИНН"
-                      type="number"
-                      pattern="[0-9]*"
-                      placeholder="Введите ИНН"
-                      onChange={(e) => setData({ ...data, supreme_management_inn: e.target.value })}
+          {info?.full !== "Индивидуальный предприниматель" && info?.code !== "50102" && 
+            <div className={styles.mb40}>
+              <Wrapper
+                headElement={<p className={styles.title_block}>Структура органов управления</p>}
+              >
+                <div className={styles.content}>
+                  <div className={styles.row}>
+                    <SelectRS
+                      nameStyles={{ color: "#8E909B", fontSize: "14px", marginBottom: "8px" }}
+                      value={{ value: data.supreme_management_body, label: data.supreme_management_body }}
+                      name="Высший орган управления"
+                      placeholder="Высший орган управления"
+                      options={supremeManOpts}
+                      onChange={(v) => setData({ ...data, supreme_management_body: v.label  })}
                     />
                   </div>
                 </div>
-                <div className={styles.mb24} style={{ width: "100%" }}>
-                  <p className={styles.option_title}>
-                    Наличие наблюдательного совета
-                  </p>
-                  <YesOrNo
-                    value={data.is_collegiate_body}
-                    toggle={() => setData({ ...data, is_collegiate_body: !data.is_collegiate_body })}
-                  />
-                </div>
-                {data.is_collegiate_body && 
-                  <div className={styles.row}>
-                    <div className={styles.column}>
-                      <Input
-                        value={data.collegiate_person}
-                        name="Наименование наблюдательного совета"
-                        placeholder="Наименование"
-                        onChange={(e) => setData({ ...data, collegiate_person: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                }
-                <div className={styles.mb24} style={{ width: "100%" }}>
-                  <p className={styles.option_title}>
-                    Наличие коллегиального исполнительного органа
-                  </p>
-                  <YesOrNo
-                    value={data.is_supervisoty}
-                    toggle={() => setData({ ...data, is_supervisoty: !data.is_supervisoty })}
-                  />
-                </div>
-                {data.is_supervisoty && 
-                  <div className={styles.row}>
-                    <div className={styles.column}>
-                      <Input
-                        value={data.supervisoty_board_persone_name}
-                        name="Наименование коллегиального исполнительного органа"
-                        placeholder="Наименование"
-                        onChange={(e) => setData({ ...data, supervisoty_board_persone_name: e.target.value })}
-                      />
-                    </div>
-                  </div>}
-              </div>
-            </Wrapper>
-          </div>
+              </Wrapper>
+            </div>
+          }
           <div className={styles.mb40}>
             <Wrapper
               headElement={<p className={styles.title_block}>Сведения о персонале</p>}
@@ -501,63 +477,45 @@ const Step2 = () => {
             </Wrapper>
           </div>
 
-          {/* <div className={styles.mb40}>
+          {info?.full !== "Индивидуальный предприниматель" && info?.code !== "50102" && <div className={styles.mb40}>
             <Wrapper
-              headElement={<p className={styles.title_block}>Сведения о группе компаний</p>}
+              headElement={<p className={styles.title_block}>Учредители – юридические лица</p>}
             >
               <div className={styles.content}>
-                <div className={styles.row}>
-                  <Input
-                    value={data.company_group_name}
-                    name="Название группы компаний"
-                    placeholder="Укажите название"
-                    onChange={(e) => setData({ ...data, company_group_name: e.target.value })}
-                  />
-                </div>
-                <div className={styles.row}>
-                  <DateInput
-                    isError={showErrors && erroredFields.includes("start_date")}
-                    name="Дата начала действия"
-                    value={data.start_date}
-                    onChange={onChangeStartDate}
-                  />
-
-                  <DateInput 
-                    isError={showErrors && erroredFields.includes("end_date")}
-                    name="Дата окончания действия" 
-                    value={data.end_date}
-                    onChange={onChangeEndDate}
-                    />
-                </div>
-                
-                <div className={styles.row}>
-                  <p>Состав группы компаний</p>
-                </div>
-                
-                {data.group_members?.map(({ name, id }) => 
+                {data.founders.map(({ id, founder_inn, capital }) => 
                   <div className={`${styles.row} ${styles.align_end}`} key={id}>
-                    <DaDataSelect 
-                      backgroundColor="#F0F2F5"
-                      name="Название"
-                      value={name}
-                      style={{ width: "50%" }}
-                      message="Введите название или ИНН"
-                      formatedOptions={(list) => list.map((item) => ({ value: item, label: item.unrestricted_value }) )}
-                      onSelect={onChangeCompanyGroupMember(id)}
-                    />
-
-                    <DeleteButton onClick={deleteCompanyGroupMember(id)} />
-                  </div>)}
-
-                <div className={styles.buttons}>
-                  <AddButton 
+                    <div className={styles.column}>
+                      <DaDataSelect 
+                        backgroundColor="#F0F2F5"
+                        name="Учредитель"
+                        value={founder_inn}
+                        message="Введите ИНН"
+                        formatedOptions={formatedOptions}
+                        onSelect={onSelectFounderInn(id)}
+                      />
+                    </div>
+                    <div className={styles.column}>
+                      <Input
+                        value={capital}
+                        maxLegth={6}
+                        name="Доля в уставном капитале"
+                        onChange={onChangeFounderCapital(id)}
+                      />
+                    </div>
+                    <div style={{ width: "auto" }} className={styles.column}>
+                      <DeleteButton onClick={removeFromFounderList(id)} />
+                    </div>
+                  </div>
+                )}
+                <div>
+                  <AddButton
                     type="button" 
-                    onClick={addCompanyGroupMember} 
+                    onClick={addToFoundersList} 
                   />
                 </div>
               </div>
             </Wrapper>
-          </div> */}
+          </div>}
 
           {/* Члены наблюдательного совета */}
           <div className={styles.mb40}>
@@ -1710,6 +1668,7 @@ const Step2 = () => {
             <ButtonRS
               title="Продолжить"
               style={{ width: "auto" }}
+              disable={disableUI}
               onClick={onSubmit}
             />
           </div>

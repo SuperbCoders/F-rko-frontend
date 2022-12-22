@@ -13,7 +13,6 @@ export const initData = {
     is_person_a_foreign_public: false
   },
   addresses: [],
-  group_members: [],
   salary_debt: 0,
   contact_number: "",
   is_supervisoty: false,
@@ -23,9 +22,12 @@ export const initData = {
   email: "",
   fax: "",
   contact_phone_number: "",
+  codeword: "",
+  founders: []
 }
 
 export const RequisitesContext = React.createContext({
   data: {},
+  info: {},
   setData: () => {}
 });

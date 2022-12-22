@@ -15,7 +15,7 @@ import { ROUTES } from "../../helpers"
 
 const Step1 = () => {
   const navigate = useNavigate();
-  const { data, setData } = React.useContext(RequisitesContext)
+  const { data, info, setData } = React.useContext(RequisitesContext)
 
   const initFields = {
     name: {
@@ -39,6 +39,7 @@ const Step1 = () => {
 
   const [fields, setFields] = React.useState(initFields)
   const [showErrors, setShowErrors] = React.useState(false)
+  const [disableUI, setDisableUI] = React.useState(false)
 
   React.useEffect(() => window.scrollTo(0, 0), []);
 
@@ -67,8 +68,10 @@ const Step1 = () => {
       oktmo: data.oktmo
     }
     localStorage.setItem("contact_number", data.contact_number)
+    setDisableUI(true)
 
     await userApi.postInfo(dto, formattedPhone)
+    setDisableUI(false)
     setShowErrors(false)
     localStorage.setItem("rko_active_step", 2)
     setData(prev => ({ ...prev, ...dto }))
@@ -89,6 +92,7 @@ const Step1 = () => {
   }
   
   const onSelect = (a) => {
+    info.current = a?.value?.data?.opf ?? ""
     const { value } = a || {}
     const { data } = value || {}
 
@@ -224,6 +228,7 @@ const Step1 = () => {
                   <ButtonRS
                     title="Продолжить"
                     style={{ maxWidth: "267px" }}
+                    disable={disableUI}
                     type="submit"
                   />
                 </div>
