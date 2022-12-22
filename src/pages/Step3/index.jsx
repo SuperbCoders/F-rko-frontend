@@ -47,7 +47,6 @@ export const Protector = ({ children }) => {
 const Step3 = () => {
   const cardList = [
     {
-      id: 1,
       name: "Первый ",
       desc: "Подойдёт тем, кто неавно зарегистрировал ИП или ООО и только начинает вести бизнес",
       list: [
@@ -62,7 +61,6 @@ const Step3 = () => {
       price: 0,
     },
     {
-      id: 2,
       name: "Второй",
       desc: "Оптимальный тариф для тех, чей бизнес начал приносить первую прибыль",
       list: [
@@ -77,7 +75,6 @@ const Step3 = () => {
       price: 490,
     },
     {
-      id: 3,
       name: "Третий",
       desc: "Для активно растущего бизнеса, который выходит на новые рынки",
       list: [
@@ -95,7 +92,7 @@ const Step3 = () => {
   const { data, setData } = React.useContext(RequisitesContext)
 
   const [isShowModal, setShowModal] = useState(false);
-  const [activeCard, setActiveCard] = useState(null);
+  const [activeCard, setActiveCard] = useState("");
   const [overdraft, setOverdraft] = useState(false);
   const [acquire, setAcquire] = useState(false);
   const [isCommunity, setIsCommunity] = React.useState(false)
@@ -141,6 +138,7 @@ const Step3 = () => {
 
       start_date: typeof start_date === "object" ? `${start_date.getFullYear()}-${start_date.getMonth() + 1}-${start_date.getDate()}` : start_date,
       end_date: typeof end_date === "object" ? `${end_date.getFullYear()}-${end_date.getMonth() + 1}-${end_date.getDate()}` : end_date,
+      tariff: activeCard ? activeCard : "",
       is_finished: true
     }
 
@@ -151,7 +149,7 @@ const Step3 = () => {
     setData(initData)
     setShowModal(true)
   }
-
+  
   return (
     <>
       <HeaderMy />
@@ -168,11 +166,11 @@ const Step3 = () => {
             Тарифы на расчетно-кассовое обслуживание
           </p>
           <div className={styles.cards}>
-            {cardList.map(({ id, name, desc, price, list }) => 
+            {cardList.map(({ name, desc, price, list }) => 
               <div
-                key={id}
+                key={name}
                 className={styles.cards__item}
-                onClick={() => setActiveCard(id)}
+                onClick={() => setActiveCard(name)}
               >
                 <p className={styles.name}>{name}</p>
                 <p className={styles.desc}>{desc}</p>
@@ -186,125 +184,139 @@ const Step3 = () => {
                 </ul>
                 <p className={styles.price}>{price} руб/мес</p>
                 <button
-                  className={classNames(styles.button, id === activeCard && styles.active)}
+                  className={classNames(styles.button, name === activeCard && styles.active)}
                 >
-                  {id === activeCard ? "Выбрано" : "Выбрать"}
-                  {id === activeCard && <TickSymbol />}
+                  {name === activeCard ? "Выбрано" : "Выбрать"}
+                  {name === activeCard && <TickSymbol />}
                 </button>
               </div>
             )}
           </div>
-          <p className={styles.title}>
-            Выберите дополнительные продукты к подключению
-          </p>
-          <div className={styles.options}>
-            <div className={styles.options__item}>
-              <p className={styles.text}>СМС-оповещение</p>
-              <CheckBoxRS
-                isChecked={true} 
-                size="medium" 
-                onChange={() => {}}
-              />
-            </div>
-            <div className={styles.options__item}>
-              <div>
-                <p className={styles.text}>Интернет-эквайринг</p>
-                <p className="p mt10">Торговый-эквайринг - Способ безналичного приема платежей за товары либо услуги банковской картой</p>
-              </div>
-              <CheckBoxRS
-                isChecked={acquire} 
-                size="medium" 
-                onChange={() => setAcquire(!acquire)}
-              />
-            </div>
-            <div className={styles.options__item}>
-              <div>
-                <p className={styles.text}>Комьюнити</p>
-                <p className="p mt10">
-                  Бесплатный онлайн-сервис для поиска бизнес-партнёров. Собирает и обрабатывает информацию о предпринимателях на множестве различных платформ, формирует подборку интересных контактов, представляет и знакомит предпринимателей друг с другом.
-                </p>
-              </div>
-              <CheckBoxRS
-                isChecked={isCommunity} 
-                size="medium" 
-                onChange={() => setIsCommunity(!isCommunity)}
-              />
-            </div>
-            <div className={styles.options__item}>
-              <div>
-                <p className={styles.text}>Бухгалтерия</p>
-                <p className="p mt10">
-                  Онлайн-сервис по ведению бухгалтерского учета и дистанционной сдаче налогов и сборов в ФНС и различные фонды. Сервис интегрирован с интернет-банком и мобильным банком. Стоимость сервиса - от 833 Р/месяц.
-                </p>
-              </div>
-              <CheckBoxRS
-                isChecked={isFinance} 
-                size="medium" 
-                onChange={() => setIsFinance(!isFinance)}
-              />
-            </div>
-            <div className={styles.options__item}>
-              <div>
-                <p className={styles.text}>Юридическая поддержка</p>
-                <p className="p mt10">
-                  Услуги юридической поддержки по бизнесу и личным вопросам. После подключения услуги в режиме 24/7 можно получать консультации профессиональных юристов. Стоимость услуги - от 500 Р/месяц.
-                </p>
-              </div>
-              <CheckBoxRS
-                isChecked={isSupport} 
-                size="medium" 
-                onChange={() => setIsSupport(!isSupport)}
-              />
-            </div>
-            <div className={styles.options__item}>
-              <div>
-                <p className={styles.text}>Продвижение</p>
-                <p className="p mt10">
-                  Услуга продвижения бизнеса на онлайн-площадках. Выдается промо-код, позволяющий увеличить рекламный бюджет. Выдача промо-кода - бесплатно.а продвижения бизнеса на онлайн-площадках. Выдается промо-код, позволяющий увеличить рекламный бюджет. Выдача промо-кода - бесплатно.
-                </p>
-              </div>
-              <CheckBoxRS
-                isChecked={isDev} 
-                size="medium" 
-                onChange={() => setIsDev(!isDev)}
-              />
-            </div>
 
-            <div className={styles.options__item}>
-              <p className={styles.text}>Овердрафт</p>
-              <CheckBoxRS
-                isChecked={overdraft} 
-                size="medium" 
-                onChange={() => setOverdraft((prevState) => !prevState)}
-              />
-            </div>
+          <div className="flex jcc">
+            <button
+              className={classNames(styles.button, activeCard === "" && styles.active)}
+              type="button"
+              onClick={() => setActiveCard("")}
+            >
+              Выбрать позже
+              {activeCard === "" && <TickSymbol />}
+            </button>
+          </div>
 
-            <div className={styles.agreement}>
-              <button
-                className={styles.toggle}
-                onClick={toggle}
-              >
-                Согласие на получение информационной рассылки
-              </button>
-              <div className={styles.foldable}>
-                <div className="flex aic">
-                  <label className="mr15">
-                    <input 
-                      type="checkbox"
-                      checked={isSubed}
-                      name="sub"
-                      className="agree__radio-real"
-                      onChange={() => setIsSubed(!isSubed)}
-                    />
-                    <span className="agree__toggle"></span>
-                  </label>
-                  <p className={styles.text}>
-                    Заявитель дает согласие на получение им предложений, информации о продуктах/ услугах, рекламы и иной информации от Банка, Партнеров Банка по почте, по сетям электросвязи, в том числе путем контактов по телефону, электронной почте, с помощью СМС - сообщений и иными способами.
+          <div className="mt60">
+            <p className={styles.title}>
+              Выберите дополнительные продукты к подключению
+            </p>
+            <div className={styles.options}>
+              <div className={styles.options__item}>
+                <p className={styles.text}>СМС-оповещение</p>
+                <CheckBoxRS
+                  isChecked={true} 
+                  size="medium" 
+                  onChange={() => {}}
+                />
+              </div>
+              <div className={styles.options__item}>
+                <div>
+                  <p className={styles.text}>Интернет-эквайринг</p>
+                  <p className="p mt10">Торговый-эквайринг - Способ безналичного приема платежей за товары либо услуги банковской картой</p>
+                </div>
+                <CheckBoxRS
+                  isChecked={acquire} 
+                  size="medium" 
+                  onChange={() => setAcquire(!acquire)}
+                />
+              </div>
+              <div className={styles.options__item}>
+                <div>
+                  <p className={styles.text}>Комьюнити</p>
+                  <p className="p mt10">
+                    Бесплатный онлайн-сервис для поиска бизнес-партнёров. Собирает и обрабатывает информацию о предпринимателях на множестве различных платформ, формирует подборку интересных контактов, представляет и знакомит предпринимателей друг с другом.
                   </p>
                 </div>
+                <CheckBoxRS
+                  isChecked={isCommunity} 
+                  size="medium" 
+                  onChange={() => setIsCommunity(!isCommunity)}
+                />
               </div>
-            </div>
+              <div className={styles.options__item}>
+                <div>
+                  <p className={styles.text}>Бухгалтерия</p>
+                  <p className="p mt10">
+                    Онлайн-сервис по ведению бухгалтерского учета и дистанционной сдаче налогов и сборов в ФНС и различные фонды. Сервис интегрирован с интернет-банком и мобильным банком. Стоимость сервиса - от 833 Р/месяц.
+                  </p>
+                </div>
+                <CheckBoxRS
+                  isChecked={isFinance} 
+                  size="medium" 
+                  onChange={() => setIsFinance(!isFinance)}
+                />
+              </div>
+              <div className={styles.options__item}>
+                <div>
+                  <p className={styles.text}>Юридическая поддержка</p>
+                  <p className="p mt10">
+                    Услуги юридической поддержки по бизнесу и личным вопросам. После подключения услуги в режиме 24/7 можно получать консультации профессиональных юристов. Стоимость услуги - от 500 Р/месяц.
+                  </p>
+                </div>
+                <CheckBoxRS
+                  isChecked={isSupport} 
+                  size="medium" 
+                  onChange={() => setIsSupport(!isSupport)}
+                />
+              </div>
+              <div className={styles.options__item}>
+                <div>
+                  <p className={styles.text}>Продвижение</p>
+                  <p className="p mt10">
+                    Услуга продвижения бизнеса на онлайн-площадках. Выдается промо-код, позволяющий увеличить рекламный бюджет. Выдача промо-кода - бесплатно.а продвижения бизнеса на онлайн-площадках. Выдается промо-код, позволяющий увеличить рекламный бюджет. Выдача промо-кода - бесплатно.
+                  </p>
+                </div>
+                <CheckBoxRS
+                  isChecked={isDev} 
+                  size="medium" 
+                  onChange={() => setIsDev(!isDev)}
+                />
+              </div>
 
+              <div className={styles.options__item}>
+                <p className={styles.text}>Овердрафт</p>
+                <CheckBoxRS
+                  isChecked={overdraft} 
+                  size="medium" 
+                  onChange={() => setOverdraft((prevState) => !prevState)}
+                />
+              </div>
+
+              <div className={styles.agreement}>
+                <button
+                  className={styles.toggle}
+                  onClick={toggle}
+                >
+                  Согласие на получение информационной рассылки
+                </button>
+                <div className={styles.foldable}>
+                  <div className="flex aic">
+                    <label className="mr15">
+                      <input 
+                        type="checkbox"
+                        checked={isSubed}
+                        name="sub"
+                        className="agree__radio-real"
+                        onChange={() => setIsSubed(!isSubed)}
+                      />
+                      <span className="agree__toggle"></span>
+                    </label>
+                    <p className={styles.text}>
+                      Заявитель дает согласие на получение им предложений, информации о продуктах/ услугах, рекламы и иной информации от Банка, Партнеров Банка по почте, по сетям электросвязи, в том числе путем контактов по телефону, электронной почте, с помощью СМС - сообщений и иными способами.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
           </div>
           <div className={styles.agreement}>
             <p className={styles.text}>
