@@ -19,7 +19,10 @@ export const initData = {
   is_supervisoty: false,
   is_collegiate_body: false,
   information_goals: [...statementsTexts],
-  beneficiaries: "Отсутствуют"
+  beneficiaries: "Отсутствуют",
+  email: "",
+  fax: "",
+  contact_phone_number: "",
 }
 
 export const RequisitesContext = React.createContext({

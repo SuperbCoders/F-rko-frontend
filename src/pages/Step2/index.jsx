@@ -22,7 +22,7 @@ import AddButton from "../../components/AddButton";
 import DownloadButton from "../../components/DownloadButton";
 import { passportApi, userApi } from "../../api";
 import { RequisitesContext } from "../../contexts/companyRequisits";
-import PhoneInput from "../../components/PhoneInput";
+import MaskedInput from "../../components/MaskedInput";
 import DaDataSelect from "../../components/DaDataSelect";
 
 export const statementsTexts = [
@@ -104,14 +104,14 @@ const Step2 = () => {
 
   const [showErrors, setShowErrors] = React.useState(false)
   const [passportPages, setPassportPages] = React.useState([null, null])
-  const [erroredFields, setErroredFields] = React.useState([ 
-    ...!data.start_date ? ["start_date"] : [], 
-    ...!data.end_date ? ["end_date"] : [], 
-  ])
+  // const [erroredFields, setErroredFields] = React.useState([ 
+  //   ...!data.start_date ? ["start_date"] : [], 
+  //   ...!data.end_date ? ["end_date"] : [], 
+  // ])
   const [isBeneficiaries, setIsBeneficiaries] = React.useState(false)
 
-  React.useEffect(() => setErroredFields(prev => prev ? prev.filter(f => f !== "start_date") : [...prev, "start_date"]), [data.start_date])
-  React.useEffect(() => setErroredFields(prev => prev ? prev.filter(f => f !== "end_date") : [...prev, "end_date"]), [data.end_date])
+  // React.useEffect(() => setErroredFields(prev => prev ? prev.filter(f => f !== "start_date") : [...prev, "start_date"]), [data.start_date])
+  // React.useEffect(() => setErroredFields(prev => prev ? prev.filter(f => f !== "end_date") : [...prev, "end_date"]), [data.end_date])
   React.useEffect(() => setIsBeneficiaries(data.beneficiaries !== "Отсутствуют"), [data.beneficiaries])
 
   const addToAddressList = () => {
@@ -211,14 +211,13 @@ const Step2 = () => {
   const onSubmit = (e) => {
     e.preventDefault()
     setShowErrors(true)
-    const { start_date, end_date } = data
-    if (!start_date || !end_date) {
-      return setErroredFields(prev => ([
-        ...prev, 
-        ...!start_date ? ["start_date"] : [], 
-        ...!end_date ? ["end_date"] : []
-      ]))
-    }
+    // if (!start_date || !end_date) {
+    //   return setErroredFields(prev => ([
+    //     ...prev, 
+    //     ...!start_date ? ["start_date"] : [], 
+    //     ...!end_date ? ["end_date"] : []
+    //   ]))
+    // }
 
     const formattedPhone = data.contact_number.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скоблки
 
@@ -232,8 +231,8 @@ const Step2 = () => {
         basis,
         address
       })),
-      start_date: start_date ? `${start_date.getFullYear()}-${start_date.getMonth() + 1}-${start_date.getDate()}` : "",
-      end_date: end_date ? `${end_date.getFullYear()}-${end_date.getMonth() + 1}-${end_date.getDate()}` : "",
+      // start_date: start_date ? `${start_date.getFullYear()}-${start_date.getMonth() + 1}-${start_date.getDate()}` : "",
+      // end_date: end_date ? `${end_date.getFullYear()}-${end_date.getMonth() + 1}-${end_date.getDate()}` : "",
       group_members: data.group_members?.map(({ name, inn, ogrn }) => ({ name, inn, ogrn })), // оставил только нужные поля
     }
 
@@ -244,11 +243,13 @@ const Step2 = () => {
       dto.list_collegial_executive_body.first_passport_page_url = passportPagesUrls.current[1]
     }
 
-    userApi.postInfo(dto, formattedPhone).then(() => {
-      localStorage.setItem("rko_active_step", 3)
-      localStorage.removeItem("rko_data")
-      navigate(ROUTES.STEP3)
-    })
+    console.log("dto", dto);
+
+    // userApi.postInfo(dto, formattedPhone).then(() => {
+    //   localStorage.setItem("rko_active_step", 3)
+    //   localStorage.removeItem("rko_data")
+    //   navigate(ROUTES.STEP3)
+    // })
   }
 
   return (
@@ -323,6 +324,54 @@ const Step2 = () => {
         </div>
 
         <form>
+          <div className={styles.mb64}>
+            <Wrapper headElement={<p className={styles.title_block}>Контакты</p>}>
+              <div className={styles.content}>
+                <div className={styles.row}>
+                  <div className={styles.input__wrapper}>
+                    <p className={styles.name}>E-mail</p>
+                    <MaskedInput
+                      // mask="*@*.com"
+                      placeholder="pochta@server.com"
+                      value={data.email}
+                      onChange={(e) => setData(prev => ({ ...prev, email: e.target.value }))}
+                    />
+                  </div>
+                  <div className={styles.input__wrapper}>
+                    <p className={styles.name}>Телефон</p>
+                    <MaskedInput
+                      mask="+7 (999) 999 99 99"
+                      placeholder="+7 (__) ___ __ __"
+                      maskChar="_"
+                      value={data.contact_phone_number}
+                      onChange={(e) => setData(prev => ({ ...prev, contact_phone_number: e.target.value }))}
+                    />
+                  </div>
+                </div>
+                <div className={styles.row}>
+                  <div className={styles.input__wrapper}>
+                    <p className={styles.name}>Сайт компании</p>
+                    <MaskedInput
+                      // mask="https://"
+                      placeholder="https://"
+                      value={data.domainname}
+                      onChange={(e) => setData(prev => ({ ...prev, domainname: e.target.value }))}
+                    />
+                  </div>
+                  <div className={styles.input__wrapper}>
+                    <p className={styles.name}>Факс</p>
+                    <MaskedInput
+                      mask="+7 (999) 999 99 99"
+                      placeholder="+7 (__) ___ __ __"
+                      maskChar="_"
+                      value={data.fax}
+                      onChange={(e) => setData(prev => ({ ...prev, fax: e.target.value }))}
+                    />
+                  </div>
+                </div>
+              </div>
+            </Wrapper>
+          </div>
           <div className={styles.mb64}>
             <Wrapper headElement={<p className={styles.title_block}>Адреса</p>}>
               <div className={styles.content}>
@@ -598,7 +647,10 @@ const Step2 = () => {
 
                 <div className={styles.input__wrapper}>
                   <p className={styles.name}>Телефон</p>
-                  <PhoneInput
+                  <MaskedInput
+                    mask="+7 (999) 999 99 99"
+                    maskChar="_"
+                    placeholder="+7 (__) ___ __ __"
                     value={watch.account_own_phone ?? ""}
                     style={{margin: 0, padding: "20px 16px" }}
                     onChange={(e) => setData({ ...data, list_supervisoty_board_persone: { ...watch, account_own_phone: e.target.value } })}
@@ -920,7 +972,10 @@ const Step2 = () => {
 
                 <div className={styles.input__wrapper}>
                   <p className={styles.name}>Телефон</p>
-                  <PhoneInput
+                  <MaskedInput
+                    mask="+7 (999) 999 99 99"
+                    maskChar="_"
+                    placeholder="+7 (__) ___ __ __"
                     value={exec.account_own_phone ?? ""}
                     style={{margin: 0, padding: "20px 16px" }}
                     onChange={(e) => setData({ ...data, list_collegial_executive_body: { ...exec, account_own_phone: e.target.value } })}
@@ -1650,7 +1705,7 @@ const Step2 = () => {
               <ScanOrPhoto name={"Прочие документы"} />
             </Wrapper>
           </div> */}
-          {erroredFields.length && showErrors ? <p style={{ color: "red" }}>Часть полей не заполнена или заполнена некорректно</p> : null}
+          {/* {erroredFields.length && showErrors ? <p style={{ color: "red" }}>Часть полей не заполнена или заполнена некорректно</p> : null} */}
           <div style={{ textAlign: "right", margin: "40px 0" }}>
             <ButtonRS
               title="Продолжить"

@@ -8,7 +8,7 @@ import cube from "../../assets/img/cube.png";
 import { useNavigate } from "react-router-dom";
 import HeaderMy from "../../components/HeaderMy";
 import DaDataSelect from "../../components/DaDataSelect";
-import PhoneInput from "../../components/PhoneInput";
+import MaskedInput from "../../components/MaskedInput";
 import { userApi } from "../../api";
 import { RequisitesContext } from "../../contexts/companyRequisits";
 import { ROUTES } from "../../helpers"
@@ -158,7 +158,10 @@ const Step1 = () => {
                   <p className={styles.input__name}>Номер телефона</p>
                   <div className={styles.input__container}>
                     <div>
-                      <PhoneInput
+                      <MaskedInput
+                        mask="+7 (999) 999 99 99"
+                        placeholder="+7 (__) ___ __ __"
+                        maskChar="_"
                         value={data.contact_number ?? ""}
                         required={true}
                         className={!/[0-9]+/.test(data.contact_number?.[17]) && showErrors ? styles.input__error : ""}
