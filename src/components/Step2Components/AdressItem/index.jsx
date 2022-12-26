@@ -15,7 +15,7 @@ const AddressItem = ({ id, type, address, onSelectType, onSelectAddress }) => {
     })
   }
 
-  const formatedOptions = (list) => list.map((item) => ({ value: item.data.address.unrestricted_value, label: item.data.address.unrestricted_value }))
+  const formatedOptions = (list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))
 
   return (
     <>
@@ -49,6 +49,7 @@ const AddressItem = ({ id, type, address, onSelectType, onSelectAddress }) => {
               name="Адрес"
               nameStyles={{ color: "#8E909B", fontSize: "14px", marginBottom: "8px" }}
               value={address}
+              isAddr={true}
               message="Напишите адрес"
               formatedOptions={formatedOptions}
               onSelect={onSelectAddress(id)}
