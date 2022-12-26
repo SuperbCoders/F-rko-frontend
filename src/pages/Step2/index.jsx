@@ -1241,34 +1241,34 @@ const Step2 = () => {
 
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
-                  Количество операций по безналичным платежам в месяц
+                  Количество операций по снятию наличности в неделю
                 </p>
                 <div className={styles.row}>
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, operation_volume: "0-29" })}
+                      onClick={() => setData({ ...data, week_cash_withdrawal: "0-29" })}
                     >
                       <RadioButtonRS
-                        isActive={data.operation_volume === "0-29"}
+                        isActive={data.week_cash_withdrawal === "0-29"}
                       />
                       <p>0-29</p>
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, operation_volume: "30-100" })}
+                      onClick={() => setData({ ...data, week_cash_withdrawal: "30-100" })}
                     >
                       <RadioButtonRS
-                        isActive={data.operation_volume === "30-100"}
+                        isActive={data.week_cash_withdrawal === "30-100"}
                       />
                       <p>30-100</p>
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, operation_volume: ">100" })}
+                      onClick={() => setData({ ...data, week_cash_withdrawal: ">100" })}
                     >
                       <RadioButtonRS
-                        isActive={data.operation_volume === ">100"}
+                        isActive={data.week_cash_withdrawal === ">100"}
                       />
                       <p>более 100</p>
                     </div>
@@ -1277,36 +1277,72 @@ const Step2 = () => {
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
-                  Сумма операций по снятию наличности в месяц
+                  Количество операций по снятию наличности в квартал
                 </p>
                 <div className={styles.row}>
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_per_month: "0 - 99 000" })}
+                      onClick={() => setData({ ...data, quarter_cash_withdrawal: "0-29" })}
                     >
                       <RadioButtonRS
-                        isActive={data.sum_per_month === "0 - 99 000"}
+                        isActive={data.quarter_cash_withdrawal === "0-29"}
                       />
-                      <p>0 - 99 000 руб.</p>
+                      <p>0-29</p>
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_per_month: "100 000 - 1 000 000" })}
+                      onClick={() => setData({ ...data, quarter_cash_withdrawal: "30-100" })}
                     >
                       <RadioButtonRS
-                        isActive={data.sum_per_month === "100 000 - 1 000 000"}
+                        isActive={data.quarter_cash_withdrawal === "30-100"}
                       />
-                      <p>100 000 - 1 000 000 руб.</p>
+                      <p>30-100</p>
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_per_month: ">1 000 000" })}
+                      onClick={() => setData({ ...data, quarter_cash_withdrawal: ">100" })}
                     >
                       <RadioButtonRS
-                        isActive={data.sum_per_month === ">1 000 000"}
+                        isActive={data.quarter_cash_withdrawal === ">100"}
                       />
-                      <p>более 1 000 000 руб.</p>
+                      <p>более 100</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                  Количество операций по снятию наличности в год
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, age_cash_withdrawal: "0-29" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.age_cash_withdrawal === "0-29"}
+                      />
+                      <p>0-29</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, age_cash_withdrawal: "30-100" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.age_cash_withdrawal === "30-100"}
+                      />
+                      <p>30-100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, age_cash_withdrawal: ">100" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.age_cash_withdrawal === ">100"}
+                      />
+                      <p>более 100</p>
                     </div>
                   </div>
                 </div>
@@ -1341,6 +1377,42 @@ const Step2 = () => {
                     >
                       <RadioButtonRS
                         isActive={data.sum_week_cash_withdrawal === ">1 000 000"}
+                      />
+                      <p>более 1 000 000 руб.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Сумма операций по снятию денежных средств в наличной форме в месяц
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_mouth_cash_withdrawal: "0 - 99 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_mouth_cash_withdrawal === "0 - 99 000"}
+                      />
+                      <p>0 - 99 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_mouth_cash_withdrawal: "100 000 - 1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_mouth_cash_withdrawal === "100 000 - 1 000 000"}
+                      />
+                      <p>100 000 - 1 000 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_mouth_cash_withdrawal: ">1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_mouth_cash_withdrawal === ">1 000 000"}
                       />
                       <p>более 1 000 000 руб.</p>
                     </div>
@@ -1385,36 +1457,324 @@ const Step2 = () => {
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
+                Сумма операций по снятию денежных средств в наличной форме в год
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_age_cash_withdrawal: "0 - 99 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_age_cash_withdrawal === "0 - 99 000"}
+                      />
+                      <p>0 - 99 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_age_cash_withdrawal: "100 000 - 1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_age_cash_withdrawal === "100 000 - 1 000 000"}
+                      />
+                      <p>100 000 - 1 000 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_age_cash_withdrawal: ">1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_age_cash_withdrawal === ">1 000 000"}
+                      />
+                      <p>более 1 000 000 руб.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                  Количество операций по внешнеторговым контрактам в неделю
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_trade_contracts_week: "0-29" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_week === "0-29"}
+                      />
+                      <p>0-29</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_trade_contracts_week: "30-100" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_week === "30-100"}
+                      />
+                      <p>30-100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_trade_contracts_week: ">100" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_week === ">100"}
+                      />
+                      <p>более 100</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
                   Количество операций по внешнеторговым контрактам в месяц
                 </p>
                 <div className={styles.row}>
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, outside_contracts_volume: "0-29" })}
+                      onClick={() => setData({ ...data, foreign_trade_contracts_month: "0-29" })}
                     >
                       <RadioButtonRS
-                        isActive={data.outside_contracts_volume === "0-29"}
+                        isActive={data.foreign_trade_contracts_month === "0-29"}
                       />
                       <p>0-29</p>
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, outside_contracts_volume: "30-100" })}
+                      onClick={() => setData({ ...data, foreign_trade_contracts_month: "30-100" })}
                     >
                       <RadioButtonRS
-                        isActive={data.outside_contracts_volume === "30-100"}
+                        isActive={data.foreign_trade_contracts_month === "30-100"}
                       />
                       <p>30-100</p>
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, outside_contracts_volume: ">100" })}
+                      onClick={() => setData({ ...data, foreign_trade_contracts_month: ">100" })}
                     >
                       <RadioButtonRS
-                        isActive={data.outside_contracts_volume === ">100"}
+                        isActive={data.foreign_trade_contracts_month === ">100"}
                       />
                       <p>более 100</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                  Количество операций по внешнеторговым контрактам в квартал
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_trade_contracts_quarter: "0-29" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_quarter === "0-29"}
+                      />
+                      <p>0-29</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_trade_contracts_quarter: "30-100" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_quarter === "30-100"}
+                      />
+                      <p>30-100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_trade_contracts_quarter: ">100" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_quarter === ">100"}
+                      />
+                      <p>более 100</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                  Количество операций по внешнеторговым контрактам в год
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_trade_contracts_age: "0-29" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_age === "0-29"}
+                      />
+                      <p>0-29</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_trade_contracts_age: "30-100" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_age === "30-100"}
+                      />
+                      <p>30-100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_trade_contracts_age: ">100" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_age === ">100"}
+                      />
+                      <p>более 100</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                  Сумма операций по внешнеторговым контрактам в неделю
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_sum_contracts_week: "0 - 99 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_week === "0 - 99 000"}
+                      />
+                      <p>0 - 99 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_sum_contracts_week: "100 000 - 1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_week === "100 000 - 1 000 000"}
+                      />
+                      <p>100 000 - 1 000 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_sum_contracts_week: ">1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_week === ">1 000 000"}
+                      />
+                      <p>более 1 000 000 руб.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Сумма операций по внешнеторговым контрактам в месяц
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_sum_contracts_month: "0 - 99 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_month === "0 - 99 000"}
+                      />
+                      <p>0 - 99 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_sum_contracts_month: "100 000 - 1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_month === "100 000 - 1 000 000"}
+                      />
+                      <p>100 000 - 1 000 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_sum_contracts_month: ">1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_month === ">1 000 000"}
+                      />
+                      <p>более 1 000 000 руб.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Сумма операций по внешнеторговым контрактам в квартал
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_sum_contracts_quarter: "0 - 99 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_quarter === "0 - 99 000"}
+                      />
+                      <p>0 - 99 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_sum_contracts_quarter: "100 000 - 1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_quarter === "100 000 - 1 000 000"}
+                      />
+                      <p>100 000 - 1 000 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_sum_contracts_quarter: ">1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_quarter === ">1 000 000"}
+                      />
+                      <p>более 1 000 000 руб.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Сумма операций по внешнеторговым контрактам в год
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_sum_contracts_age: "0 - 99 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_age === "0 - 99 000"}
+                      />
+                      <p>0 - 99 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_sum_contracts_age: "100 000 - 1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_age === "100 000 - 1 000 000"}
+                      />
+                      <p>100 000 - 1 000 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, foreign_sum_contracts_age: ">1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_age === ">1 000 000"}
+                      />
+                      <p>более 1 000 000 руб.</p>
                     </div>
                   </div>
                 </div>
@@ -1426,18 +1786,18 @@ const Step2 = () => {
                 <div className={styles.row}>
                   <div className={styles.checks}>
                     <div className={styles.checks__item}
-                      onClick={() => setData({ ...data, cash_source: cash_source[0] })}
+                      onClick={() => setData({ ...data, sources_cash_receipts: cash_source[0] })}
                     >
                       <RadioButtonRS
-                        isActive={data.cash_source === cash_source[0]}
+                        isActive={data.sources_cash_receipts === cash_source[0]}
                       />
                       <p>{cash_source[0]}</p>
                     </div>
                     <div className={styles.checks__item}
-                      onClick={() => setData({ ...data, cash_source: cash_source[1] })}
+                      onClick={() => setData({ ...data, sources_cash_receipts: cash_source[1] })}
                     >
                       <RadioButtonRS
-                        isActive={data.cash_source === cash_source[1]}
+                        isActive={data.sources_cash_receipts === cash_source[1]}
                       />
                       <p>{cash_source[1]}</p>
                     </div>
@@ -1446,18 +1806,18 @@ const Step2 = () => {
                 <div className={styles.row}>
                   <div className={styles.checks}>
                     <div className={styles.checks__item}
-                      onClick={() => setData({ ...data, cash_source: cash_source[2] })}
+                      onClick={() => setData({ ...data, sources_cash_receipts: cash_source[2] })}
                       >
                       <RadioButtonRS
-                        isActive={data.cash_source === cash_source[2]}
+                        isActive={data.sources_cash_receipts === cash_source[2]}
                       />
                       <p>{cash_source[2]}</p>
                     </div>
                     <div className={styles.checks__item}
-                      onClick={() => setData({ ...data, cash_source: cash_source[3] })}
+                      onClick={() => setData({ ...data, sources_cash_receipts: cash_source[3] })}
                       >
                       <RadioButtonRS
-                        isActive={data.cash_source === cash_source[3]}
+                        isActive={data.sources_cash_receipts === cash_source[3]}
                       />
                       <p>{cash_source[3]}</p>
                     </div>
@@ -1470,28 +1830,28 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, state_employers: "0-29" })}
+                      onClick={() => setData({ ...data, headcount: "0-29" })}
                     >
                       <RadioButtonRS
-                        isActive={data.state_employers === "0-29"}
+                        isActive={data.headcount === "0-29"}
                       />
                       <p>0-29</p>
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, state_employers: "30-100" })}
+                      onClick={() => setData({ ...data, headcount: "30-100" })}
                     >
                       <RadioButtonRS
-                        isActive={data.state_employers === "30-100"}
+                        isActive={data.headcount === "30-100"}
                       />
                       <p>30-100</p>
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, state_employers: ">100" })}
+                      onClick={() => setData({ ...data, headcount: ">100" })}
                     >
                       <RadioButtonRS
-                        isActive={data.state_employers === ">100"}
+                        isActive={data.headcount === ">100"}
                       />
                       <p>более 100</p>
                     </div>

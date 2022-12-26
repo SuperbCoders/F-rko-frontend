@@ -104,6 +104,12 @@ function App() {
 
     if (prevSavedData) {
       setRequisits(prev => {
+        if (prevSavedData.list_collegial_executive_body) {
+          delete prevSavedData.list_collegial_executive_body
+        }
+        if (prevSavedData.list_supervisoty_board_persone) {
+          delete prevSavedData.list_supervisoty_board_persone
+        }
 
         if (!prevSavedData.planned_operations) {
           prevSavedData.planned_operations = []
@@ -126,8 +132,18 @@ function App() {
         if (!prevSavedData.information_counterparties2) {
           prevSavedData.information_counterparties2 = []
         }
-
-        prevSavedData.list_person.forEach(p => {
+        if (!prevSavedData.list_person) {
+          prevSavedData.list_person = [
+            {
+              accownt_own_living: "Совпадает",
+              account_own_mail: "Совпадает с адресом регистрации",
+              is_person_a_foreign_public: false,
+              roles: []
+            }
+          ]
+        }
+        
+        prevSavedData.list_person?.forEach(p => {
           if (p.account_datebirth) {
             p.account_datebirth = new Date(p.account_datebirth)
           }
