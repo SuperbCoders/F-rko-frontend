@@ -5,7 +5,7 @@ import CheckBoxRS from "../../CheckBoxRS";
 import DaDataSelect from "../../DaDataSelect";
 import DeleteButton from "../../DeleteButton";
 
-const AddressItem = ({ id, type, address, onSelectType, onSelectAddress }) => {
+const AddressItem = ({ id, type, address, error=false, onSelectType, onSelectAddress }) => {
   const { setData } = React.useContext(RequisitesContext)
 
   const removeFromAddressList = (id) => () => {
@@ -50,6 +50,7 @@ const AddressItem = ({ id, type, address, onSelectType, onSelectAddress }) => {
               nameStyles={{ color: "#8E909B", fontSize: "14px", marginBottom: "8px" }}
               value={address}
               isAddr={true}
+              error={error}
               message="Напишите адрес"
               formatedOptions={formatedOptions}
               onSelect={onSelectAddress(id)}
@@ -59,6 +60,10 @@ const AddressItem = ({ id, type, address, onSelectType, onSelectAddress }) => {
         <div style={{ width: "auto" }} className={styles.column}>
           <DeleteButton onClick={removeFromAddressList(id)} />
         </div>
+      </div>
+
+      <div style={{ width: "100%" }} className={styles.mb24}>
+      {error && <p className="text-error">Поле не заполнено</p>}
       </div>
     </>
   );

@@ -7,13 +7,13 @@ const opts = [
   { value: "test3", label: "Тестовое значение #3" },
 ];
 
-const SelectRS = ({ name, nameStyles={}, backgroundColor,  options=opts, value, defaultValue="", onChange, ...props }) => {
+const SelectRS = ({ name, nameStyles={}, error=false, backgroundColor,  options=opts, value, defaultValue="", onChange, ...props }) => {
   const styles = {
     placeholder: (provided) => ({ ...provided, color: "#c8c8c8" }),
     indicatorSeparator: () => ({ display: "none" }),
     control: (provided, state) => ({
       ...provided,
-      borderColor: backgroundColor ? backgroundColor : "#D6D8DA",
+      borderColor: error ? "red" : backgroundColor ? backgroundColor : "#D6D8DA",
       borderRadius: "8px",
       backgroundColor,
       boxShadow: "none",

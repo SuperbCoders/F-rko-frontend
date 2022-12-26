@@ -19,7 +19,7 @@ const Input = ({
       <input
         value={value}
         type={type}
-        className={classNames(styles.input, error && styles.error)}
+        className={classNames(styles.input, error && "error")}
         placeholder={placeholder}
         onChange={onChange}
         {...props}

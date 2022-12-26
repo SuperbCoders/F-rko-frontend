@@ -8,20 +8,21 @@ import { isObject } from './helpers';
 
 function App() {
   const [requisits, setRequisits] = React.useState(initData)
+  const [erroredFields, setErroredFields] = React.useState([])
 
   const helpingInfo = React.useRef({ opf: "", custom_planned_operation: {} })
 
-  React.useEffect(() => {
-    const saveData = () => setRequisits(prev => {
-      if (isObject(prev)) {
-        localStorage.setItem('rko_data', JSON.stringify(prev));
-        localStorage.setItem('rko_info', JSON.stringify(helpingInfo.current));
-      } 
-      return prev
-    })
-    window.addEventListener('beforeunload', saveData);
-    return () => window.removeEventListener('beforeunload', saveData)
-  }, [])
+  // React.useEffect(() => {
+  //   const saveData = () => setRequisits(prev => {
+  //     if (isObject(prev)) {
+  //       localStorage.setItem('rko_data', JSON.stringify(prev));
+  //       localStorage.setItem('rko_info', JSON.stringify(helpingInfo.current));
+  //     } 
+  //     return prev
+  //   })
+  //   window.addEventListener('beforeunload', saveData);
+  //   return () => window.removeEventListener('beforeunload', saveData)
+  // }, [])
 
   React.useEffect(() => {
     const phone = localStorage.getItem("contact_number") ?? ""
@@ -104,13 +105,8 @@ function App() {
 
     if (prevSavedData) {
       setRequisits(prev => {
-        if (prevSavedData.list_collegial_executive_body) {
-          delete prevSavedData.list_collegial_executive_body
-        }
-        if (prevSavedData.list_supervisoty_board_persone) {
-          delete prevSavedData.list_supervisoty_board_persone
-        }
-
+        delete prevSavedData.list_collegial_executive_body
+        delete prevSavedData.list_supervisoty_board_persone
         delete prevSavedData.is_supervisoty
         delete prevSavedData.is_collegiate_body
         delete prevSavedData.list_person
@@ -172,7 +168,7 @@ function App() {
 
   return (
     <RequisitesContext.Provider
-      value={{ data: requisits, info: helpingInfo, setData: setRequisits }}
+      value={{ data: requisits, info: helpingInfo, setData: setRequisits, erroredFields, setErroredFields }}
     >
       <AppRouter />
     </RequisitesContext.Provider>
