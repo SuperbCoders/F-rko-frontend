@@ -26,7 +26,7 @@ export const initData = {
   document_confirming_real_activity: [],
   document_licenses: [],
   information_counterparties: false,
-  information_counterparties2: [],
+  information_counterparties_two: [],
   subject_licensing: "Не осуществляет",
 }
 

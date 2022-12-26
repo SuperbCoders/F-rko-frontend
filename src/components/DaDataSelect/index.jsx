@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Select from "react-select";
-import { requestCountries, requestCodes, requestDaData } from "../../api/DaData";
+import { requestCountries, requestCodes, requestDaData, requestAddress } from "../../api/DaData";
 
 const DaDataSelect = ({
   name,
@@ -14,6 +14,7 @@ const DaDataSelect = ({
   formatedOptions,
   isCountries=false,
   isCode=false,
+  isAddr=false,
   style={},
   ...props
 }) => {
@@ -64,6 +65,10 @@ const DaDataSelect = ({
         .then((data) => data.json())
         .then((data) => { console.log(data.suggestions); setOptionsList(data.suggestions) })
 
+    } else if (isAddr) {
+      requestAddress(text.trim())
+      .then((data) => data.json())
+      .then((data) => setOptionsList(data.suggestions))
     } else {
       requestDaData(text.trim())
       .then((data) => data.json())

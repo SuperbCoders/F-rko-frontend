@@ -46,6 +46,7 @@ export const Protector2 = ({ children }) => {
 }
 
 const Step2 = () => {
+  const navigate = useNavigate()
   const planned_operations = [
     "Договор возмездного оказания услуг",
     "Договор поставки",
@@ -244,12 +245,12 @@ const Step2 = () => {
   }
 
   const onChangeCounterparties = (i) => (e) => {
-    data.information_counterparties2[i] = e.target.value
+    data.information_counterparties_two[i] = e.target.value
     setData({ ...data })
   }
 
   const removeFromCounterparties = (idx) => () =>  {
-    data.information_counterparties2.filter((_, i) => i !== idx)
+    data.information_counterparties_two.filter((_, i) => i !== idx)
     setData({ ...data })
   }
 
@@ -267,15 +268,16 @@ const Step2 = () => {
       })),
       list_persone: [...data.list_persone],
       planned_operations: customPlannedOper.active ? [...data.planned_operations, customPlannedOper.value] : data.planned_operations,
-      document_certifying_identity_executive: data.document_certifying_identity_executive.map(d => d.path),
-      document_confirming_real_activity: data.document_confirming_real_activity.map(d => d.path),
-      document_licenses: data.document_licenses.map(d => d.path),
+      document_certifying_identity_executive: data.document_certifying_identity_executive.map(d => d?.path),
+      document_confirming_real_activity: data.document_confirming_real_activity.map(d => d?.path),
+      document_licenses: data.document_licenses.map(d => d?.path),
+      information_counterparties_two: data.information_counterparties ? data.information_counterparties_two : []
     }
 
     dto.list_persone.map(p => ({
       ...p,
       accownt_own_living: p.accownt_own_living === "Совпадает" ? p.account_own_registration : p.accownt_own_living,
-      first_passport_page_url: p.first_passport_page_url.path
+      first_passport_page_url: p.first_passport_page_url?.path
     }))
 
     setDisableUI(true)
@@ -549,8 +551,8 @@ const Step2 = () => {
                               data.list_persone[i].account_onw_role = roles?.includes(r) ? roles.filter(role => role !== r) : [...roles, r]
                               setData({ ...data })
                             }}
-                            >
-                              <p>{r}</p>
+                          >
+                            <p>{r}</p>
                           </CheckBoxRS>
                           </div>
                         )}
@@ -585,7 +587,7 @@ const Step2 = () => {
                         }}
                       />
                     </div>
-                    <div className={classNames(styles.row, "bg-grey")}>
+                    {p.account_onw_role?.includes("ЕИО") && <div className={classNames(styles.row, "bg-grey")}>
                       <Input 
                         value={p.account_own_job_title}
                         name="Должность"
@@ -595,7 +597,7 @@ const Step2 = () => {
                           setData({ ...data })
                         }}
                       />
-                    </div>
+                    </div>}
                     <div className={styles.checks}>
                       <p className={styles.checks__item}>Пол</p>
                       <div
@@ -623,16 +625,16 @@ const Step2 = () => {
                       <div className={styles.input__wrapper}>
                         <p className={styles.name}>ИНН</p>
                         <MaskedInput
-                        value={p.account_onw_inn}
-                        name="ИНН" 
-                        maskChar="_"
-                        mask="999999999999"
-                        placeholder="____________"
-                        onChange={(e) => {
-                          data.list_persone[i].account_onw_inn = e.target.value
-                          setData({ ...data })
-                        }}
-                      />
+                          value={p.account_onw_inn}
+                          name="ИНН" 
+                          maskChar="_"
+                          mask="999999999999"
+                          placeholder="____________"
+                          onChange={(e) => {
+                            data.list_persone[i].account_onw_inn = e.target.value
+                            setData({ ...data })
+                          }}
+                        />
                       </div>
                       <Input
                         value={p.account_own_snils}
@@ -730,7 +732,7 @@ const Step2 = () => {
                             placeholder="Выбрать статус"
                             options={[{ label: 'Супруг', value: 'Супруг' }, { label: 'Супруга', value: 'Супруга' } ]}
                             onChange={(v) => {
-                              data.list_persone[i].assigned_publ_pers_relation = v.label
+                              data.list_persone[i].assigned_publ_pers_relation = v?.label ?? ""
                               setData({ ...data })
                             }}
                           />
@@ -743,10 +745,11 @@ const Step2 = () => {
                           backgroundColor="#F0F2F5"
                           name="Адрес регистрации"
                           value={p.account_own_registration}
+                          isAddr={true}
                           message="Введите адрес"
-                          formatedOptions={formatedOptions}
+                          formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
                           onSelect={(v) => {
-                            data.list_persone[i].account_own_registration = v.label
+                            data.list_persone[i].account_own_registration = v?.label ?? ""
                             setData({ ...data })
                           }}
                         />
@@ -794,7 +797,7 @@ const Step2 = () => {
                             message="Введите адрес"
                             formatedOptions={formatedOptions}
                             onSelect={(v) => {
-                              data.list_persone[i].accownt_own_living = v.label
+                              data.list_persone[i].accownt_own_living = v?.label ?? ""
                               setData({ ...data })
                             }}
                           />
@@ -823,12 +826,15 @@ const Step2 = () => {
                       />
                     </div>
                     <div className={classNames(styles.row, "bg-grey", "form")}>
-                      <Input
+                      <DaDataSelect
+                        backgroundColor="#F0F2F5"
                         name="Место рождения"
                         value={p.account_birth_place}
-                        placeholder="Введите адрес"
-                        onChange={(e) => {
-                          data.list_persone[i].account_birth_place = e.target.value
+                        message="Введите адрес"
+                        isAddr={true}
+                        formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
+                        onSelect={(v) => {
+                          data.list_persone[i].account_birth_place = v?.label ?? ""
                           setData({ ...data })
                         }}
                       />
@@ -852,7 +858,7 @@ const Step2 = () => {
                         backgroundColor="#F0F2F5"
                         options={identityDocOpts}
                         onChange={(v) => {
-                          data.list_persone[i].doc_type = v.label
+                          data.list_persone[i].doc_type = v?.label ?? ""
                           setData({ ...data })
                         }}
                       />
@@ -864,7 +870,7 @@ const Step2 = () => {
                         pattern="[0-9]*"
                         name="Серия документа, удостоверяющего личность (при наличии)"
                         placeholder="Введите серию документа"
-                        onChange={() => {
+                        onChange={(e) => {
                           data.list_persone[i].doc_serial = e.target.value
                           setData({ ...data })
                         }}
@@ -875,7 +881,7 @@ const Step2 = () => {
                         pattern="[0-9]*"
                         name="Номер документа, удостоверяющего личность"
                         placeholder="Введите номер документа"
-                        onChange={() => {
+                        onChange={(e) => {
                           data.list_persone[i].doc_number = e.target.value
                           setData({ ...data })
                         }}
@@ -884,7 +890,7 @@ const Step2 = () => {
                         value={p.issued_by}
                         name="Кем выдан"
                         placeholder="Наименование"
-                        onChange={() => {
+                        onChange={(e) => {
                           data.list_persone[i].issued_by = e.target.value
                           setData({ ...data })
                         }}
@@ -1239,6 +1245,17 @@ const Step2 = () => {
                 </div>
               </div>
 
+              <div className={styles.mb24}>
+                <p className={styles.mb24}>
+                  История, репутация, сектор рынка и конкуренция
+                </p>
+                <Input 
+                  value={data.history_reputation ?? ""}
+                  placeholder=""
+                  onChange={(e) => setData({ ...data, history_reputation: e.target.value })}
+                />
+              </div>
+
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
                 Компания осуществляет деятельность, подлежащую лицензированию
@@ -1246,7 +1263,7 @@ const Step2 = () => {
                 <div className={styles.row}>
                   <div className={styles.mb24}>
                     <YesOrNo
-                      value={data.subject_licensing}
+                      value={data?.subject_licensing && data.subject_licensing === "Осуществляет"}
                       toggle={() => data.subject_licensing === "Не осуществляет" ? setData({ ...data, subject_licensing: "Осуществляет" }) : setData({ ...data, subject_licensing: "Не осуществляет" })}
                     />
                   </div>
@@ -2177,8 +2194,8 @@ const Step2 = () => {
                       value={data.information_counterparties}
                       toggle={() => {
                         data.information_counterparties = !data.information_counterparties
-                        if (data.information_counterparties && !data.information_counterparties2.length) {
-                          data.information_counterparties2 = [""]
+                        if (data.information_counterparties && !data.information_counterparties_two.length) {
+                          data.information_counterparties_two = [""]
                         }
                         setData({ ...data })
                       }}
@@ -2186,7 +2203,7 @@ const Step2 = () => {
                   </div>
                   {data.information_counterparties && 
                     <div>
-                      {data.information_counterparties2.map((p, i) =>
+                      {data.information_counterparties_two.map((p, i) =>
                         <div className={styles.row}>
                           <Input
                             value={p}
@@ -2199,7 +2216,7 @@ const Step2 = () => {
                       <AddButton
                         type="button" 
                         onClick={() => {
-                          data.information_counterparties2.push("")
+                          data.information_counterparties_two.push("")
                           setData({ ...data })
                         }} 
                       />

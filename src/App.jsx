@@ -58,8 +58,8 @@ function App() {
         if (!data.salary_debt) {
           data.salary_debt = 0
         }
-        if (!data.information_counterparties2) {
-          data.information_counterparties2 = []
+        if (!data.information_counterparties_two) {
+          data.information_counterparties_two = []
         }
 
         if (!data.employers_volume) {
@@ -113,6 +113,8 @@ function App() {
 
         delete prevSavedData.is_supervisoty
         delete prevSavedData.is_collegiate_body
+        delete prevSavedData.list_person
+        delete prevSavedData.information_counterparties2
 
         if (!prevSavedData.planned_operations) {
           prevSavedData.planned_operations = []
@@ -132,8 +134,8 @@ function App() {
         if (!prevSavedData.information_counterparties) {
           prevSavedData.information_counterparties = false
         }
-        if (!prevSavedData.information_counterparties2) {
-          prevSavedData.information_counterparties2 = []
+        if (!prevSavedData.information_counterparties_two) {
+          prevSavedData.information_counterparties_two = []
         }
         if (!prevSavedData.list_persone) {
           prevSavedData.list_persone = [

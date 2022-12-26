@@ -39,3 +39,16 @@ export const requestCodes = (query) => {
     body: JSON.stringify({ query }),
   });
 };
+
+export const requestAddress = (query) => {
+  return fetch(url + "address", {
+    method: "POST",
+    mode: "cors",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Token ${APIKey}`,
+    },
+    body: JSON.stringify({ query }),
+  });
+};
