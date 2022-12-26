@@ -10,11 +10,9 @@ const apiConfig = {
 }
 
 const apiConfigMultipartFormdata = {
-  returnRejectedPromiseOnError: true,
   baseURL: "https://rko-bot.spaaace.io/",
   headers: {
     "Content-Type": "multipart/form-data",
-    Accept: "application/json",
   },
 }
 
@@ -65,16 +63,16 @@ class UserApi extends BaseApi {
   }
 }
 
-class PassportApi extends BaseApi {
+class DocumentApi extends BaseApi {
   constructor(config) {
     super(config)
   }
 
-  uploadPassport = (file) => {
-    return this.post("/api/passport-load/", { passport: file })
+  upload = (formdata) => {
+    return this.post("/api/document-load/", { data: formdata })
   }
 }
 
 export const userApi = new UserApi(apiConfig)
-export const passportApi = new PassportApi(apiConfigMultipartFormdata)
+export const documentApi = new DocumentApi(apiConfigMultipartFormdata)
 

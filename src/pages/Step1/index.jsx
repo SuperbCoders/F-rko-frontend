@@ -43,56 +43,16 @@ const Step1 = () => {
 
   React.useEffect(() => window.scrollTo(0, 0), []);
 
-  const onSubmit = async (e) => {
-    e.preventDefault()
-    setShowErrors(true)
-
-    if (!/[0-9]+/.test(data.contact_number[17]) || !data.company_name?.length || !fields.name.valid) {
-      return
+  const onAgree = () => setFields({
+    ...fields,
+    agree: {
+      value: !fields.agree.value,
+      valid: !fields.agree.valid
     }
+  })
 
-    const formattedPhone = data.contact_number.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скоблки
-
-    const dto = {
-      contact_number: data.contact_number,
-      inn: data.inn,
-      is_finished: false,
-      short_name: data.short_name,
-      company_name: data.company_name,
-      registration_date: data.registration_date,
-      kpp: data.kpp,
-      ogrn: data.ogrn,
-      ogrn_date: data.ogrn_date,
-      registrator_name: data.registrator_name,
-      okved: data.okved,
-      oktmo: data.oktmo
-    }
-    localStorage.setItem("contact_number", data.contact_number)
-    setDisableUI(true)
-
-    await userApi.postInfo(dto, formattedPhone)
-    setDisableUI(false)
-    setShowErrors(false)
-    localStorage.setItem("rko_active_step", 2)
-    setData(prev => ({ ...prev, ...dto }))
-    navigate(ROUTES.STEP2)
-  };
-  
-  const onChange = (name) => (e) => {
-    setFields({
-      ...fields,
-      [name]: {
-        ...fields[name],
-        value: e.target.value,
-        valid: fields[name].validateFn(e.target.value),
-      }
-    })
-  
-    name === "name" && localStorage.setItem("rko_name", e.target.value)
-  }
-  
   const onSelect = (a) => {
-    info.current = a?.value?.data?.opf ?? ""
+    info.current.opf = a?.value?.data?.opf ?? ""
     const { value } = a || {}
     const { data } = value || {}
 
@@ -110,14 +70,40 @@ const Step1 = () => {
       oktmo: data?.oktmo ?? ""
     }))
   }
-  
-  const onAgree = () => setFields({
-    ...fields,
-    agree: {
-      value: !fields.agree.value,
-      valid: !fields.agree.valid
+
+  const onSubmit = async (e) => {
+    e.preventDefault()
+    setShowErrors(true)
+
+    const formattedPhone = data.contact_number.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скоблки
+
+    localStorage.setItem("contact_number", data.contact_number)
+    setDisableUI(true)
+
+    try {
+      await userApi.postInfo(data, formattedPhone)
+      setDisableUI(false)
+      setShowErrors(false)
+      localStorage.setItem("rko_active_step", 2)
+      navigate(ROUTES.STEP2)
+    } catch (error) {
+      setDisableUI(false)
+      setShowErrors(false)
     }
-  })
+  };
+  
+  const onChange = (name) => (e) => {
+    setFields({
+      ...fields,
+      [name]: {
+        ...fields[name],
+        value: e.target.value,
+        valid: fields[name].validateFn(e.target.value),
+      }
+    })
+  
+    name === "name" && localStorage.setItem("rko_name", e.target.value)
+  }
 
   return (
     <>

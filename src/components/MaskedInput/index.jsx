@@ -12,7 +12,7 @@ const MaskedInput = ({ value, maskChar="", mask="", placeholder="", className=""
       maskChar={maskChar}
       {...props}
     />
-  );
+  )
 };
 
 export default MaskedInput;

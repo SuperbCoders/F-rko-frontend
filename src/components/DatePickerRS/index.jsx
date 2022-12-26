@@ -5,15 +5,16 @@ import "react-datepicker/dist/react-datepicker.css";
 
 registerLocale("ru", ru);
 
-const DatePickerRS = ({ value, required=false, className="", onChange }) => {
+const DatePickerRS = ({ value, required=false, className="", dateFormat="dd-MM-yyyy", open, onChange }) => {
   return (
     <DatePicker
       placeholderText="Дата"
       selected={value}
       locale="ru"
       className={className}
+      open={open}
       required={required}
-      dateFormat="yyyy-MM-dd"
+      dateFormat={dateFormat}
       onChange={onChange}
     />
   );

@@ -96,7 +96,6 @@ const Step3 = () => {
   const [additionals, setAdditionals] = React.useState(["СМС-оповещение"])
   const [activeCard, setActiveCard] = useState("");
   const [disableUI, setDisableUI] = React.useState(false)
-
   const [isSubed, setIsSubed] = React.useState(false)
 
   React.useEffect(() => window.scrollTo(0, 0), []);
@@ -121,31 +120,26 @@ const Step3 = () => {
   const onCheck = (name) => () => setAdditionals(prev => prev.includes(name) ? prev.filter(a => a !== name ) : [...prev, name] ) 
 
   const onSubmit = async () => {
-    // const { start_date, end_date } = data
-
-    const formattedPhone = data.contact_number.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скоблки
+    const formattedPhone = data.contact_number.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скобки
 
     const dto = {
       ...data,
-      addresses: data.addresses.map(({ type_adress, basis, address }) => ({ 
+      addresses: data.addresses.map(({ type_adress, address }) => ({ 
         type_adress, 
         legal_address: type_adress === "Юридический" ? address : "", 
-        physic_address: type_adress === "Фактический" ? address : "",
         mail_address: type_adress === "Почтовый" ? address : "",
-        basis,
         address
       })),
-
-      // start_date: typeof start_date === "object" ? `${start_date.getFullYear()}-${start_date.getMonth() + 1}-${start_date.getDate()}` : start_date,
-      // end_date: typeof end_date === "object" ? `${end_date.getFullYear()}-${end_date.getMonth() + 1}-${end_date.getDate()}` : end_date,
       tariff: activeCard ? activeCard : "",
       additional_products: additionals,
+      sms_sending: isSubed,
       is_finished: true
     }
 
     setDisableUI(true)
     await userApi.postInfo(dto, formattedPhone)
     localStorage.removeItem("rko_name")
+    localStorage.removeItem("rko_info")
     localStorage.removeItem("rko_data")
     localStorage.setItem("rko_active_step", 1)
     setData(initData)

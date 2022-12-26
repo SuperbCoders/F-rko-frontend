@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Select from "react-select";
-import { requestDaData } from "../../api/DaData";
+import { requestCountries, requestCodes, requestDaData } from "../../api/DaData";
 
 const DaDataSelect = ({
   name,
@@ -12,6 +12,8 @@ const DaDataSelect = ({
   backgroundColor="",
   message="Введите название или ИНН",
   formatedOptions,
+  isCountries=false,
+  isCode=false,
   style={},
   ...props
 }) => {
@@ -46,10 +48,29 @@ const DaDataSelect = ({
     })
   }
   const onChange = (text) => {
-    requestDaData(text.trim())
-    .then((data) => data.json())
-    .then((data) => setOptionsList(data.suggestions));
+    if (isCountries) {
+      requestCountries(text.trim())
+      .then((data) => data.json())
+      .then((data) => {
+        const russiaOption = data.suggestions.find(s => s.value === "Россия") 
+        setOptionsList(
+          russiaOption
+          ? [ russiaOption, ...data.suggestions.filter(s => s.value !== "Россия") ]
+          : data.suggestions
+        )
+      })
+    } else if (isCode) {
+      requestCodes(text.trim())
+        .then((data) => data.json())
+        .then((data) => { console.log(data.suggestions); setOptionsList(data.suggestions) })
+
+    } else {
+      requestDaData(text.trim())
+      .then((data) => data.json())
+      .then((data) => setOptionsList(data.suggestions))
+    }
   }
+
   return (
     <div className={styles.input__wrapper} style={style}>
       {name ? <p className={styles.name} style={nameStyles}>{name}</p> : null}

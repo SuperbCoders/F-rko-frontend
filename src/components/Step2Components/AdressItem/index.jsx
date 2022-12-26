@@ -10,7 +10,7 @@ const AddressItem = ({ id, type, address, onSelectType, onSelectAddress }) => {
 
   const removeFromAddressList = (id) => () => {
     setData(prev => {
-      prev.addresses = prev.addresses.filter(a => a.id !== id)
+      prev.addresses = prev.addresses.filter((_, i) => i !== id)
       return {...prev}
     })
   }

@@ -9,18 +9,16 @@ import { isObject } from './helpers';
 function App() {
   const [requisits, setRequisits] = React.useState(initData)
 
-  const info = React.useRef({ code: "", full: "" })
+  const helpingInfo = React.useRef({ opf: "", custom_planned_operation: {} })
 
   React.useEffect(() => {
-    const saveData = () => {
-      setRequisits(prev => {
-        if (isObject(prev)) {
-          localStorage.setItem('rko_data', JSON.stringify(prev));
-          localStorage.setItem('rko_info', JSON.stringify(info.current));
-        } 
-        return prev
-      })
-    }
+    const saveData = () => setRequisits(prev => {
+      if (isObject(prev)) {
+        localStorage.setItem('rko_data', JSON.stringify(prev));
+        localStorage.setItem('rko_info', JSON.stringify(helpingInfo.current));
+      } 
+      return prev
+    })
     window.addEventListener('beforeunload', saveData);
     return () => window.removeEventListener('beforeunload', saveData)
   }, [])
@@ -30,25 +28,23 @@ function App() {
     const prevSavedData = JSON.parse(localStorage.getItem('rko_data'))
     const raw = localStorage.getItem('rko_info')
     if (raw) {
-      info.current = JSON.parse(raw);
+      helpingInfo.current = JSON.parse(raw);
     }
 
     if (phone && !prevSavedData) {
       userApi.getInfo(phone.replace(/\(|\)+|-|\s|/g, "")).then(data => {
-        data.addresses = data?.addresses?.map((a, idx) => ({ ...a, id: idx })) || []
-        if (!data.list_supervisoty_board_persone) {
-          data.list_supervisoty_board_persone = {
-            accownt_own_living: "Совпадает",
-            account_own_mail: "Совпадает с адресом регистрации",
-            is_person_a_foreign_public: false
-          }
+        if (!data.list_person) {
+          data.list_person = [
+            {
+              accownt_own_living: "Совпадает",
+              account_own_mail: "Совпадает с адресом регистрации",
+              is_person_a_foreign_public: false,
+              roles: []
+            }
+          ]
         }
-        if (!data.list_collegial_executive_body) {
-          data.list_collegial_executive_body = {
-            accownt_own_living: "Совпадает",
-            account_own_mail: "Совпадает с адресом регистрации",
-            is_person_a_foreign_public: false
-          }
+        if (!data.beneficiaries) {
+          data.beneficiaries = "Отсутствуют"
         }
         if (!data.group_members) {
           data.group_members = []
@@ -59,9 +55,11 @@ function App() {
         if (!data.information_goals) {
           data.information_goals = [...statementsTexts]
         }
-
         if (!data.salary_debt) {
           data.salary_debt = 0
+        }
+        if (!data.information_counterparties2) {
+          data.information_counterparties2 = []
         }
 
         if (!data.employers_volume) {
@@ -79,88 +77,68 @@ function App() {
         if (!data.supreme_management_inn) {
           data.supreme_management_inn = ""
         }
-
-        //корректные форматы данных для datepicker'a
-        // if (data.start_date) {
-        //   data.start_date = new Date(data.start_date?.split("-")[0], data.start_date.split("-")[1], data.start_date?.split("-")[2])
-        // } else {
-        //   data.start_date = ""
-        // }
-
-        // if (data.end_date) {
-        //   data.end_date = new Date(data.end_date?.split("-")[0], data.end_date?.split("-")[1], data.end_date?.split("-")[2])
-        // } else {
-        //   data.end_date = ""
-        // }
-
-        const { list_collegial_executive_body, list_supervisoty_board_persone: { account_datebirth, date_issue, validity } } = data
-        if (account_datebirth) {
-          data.list_supervisoty_board_persone.account_datebirth = new Date(account_datebirth)
+        if (!data.document_certifying_identity_executive) {
+          data.document_certifying_identity_executive = []
         }
-        if (date_issue) {
-          data.list_supervisoty_board_persone.date_issue = new Date(date_issue)
+        if (!data.document_confirming_real_activity) {
+          data.document_confirming_real_activity = []
         }
-        if (validity) {
-          data.list_supervisoty_board_persone.validity = new Date(validity)
+        if (!data.document_licenses) {
+          data.document_licenses = []
         }
 
-        if (list_collegial_executive_body.account_datebirth) {
-          data.list_collegial_executive_body.account_datebirth = new Date(list_collegial_executive_body.account_datebirth)
-        }
-        if (list_collegial_executive_body.date_issue) {
-          data.list_collegial_executive_body.date_issue = new Date(list_collegial_executive_body.date_issue)
-        }
-        if (list_collegial_executive_body.validity) {
-          data.list_collegial_executive_body.validity = new Date(list_collegial_executive_body.validity)
-        }
+        data.list_person.forEach(p => {
+          if (p.account_datebirth) {
+            p.account_datebirth = new Date(p.account_datebirth)
+          }
+          if (p.date_issue) {
+            p.date_issue = new Date(p.date_issue)
+          }
+          if (p.validity) {
+            p.validity = new Date(p.validity)
+          }
+        })
         setRequisits(prev => ({ ...prev, ...data }))
       })    
     }
 
     if (prevSavedData) {
       setRequisits(prev => {
-        //корректные форматы данных для datepicker'a
-        const { 
-          // start_date, 
-          // end_date, 
-          list_supervisoty_board_persone, 
-          list_collegial_executive_body } = prevSavedData
-        // if (start_date) {
-        //   prevSavedData.start_date = new Date(start_date)
-        // } else {
-        //   prevSavedData.start_date = ""
-        // }
 
-        // if (end_date) {
-        //   prevSavedData.end_date = new Date(end_date)
-        // } else {
-        //   prevSavedData.end_date = ""
-        // }
-
-        if (list_supervisoty_board_persone.account_datebirth) {
-          prevSavedData.list_supervisoty_board_persone.account_datebirth = new Date(list_supervisoty_board_persone.account_datebirth)
+        if (!prevSavedData.planned_operations) {
+          prevSavedData.planned_operations = []
         }
-        
-        if (list_supervisoty_board_persone.date_issue) {
-          prevSavedData.list_supervisoty_board_persone.date_issue = new Date(list_supervisoty_board_persone.date_issue)
+        if (!prevSavedData.beneficiaries) {
+          prevSavedData.beneficiaries = "Отсутствуют"
+        }
+        if (!prevSavedData.document_certifying_identity_executive) {
+          prevSavedData.document_certifying_identity_executive = []
+        }
+        if (!prevSavedData.document_confirming_real_activity) {
+          prevSavedData.document_confirming_real_activity = []
+        }
+        if (!prevSavedData.document_licenses) {
+          prevSavedData.document_licenses = []
+        }
+        if (!prevSavedData.information_counterparties) {
+          prevSavedData.information_counterparties = false
+        }
+        if (!prevSavedData.information_counterparties2) {
+          prevSavedData.information_counterparties2 = []
         }
 
-        if (list_supervisoty_board_persone.validity) {
-          prevSavedData.list_supervisoty_board_persone.validity = new Date(list_supervisoty_board_persone.validity)
-        }
+        prevSavedData.list_person.forEach(p => {
+          if (p.account_datebirth) {
+            p.account_datebirth = new Date(p.account_datebirth)
+          }
+          if (p.date_issue) {
+            p.date_issue = new Date(p.date_issue)
+          }
+          if (p.validity) {
+            p.validity = new Date(p.validity)
+          }
+        })
 
-        if (list_collegial_executive_body.account_datebirth) {
-          prevSavedData.list_collegial_executive_body.account_datebirth = new Date(list_collegial_executive_body.account_datebirth)
-        }
-        
-        if (list_collegial_executive_body.date_issue) {
-          prevSavedData.list_collegial_executive_body.date_issue = new Date(list_collegial_executive_body.date_issue)
-        }
-
-        if (list_collegial_executive_body.validity) {
-          prevSavedData.list_collegial_executive_body.validity = new Date(list_collegial_executive_body.validity)
-        }
-        
         return { ...prev, ...prevSavedData }
       })
     }
@@ -168,7 +146,7 @@ function App() {
 
   return (
     <RequisitesContext.Provider
-      value={{ data: requisits, info, setData: setRequisits }}
+      value={{ data: requisits, info: helpingInfo, setData: setRequisits }}
     >
       <AppRouter />
     </RequisitesContext.Provider>
