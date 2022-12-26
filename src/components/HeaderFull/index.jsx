@@ -3,14 +3,12 @@ import logo from "./../../assets/img/logo.svg";
 import styles from "./styles.module.scss";
 import classNames from "classnames";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../contexts/auth";
 import { initData, RequisitesContext } from "../../contexts/companyRequisits";
 import { ROUTES } from "../../helpers";
 
 const HeaderFull = () => {
   const navigate = useNavigate();
 
-  const { setAuth } = React.useContext(AuthContext)
   const { setData } = React.useContext(RequisitesContext)
 
   const onLogout = () => {
@@ -19,7 +17,6 @@ const HeaderFull = () => {
     localStorage.removeItem("rko_name")
     localStorage.removeItem("rko_data")
     localStorage.setItem("rko_active_step", 1)
-    setAuth({ isAuthed: false, phone: "" })
     setData(initData)
     navigate(ROUTES.STEP1)
   }

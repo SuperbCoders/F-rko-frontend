@@ -2,27 +2,37 @@ import React from 'react';
 import { statementsTexts } from '../pages/Step2';
 
 export const initData = {
-  list_supervisoty_board_persone: {
-    accownt_own_living: "Совпадает",
-    account_own_mail: "Совпадает с адресом регистрации",
-    is_person_a_foreign_public: false
-  },
-  list_collegial_executive_body: {
-    accownt_own_living: "Совпадает",
-    account_own_mail: "Совпадает с адресом регистрации",
-    is_person_a_foreign_public: false
-  },
+  list_person: [
+    {
+      accownt_own_living: "Совпадает",
+      account_own_mail: "Совпадает с адресом регистрации",
+      is_person_a_foreign_public: false,
+      roles: []
+    },
+  ],
   addresses: [],
-  group_members: [],
   salary_debt: 0,
   contact_number: "",
   is_supervisoty: false,
   is_collegiate_body: false,
   information_goals: [...statementsTexts],
-  beneficiaries: "Отсутствуют"
+  beneficiaries: "Отсутствуют",
+  email: "",
+  fax: "",
+  contact_phone_number: "",
+  codeword: "",
+  founders: [],
+  planned_operations: [],
+  is_finished: false,
+  document_certifying_identity_executive: [],
+  document_confirming_real_activity: [],
+  document_licenses: [],
+  information_counterparties: false,
+  information_counterparties2: []
 }
 
 export const RequisitesContext = React.createContext({
   data: {},
+  info: {},
   setData: () => {}
 });

@@ -8,14 +8,14 @@ import cube from "../../assets/img/cube.png";
 import { useNavigate } from "react-router-dom";
 import HeaderMy from "../../components/HeaderMy";
 import DaDataSelect from "../../components/DaDataSelect";
-import PhoneInput from "../../components/PhoneInput";
+import MaskedInput from "../../components/MaskedInput";
 import { userApi } from "../../api";
 import { RequisitesContext } from "../../contexts/companyRequisits";
 import { ROUTES } from "../../helpers"
 
 const Step1 = () => {
   const navigate = useNavigate();
-  const { data, setData } = React.useContext(RequisitesContext)
+  const { data, info, setData } = React.useContext(RequisitesContext)
 
   const initFields = {
     name: {
@@ -39,56 +39,20 @@ const Step1 = () => {
 
   const [fields, setFields] = React.useState(initFields)
   const [showErrors, setShowErrors] = React.useState(false)
+  const [disableUI, setDisableUI] = React.useState(false)
 
   React.useEffect(() => window.scrollTo(0, 0), []);
 
-  const onSubmit = async (e) => {
-    e.preventDefault()
-    setShowErrors(true)
-
-    if (!/[0-9]+/.test(data.contact_number[17]) || !data.company_name?.length || !fields.name.valid) {
-      return
+  const onAgree = () => setFields({
+    ...fields,
+    agree: {
+      value: !fields.agree.value,
+      valid: !fields.agree.valid
     }
+  })
 
-    const formattedPhone = data.contact_number.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скоблки
-
-    const dto = {
-      contact_number: data.contact_number,
-      inn: data.inn,
-      is_finished: false,
-      short_name: data.short_name,
-      company_name: data.company_name,
-      registration_date: data.registration_date,
-      kpp: data.kpp,
-      ogrn: data.ogrn,
-      ogrn_date: data.ogrn_date,
-      registrator_name: data.registrator_name,
-      okved: data.okved,
-      oktmo: data.oktmo
-    }
-    localStorage.setItem("contact_number", data.contact_number)
-
-    await userApi.postInfo(dto, formattedPhone)
-    setShowErrors(false)
-    localStorage.setItem("rko_active_step", 2)
-    setData(prev => ({ ...prev, ...dto }))
-    navigate(ROUTES.STEP2)
-  };
-  
-  const onChange = (name) => (e) => {
-    setFields({
-      ...fields,
-      [name]: {
-        ...fields[name],
-        value: e.target.value,
-        valid: fields[name].validateFn(e.target.value),
-      }
-    })
-  
-    name === "name" && localStorage.setItem("rko_name", e.target.value)
-  }
-  
   const onSelect = (a) => {
+    info.current.opf = a?.value?.data?.opf ?? ""
     const { value } = a || {}
     const { data } = value || {}
 
@@ -106,14 +70,40 @@ const Step1 = () => {
       oktmo: data?.oktmo ?? ""
     }))
   }
-  
-  const onAgree = () => setFields({
-    ...fields,
-    agree: {
-      value: !fields.agree.value,
-      valid: !fields.agree.valid
+
+  const onSubmit = async (e) => {
+    e.preventDefault()
+    setShowErrors(true)
+
+    const formattedPhone = data.contact_number.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скоблки
+
+    localStorage.setItem("contact_number", data.contact_number)
+    setDisableUI(true)
+
+    try {
+      await userApi.postInfo(data, formattedPhone)
+      setDisableUI(false)
+      setShowErrors(false)
+      localStorage.setItem("rko_active_step", 2)
+      navigate(ROUTES.STEP2)
+    } catch (error) {
+      setDisableUI(false)
+      setShowErrors(false)
     }
-  })
+  };
+  
+  const onChange = (name) => (e) => {
+    setFields({
+      ...fields,
+      [name]: {
+        ...fields[name],
+        value: e.target.value,
+        valid: fields[name].validateFn(e.target.value),
+      }
+    })
+  
+    name === "name" && localStorage.setItem("rko_name", e.target.value)
+  }
 
   return (
     <>
@@ -158,7 +148,10 @@ const Step1 = () => {
                   <p className={styles.input__name}>Номер телефона</p>
                   <div className={styles.input__container}>
                     <div>
-                      <PhoneInput
+                      <MaskedInput
+                        mask="+7 (999) 999 99 99"
+                        placeholder="+7 (__) ___ __ __"
+                        maskChar="_"
                         value={data.contact_number ?? ""}
                         required={true}
                         className={!/[0-9]+/.test(data.contact_number?.[17]) && showErrors ? styles.input__error : ""}
@@ -221,6 +214,7 @@ const Step1 = () => {
                   <ButtonRS
                     title="Продолжить"
                     style={{ maxWidth: "267px" }}
+                    disable={disableUI}
                     type="submit"
                   />
                 </div>

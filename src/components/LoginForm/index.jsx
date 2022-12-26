@@ -4,13 +4,11 @@ import CheckBoxRS from "../CheckBoxRS";
 import ButtonRS from "../ButtonRS";
 import InputRS from "../InputRS";
 import { useNavigate } from "react-router-dom";
-import PhoneInput from "../PhoneInput";
+import MaskedInput from "../MaskedInput";
 import { ROUTES } from "../../helpers";
-import { AuthContext } from "../../contexts/auth";
 import { RequisitesContext } from "../../contexts/companyRequisits";
 
 const LoginForm = () => {
-  const { auth: { phone="" }, setAuth } = React.useContext(AuthContext)
   const { setData } = React.useContext(RequisitesContext)
   const initialFields = {
     phone: {
@@ -20,15 +18,6 @@ const LoginForm = () => {
       validationFn: str => /[0-9]+/.test(str?.[17])
     }
   }
-
-  React.useEffect(() => setFields({
-    ...fields,
-    phone: {
-      ...fields.phone,
-      value: phone,
-      valid: fields.phone.validationFn(phone)
-    }
-  }), [phone])
 
   const navigate = useNavigate();
   const [showErrors, setShowErrors] = React.useState(false)
@@ -54,7 +43,6 @@ const LoginForm = () => {
     }
 
     setData(prev => ({ ...prev, contact_number: fields.phone.value }))
-    setAuth({ isAuthed: true, phone: fields.phone.value })
     localStorage.setItem("login_number", fields.phone.value)
     localStorage.setItem("contact_number", fields.phone.value)
     navigate(ROUTES.ACCOUNT)
@@ -77,7 +65,10 @@ const LoginForm = () => {
           <div className={styles.input__wrapper}>
             <p className={styles.input__name}>Номер телефона</p>
             <div className={styles.input__container}>
-              <PhoneInput
+              <MaskedInput
+                maskChar="_"
+                mask="+7 (999) 999 99 99"
+                placeholder="+7 (__) ___ __ __"
                 value={fields.phone.value}
                 onChange={onChange("phone")}
                 className={showErrors && !fields.phone.valid ? "error" : ""}

@@ -10,6 +10,7 @@ const ButtonRS = ({ view = "classic", title, disable = false, ...props }) => {
         disable && styles.disable,
         view === "ghost" && styles.ghost
       )}
+      disabled={disable}
       {...props}
     >
       {title}

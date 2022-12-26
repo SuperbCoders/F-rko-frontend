@@ -71,24 +71,24 @@
       margin-bottom: 45px;
       margin-top: auto;
     }
+  }
+}
 
-    .button {
-      background: #F3F4F4;
-      border-radius: 8px;
-      padding: 16px 32px;
-      font-size: 16px;
-      border: none;
-      outline: none;
-      color: #5B656D;
-      cursor: pointer;
-      transition: 0.25s;
-      font-weight: 500;
+.button {
+  background: #F3F4F4;
+  border-radius: 8px;
+  padding: 16px 32px;
+  font-size: 16px;
+  border: none;
+  outline: none;
+  color: #5B656D;
+  cursor: pointer;
+  transition: 0.25s;
+  font-weight: 500;
 
-      &.active {
-        background: #D41367;
-        color: #fff;
-      }
-    }
+  &.active {
+    background: #D41367;
+    color: #fff;
   }
 }
 
