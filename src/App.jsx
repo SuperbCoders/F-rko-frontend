@@ -115,6 +115,8 @@ function App() {
         delete prevSavedData.is_collegiate_body
         delete prevSavedData.list_person
         delete prevSavedData.information_counterparties2
+        delete prevSavedData.end_date
+        delete prevSavedData.start_date
 
         if (!prevSavedData.planned_operations) {
           prevSavedData.planned_operations = []
