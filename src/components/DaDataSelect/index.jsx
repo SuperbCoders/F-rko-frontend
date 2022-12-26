@@ -8,7 +8,7 @@ const DaDataSelect = ({
   setValueInput,
   onSelect,
   nameStyles={ color: "#8E909B", fontSize: "14px", marginBottom: "8px" },
-  error,
+  error=false,
   backgroundColor="",
   message="Введите название или ИНН",
   formatedOptions,

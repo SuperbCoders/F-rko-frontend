@@ -113,7 +113,7 @@ const Step2 = () => {
 
   const formatedOptions = (list) => list.map((item) => ({ value: item.data.address.unrestricted_value, label: item.data.address.unrestricted_value }))
 
-  const { data, info, setData } = React.useContext(RequisitesContext)
+  const { data, info, setData, erroredFields, setErroredFields } = React.useContext(RequisitesContext)
 
   const regDate = data?.registration_date ? new Date(parseInt(data.registration_date)) : ""
   const formatedRegDate = regDate ? `${regDate.getFullYear?.()}-${regDate?.getMonth?.() + 1}-${regDate?.getDate?.()}` : ""
@@ -121,7 +121,6 @@ const Step2 = () => {
   const orgnDate = data?.ogrn_date ? new Date(parseInt(data.ogrn_date)) : ""
   const formatedOgrnDate = orgnDate ? `${orgnDate.getFullYear?.()}-${orgnDate.getMonth?.() + 1}-${orgnDate.getDate?.()}` : ""
 
-  // const [erroredFields, setErroredFields] = React.useState([ 
   const [isBeneficiaries, setIsBeneficiaries] = React.useState(false)
   const [disableUI, setDisableUI] = React.useState(false)
   const [customPlannedOper, setCustomPlannedOper] = React.useState({ active: false, value: "" })
@@ -164,10 +163,25 @@ const Step2 = () => {
   const onSelectAddress = (idx) => (v) => {
     data.addresses[idx].address = v?.label ?? ""
     setData({ ...data })
+    setErroredFields(prev => 
+      v?.label 
+        ? [...prev, `addresses_${idx}`]
+        : prev.filter(f => f !== `addresses_${idx}`)
+    )
   }
 
   const onSelect = (str) => () => setData({ ...data, information_goals: data.information_goals.includes(str) ? data.information_goals.filter(s => s !== str) : [...data.information_goals, str] })
-  const onSelectOper = (str) => () => setData({ ...data, planned_operations: data.planned_operations.includes(str) ? data.planned_operations.filter(s => s !== str) : [...data.planned_operations, str] })
+  const onSelectOper = (str) => () => {
+    if (data.planned_operations.includes(str)) {
+      setData({ ...data, planned_operations: data.planned_operations.filter(s => s !== str) })
+      if (!data.planned_operations.length) {
+        setErroredFields(p => ([...p, "planned_operations"]))
+      }
+    } else {
+      setData({ ...data, planned_operations: [...data.planned_operations, str]})
+      setErroredFields(p => p.filter(f => f !== "planned_operations"))
+    }
+  }
 
   const getPassportPageUrl = (i) => (file) => {
     const fd = new FormData();
@@ -185,6 +199,7 @@ const Step2 = () => {
     documentApi.upload({ data: fd }).then(res => {
       data.document_certifying_identity_executive.push({ path: res.images[0]?.path, file })
       setData({ ...data })
+      setErroredFields(p => p.filter(f => f !== "document_certifying_identity_executive"))
     })
   }
   const getActivityDocUrl = (file) => {
@@ -194,6 +209,7 @@ const Step2 = () => {
     documentApi.upload({ data: fd }).then(res => {
       data.document_confirming_real_activity.push({ path: res.images[0]?.path, file: file })
       setData({ ...data })
+      setErroredFields(p => p.filter(f => f !== "document_confirming_real_activity"))
     })
   }
 
@@ -204,12 +220,14 @@ const Step2 = () => {
     documentApi.upload({ data: fd }).then(res => {
       data.document_licenses.push({ path: res.images[0]?.path, file: file })
       setData({ ...data })
+      setErroredFields(p => p.filter(f => f !== "document_licenses"))
     })  
   }
 
   const onSelectBenfs = () => {
     if (isBeneficiaries) {
       setData({ ...data, beneficiaries: "Отсутствуют" })
+      setErroredFields(p => ([...p, "beneficiaries" ]))
     } else {
       setData({ ...data, beneficiaries: data.beneficiaries !== "Отсутствуют" ? data.beneficiaries : "" })
     }
@@ -220,11 +238,19 @@ const Step2 = () => {
     data.founders[idx].founder_inn = value?.value ?? ""
     data.founders[idx].label = value?.label ?? ""
     setData({ ...data })
+    value?.label 
+      ? setErroredFields(p => p.filter(f => f !==  `founder_inn_${idx}`))
+      : setErroredFields(p => ([...p, `founder_inn_${idx}`]))
+
   }
 
   const onChangeFounderCapital = (idx) => (e) => {
     data.founders[idx].capital = e.target.value
     setData({ ...data })
+    e.target.value 
+      ? setErroredFields(p => p.filter(f => f !==  `capital_${idx}`))
+      : setErroredFields(p => ([...p, `capital_${idx}`]))
+
   }
 
   const removeFromFounderList = (idx) => () => {
@@ -237,11 +263,19 @@ const Step2 = () => {
   const onCheckCustomPlannedOper = () => {
     info.current.custom_planned_operation = { active: !customPlannedOper.active, value: customPlannedOper.value }
     setCustomPlannedOper({ active: !customPlannedOper.active, value: customPlannedOper.value })
+    if (customPlannedOper.value) {
+      setErroredFields(p => p.filter(f => f !== "custom_planned_oper"))
+    } else {
+      setErroredFields(p => ([...p, "custom_planned_oper"]))
+    }
   }
 
   const onChangeCustomPlannedOper = (e) => {
     info.current.custom_planned_operation = { active: true, value: e.target.value }
     setCustomPlannedOper({ active: true, value: e.target.value })
+    e.target.value 
+    ? setErroredFields(p => p.filter(f => f !== "custom_planned_oper"))
+    : setErroredFields(p => ([...p, "custom_planned_oper"]))
   }
 
   const onChangeCounterparties = (i) => (e) => {
@@ -253,9 +287,67 @@ const Step2 = () => {
     data.information_counterparties_two.filter((_, i) => i !== idx)
     setData({ ...data })
   }
+  console.log("data", data);
+
 
   const onSubmit = async (e) => {
     e.preventDefault()
+    const fields = [ 
+      "email",
+      "contact_phone_number",
+      "planned_operations",
+      "donaninname",
+      "fax",
+      "supreme_management_body",
+      "employers_volume",
+      "salary_debt",
+      "document_certifying_identity_executive",
+      "document_confirming_real_activity",
+      "document_licenses",
+      "account_operations",
+      "history_reputation",
+      "week_cash_withdrawal",
+      "quarter_cash_withdrawal",
+      "age_cash_withdrawal",
+      "sum_week_cash_withdrawal",
+      "sum_mouth_cash_withdrawal",
+      "sum_quarter_cash_withdrawal",
+      "sum_age_cash_withdrawal",
+      "foreign_trade_contracts_week",
+      "foreign_trade_contracts_month",
+      "foreign_trade_contracts_quarter",
+      "foreign_trade_contracts_age",
+      "num_transactions_week",
+      "num_transactions_month",
+      "num_transactions_quarter",
+      "num_transactions_age",
+      "foreign_sum_contracts_week",
+      "foreign_sum_contracts_month",
+      "foreign_sum_contracts_quarter",
+      "foreign_sum_contracts_age",
+      "sum_transactions_week",
+      "sum_transactions_month",
+      "sum_transactions_quarter",
+      "sum_transactions_age",
+      "sources_cash_receipts",
+      "headcount",
+      "supreme_management_body"
+    ]
+    const arr = fields.reduce((accum, next) => !data[next] || !data[next]?.length ? ([...accum, next]) : accum, [])
+    setErroredFields(arr)
+    if (data.information_counterparties_two.every(str => str === "")) {
+      return
+    }
+    if (data.addresses.every(a => a.address === "")) {
+      return
+    }
+    if (data.founders.every(a => a.capital === "" && a.label === "")) {
+      return
+    }
+    if (arr.length) {
+      return
+    }
+
     const formattedPhone = data.contact_number.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скоблки
 
     const dto = {
@@ -370,9 +462,17 @@ const Step2 = () => {
                     <MaskedInput
                       // mask="*@*.com"
                       placeholder="pochta@server.com"
+                      error={erroredFields.includes("email")}
                       value={data.email ?? ""}
-                      onChange={(e) => setData({ ...data, email: e.target.value })}
+                      onChange={(e) => {
+                        /[a-z0-9]+@[a-z]+\.[a-z]{2,6}/.test(e.target.value) 
+                          ? setErroredFields(prev => prev.filter(f => f !== "email"))
+                          : setErroredFields(prev => ([ ...prev, "email" ]))
+                        setData({ ...data, email: e.target.value })
+                      }}
                     />
+                      {erroredFields.includes("email") && <p className="text-error">Поле заполнено некорректно</p>}
+
                   </div>
                   <div className={styles.input__wrapper}>
                     <p className={styles.name}>Телефон</p>
@@ -381,8 +481,16 @@ const Step2 = () => {
                       placeholder="+7 (__) ___ __ __"
                       maskChar="_"
                       value={data.contact_phone_number}
-                      onChange={(e) => setData({ ...data, contact_phone_number: e.target.value })}
+                      error={erroredFields.includes("contact_phone_number")}
+                      onChange={(e) => {
+                        !/[0-9]+/.test(e.target.value?.[17])
+                          ? setErroredFields(prev => ([...prev, "contact_phone_number"]))
+                          : setErroredFields(prev => prev.filter(f => f !== "contact_phone_number"))
+                        setData({ ...data, contact_phone_number: e.target.value })
+                      }}
                     />
+                      {erroredFields.includes("contact_phone_number") && <p className="text-error">Поле заполнено некорректно</p>}
+
                   </div>
                 </div>
                 <div className={styles.row}>
@@ -392,8 +500,15 @@ const Step2 = () => {
                       // mask="https://d{2}"
                       placeholder="https://"
                       value={data.donaninname ?? "https://"}
-                      onChange={(e) => setData({ ...data, donaninname: e.target.value}) }
+                      error={erroredFields.includes("donaninname")}
+                      onChange={(e) => {
+                        !e.target.value
+                        ? setErroredFields(prev => ([...prev, "donaninname"]))
+                        : setErroredFields(prev => prev.filter(f => f !== "donaninname"))
+                        setData({ ...data, donaninname: e.target.value}) 
+                      }}
                     />
+                      {erroredFields.includes("donaninname") && <p className="text-error">Поле заполнено некорректно</p>}
                   </div>
                   <div className={styles.input__wrapper}>
                     <p className={styles.name}>Факс</p>
@@ -401,9 +516,16 @@ const Step2 = () => {
                       mask="+7 (999) 999 99 99"
                       placeholder="+7 (__) ___ __ __"
                       maskChar="_"
+                      error={erroredFields.includes("fax")}
                       value={data.fax ?? ""}
-                      onChange={(e) => setData({ ...data, fax: e.target.value })}
+                      onChange={(e) => {
+                        !/[0-9]+/.test(e.target.value?.[17])
+                        ? setErroredFields(prev => ([...prev, "fax"]))
+                        : setErroredFields(prev => prev.filter(f => f !== "fax"))
+                        setData({ ...data, fax: e.target.value })
+                      }}
                     />
+                      {erroredFields.includes("fax") && <p className="text-error">Поле заполнено некорректно</p>}
                   </div>
                 </div>
               </div>
@@ -418,6 +540,7 @@ const Step2 = () => {
                     id={idx}
                     type={type_adress}
                     address={address}
+                    error={!address.length}
                     onSelectType={onSelectAddressType}
                     onSelectAddress={onSelectAddress}
                   /> 
@@ -442,11 +565,19 @@ const Step2 = () => {
                       nameStyles={{ color: "#8E909B", fontSize: "14px", marginBottom: "8px" }}
                       value={{ value: data.supreme_management_body, label: data.supreme_management_body }}
                       name="Высший орган управления"
+                      error={erroredFields.includes("supreme_management_body")}
                       placeholder="Высший орган управления"
                       options={supremeManOpts}
-                      onChange={(v) => setData({ ...data, supreme_management_body: v.label  })}
+                      onChange={(v) => {
+                        setData({ ...data, supreme_management_body: v.label  })
+                        v.label 
+                          ? setErroredFields(prev => prev.filter(f => f !== "supreme_management_body")) 
+                          : setErroredFields(prev => ([ ...prev, "supreme_management_body" ]))
+                      }}
                     />
                   </div>
+                  {erroredFields.includes("supreme_management_body") && <p className="text-error">Поле не заполнено</p>}
+
                 </div>
               </Wrapper>
             </div>
@@ -457,23 +588,43 @@ const Step2 = () => {
             >
               <div className={styles.content}>
                 <div className={styles.row}>
-                  <Input
-                    value={data.employers_volume}
-                    type="number"
-                    pattern="[0-9]*"
-                    name="Численность персонала"
-                    placeholder="Напишите значение"
-                    onChange={(e) => setData({ ...data, employers_volume: e.target.value })}
-                  />
+                  <div>
+                    <Input
+                      value={data.employers_volume}
+                      type="number"
+                      pattern="[0-9]*"
+                      name="Численность персонала"
+                      placeholder="Напишите значение"
+                      error={erroredFields.includes("employers_volume")}
+                      onChange={(e) => {
+                        setData({ ...data, employers_volume: e.target.value })
+                        e.target.value 
+                          ? setErroredFields(p => p.filter(f => f !== "employers_volume"))
+                          : setErroredFields(p => ([...p, "employers_volume"]))
+                      }}
+                    />
+                    {erroredFields.includes("employers_volume") && <p className="text-error">Поле не заполнено</p>}
+
+                  </div>
+                  <div>
                   <Input
                     value={data.salary_debt}
                     name="Задолженность по з/п"
                     type="number"
                     pattern="[0-9]*"
+                    error={erroredFields.includes("salary_debt")}
                     placeholder="Укажите сумму"
                     rightElement={<p>₽</p>}
-                    onChange={(e) => setData({ ...data, salary_debt: e.target.value })}
+                    onChange={(e) => {
+                      setData({ ...data, salary_debt: e.target.value })
+                      e.target.value 
+                        ? setErroredFields(p => p.filter(f => f !== "salary_debt"))
+                        : setErroredFields(p => ([...p, "salary_debt"]))
+                    }}
                   />
+                    {erroredFields.includes("salary_debt") && <p className="text-error">Поле не заполнено</p>}
+
+                  </div>
                 </div>
               </div>
             </Wrapper>
@@ -485,26 +636,31 @@ const Step2 = () => {
             >
               <div className={styles.content}>
                 {data.founders?.map(({ capital, label }, idx) => 
-                  <div className={`${styles.row} ${styles.align_end}`} key={name + idx}>
+                  <div className={styles.row} key={label + idx}>
                     <div className={styles.column}>
                       <DaDataSelect 
                         backgroundColor="#F0F2F5"
                         name="Учредитель"
                         value={label}
+                        error={!label.length}
                         message="Введите Название или ИНН"
                         formatedOptions={(list) => list.map((item) => ({ value: item.data.inn, label: item.data.name.full_with_opf }))}
                         onSelect={onSelectFounderInn(idx)}
                       />
+                    {!label.length && <p className="text-error">Поле не заполнено</p>}
+
                     </div>
                     <div className={styles.column}>
                       <Input
                         value={capital}
                         maxLength={6}
+                        error={!capital.length}
                         name="Доля в уставном капитале"
                         onChange={onChangeFounderCapital(idx)}
                       />
+                    {!capital.length && <p className="text-error">Поле не заполнено</p>}
                     </div>
-                    <div style={{ width: "auto" }} className={styles.column}>
+                    <div style={{ width: "auto", marginTop: "25px" }} className={styles.column}>
                       <DeleteButton onClick={removeFromFounderList(idx)} />
                     </div>
                   </div>
@@ -518,426 +674,474 @@ const Step2 = () => {
               </div>
             </Wrapper>
           </div>}
-
           
-            <div className={styles.mb24}>
-              <Wrapper
-                headElement={<p className={styles.title_block}>Сведения о физических лицах организации</p>}
-              >
-                {data.list_persone?.map((p, i) => 
-                  <div key={i}>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <p style={{ margin: 0 }} className={styles.title_block}>{i + 1}</p>
-  
-                      <DeleteButton onClick={() => {
-                          data.list_persone = data.list_persone.filter((_, idx) => idx !== i)
-                          setData({ ...data })
-                        }} 
-                      />
+          <div className={styles.mb24}>
+            <Wrapper
+              headElement={<p className={styles.title_block}>Сведения о физических лицах организации</p>}
+            >
+              {data.list_persone?.map((p, i) => 
+                <div key={i}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <p style={{ margin: 0 }} className={styles.title_block}>{i + 1}</p>
+                    <DeleteButton onClick={() => {
+                        data.list_persone = data.list_persone.filter((_, idx) => idx !== i)
+                        setData({ ...data })
+                      }} 
+                    />
+                  </div>
+
+                  <p className={styles.mb24}>Роль лица</p>
+                  <div className={styles.row}>
+                    <div className={styles.checks}>
+                      {roles.map(r => 
+                        <div
+                        key={r}
+                        className={styles.checks__item}
+                        >
+                        <CheckBoxRS
+                          isChecked={p.account_onw_role?.includes(r)}
+                          onChange={() => {
+                            const roles = data.list_persone[i].account_onw_role ?? []
+                            data.list_persone[i].account_onw_role = roles?.includes(r) ? roles.filter(role => role !== r) : [...roles, r]
+                            setData({ ...data })
+                          }}
+                        >
+                          <p>{r}</p>
+                        </CheckBoxRS>
+                        </div>
+                      )}
                     </div>
-  
-                    <p className={styles.name_option}>Роль лица</p>
-                    <div className={styles.row}>
-                      <div className={styles.checks}>
-                        {roles.map(r => 
-                          <div
-                          key={r}
-                          className={styles.checks__item}
-                          >
-                          <CheckBoxRS
-                            isChecked={p.account_onw_role?.includes(r)}
-                            onChange={() => {
-                              const roles = data.list_persone[i].account_onw_role ?? []
-                              data.list_persone[i].account_onw_role = roles?.includes(r) ? roles.filter(role => role !== r) : [...roles, r]
-                              setData({ ...data })
-                            }}
-                          >
-                            <p>{r}</p>
-                          </CheckBoxRS>
-                          </div>
-                        )}
-                      </div>
+                  </div>
+                  <div className={styles.mb24}>
+                  {!p.account_onw_role?.length && <p className="text-error">Поле не заполнено</p>}
+                  </div>
+
+                  <div className={classNames(styles.row, "bg-grey")}>
+                    <div>
+                    <Input 
+                      value={p.account_own_lastname}
+                      name="Фамилия"
+                      error={!p.account_own_lastname?.length}
+                      placeholder="Введите Фамилию"
+                      onChange={(e) => {
+                        data.list_persone[i].account_own_lastname = e.target.value
+                        setData({ ...data })
+                      }}
+                    />
+                    {!p.account_own_lastname?.length && <p className="text-error">Поле не заполнено</p>}
+
                     </div>
+                    <div>
+                    <Input 
+                      value={p.account_own_name}
+                      name="Имя"
+                      error={!p.account_own_name?.length}
+                      placeholder="Введите Имя"
+                      onChange={(e) => {
+                        data.list_persone[i].account_own_name = e.target.value
+                        setData({ ...data })
+                      }}
+                    />
+                    {!p.account_own_name?.length && <p className="text-error">Поле не заполнено</p>}
+
+
+                    </div>
+                    <div>
+                    <Input
+                      value={p.account_own_surname}
+                      name="Отчество (при наличии)"
+                      placeholder={"Введите Отчество"}
+                      error={!p.account_own_surname?.length}
+                      onChange={(e) => {
+                        data.list_persone[i].account_own_surname = e.target.value
+                        setData({ ...data })
+                      }}
+                    />
+                    {!p.account_own_surname?.length && <p className="text-error">Поле не заполнено</p>}
+
+                    </div>
+                  </div>
+                    {p.account_onw_role?.includes("ЕИО") && 
                     <div className={classNames(styles.row, "bg-grey")}>
-                      <Input 
-                        value={p.account_own_lastname}
-                        name="Фамилия"
-                        placeholder="Введите Фамилию"
-                        onChange={(e) => {
-                          data.list_persone[i].account_own_lastname = e.target.value
-                          setData({ ...data })
-                        }}
-                      />
-                      <Input 
-                        value={p.account_own_name}
-                        name="Имя"
-                        placeholder="Введите Имя"
-                        onChange={(e) => {
-                          data.list_persone[i].account_own_name = e.target.value
-                          setData({ ...data })
-                        }}
-                      />
-                      <Input
-                        value={p.account_own_surname}
-                        name="Отчество (при наличии)"
-                        placeholder={"Введите Отчество"}
-                        onChange={(e) => {
-                          data.list_persone[i].account_own_surname = e.target.value
-                          setData({ ...data })
-                        }}
-                      />
-                    </div>
-                    {p.account_onw_role?.includes("ЕИО") && <div className={classNames(styles.row, "bg-grey")}>
                       <Input 
                         value={p.account_own_job_title}
                         name="Должность"
                         placeholder="Введите должность"
+                        error={!p.account_own_job_title?.length}
                         onChange={(e) => {
                           data.list_persone[i].account_own_job_title = e.target.value
                           setData({ ...data })
                         }}
                       />
-                    </div>}
-                    <div className={styles.checks}>
-                      <p className={styles.checks__item}>Пол</p>
-                      <div
-                        className={styles.checks__item}
-                        onClick={() => {
-                          data.list_persone[i].account_own_gender = "Мужской"
-                          setData({ ...data })
-                        }}
-                      >
-                        <RadioButtonRS isActive={p.account_own_gender === "Мужской"} />
-                        <p>Мужской</p>
-                      </div>
-                      <div
-                        className={styles.checks__item}
-                        onClick={() => {
-                          data.list_persone[i].account_own_gender = "Женский"
-                          setData({ ...data })
-                        }}
-                      >
-                        <RadioButtonRS isActive={p.account_own_gender === "Женский"} />
-                        <p>Женский</p>
-                      </div>
+                  </div>}
+                  {!p.account_own_job_title?.length && 
+                  <div className={styles.mb24} style={{ marginTop: "-24px" }}>
+                  <p className="text-error">Поле не заполнено</p>
+                  </div>
+                  }
+                  <div className={styles.checks}>
+                    <p className={styles.checks__item}>Пол</p>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        data.list_persone[i].account_own_gender = "Мужской"
+                        setData({ ...data })
+                      }}
+                    >
+                      <RadioButtonRS isActive={p.account_own_gender === "Мужской"} />
+                      <p>Мужской</p>
                     </div>
-                    <div className={classNames(styles.row, "bg-grey")}>
-                      <div className={styles.input__wrapper}>
-                        <p className={styles.name}>ИНН</p>
-                        <MaskedInput
-                          value={p.account_onw_inn}
-                          name="ИНН" 
-                          maskChar="_"
-                          mask="999999999999"
-                          placeholder="____________"
-                          onChange={(e) => {
-                            data.list_persone[i].account_onw_inn = e.target.value
-                            setData({ ...data })
-                          }}
-                        />
-                      </div>
-                      <Input
-                        value={p.account_own_snils}
-                        name="СНИЛС (при наличии)"
-                        type="number"
-                        pattern="[0-9]*"
-                        placeholder="Введите СНИЛС"
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        data.list_persone[i].account_own_gender = "Женский"
+                        setData({ ...data })
+                      }}
+                    >
+                      <RadioButtonRS isActive={p.account_own_gender === "Женский"} />
+                      <p>Женский</p>
+                    </div>
+                  </div>
+                  {p.account_own_gender === "Мужской" && p.account_own_gender === "Женский" && <p className="text-error">Поле не заполнено</p>}
+
+                  <div className={classNames(styles.row, "bg-grey")}>
+                    <div style={{ maxWidth: "calc(50% - 12px)" }} className={styles.input__wrapper}>
+                      <p className={styles.name}>ИНН</p>
+                      <MaskedInput
+                        value={p.account_onw_inn}
+                        name="ИНН" 
+                        maskChar="_"
+                        error={!p.account_onw_inn?.length}
+                        mask="999999999999"
+                        placeholder="____________"
                         onChange={(e) => {
-                          data.list_persone[i].account_own_snils = e.target.value
+                          data.list_persone[i].account_onw_inn = e.target.value
+                          setData({ ...data })
+                        }}
+                      />
+                    {!p.account_onw_inn?.length && <p className="text-error">Поле не заполнено</p>}
+                    </div>
+                    <div>
+                    <Input
+                      value={p.account_own_snils}
+                      name="СНИЛС (при наличии)"
+                      type="number"
+                      pattern="[0-9]*"
+                      error={!p.account_own_snils?.length}
+                      placeholder="Введите СНИЛС"
+                      onChange={(e) => {
+                        data.list_persone[i].account_own_snils = e.target.value
+                        setData({ ...data })
+                      }}
+                    />
+                    {!p.account_own_snils?.length && <p className="text-error">Поле не заполнено</p>}
+
+                    </div>
+                  </div>
+
+                  <div className={classNames(styles.row, "bg-grey")}>
+                    <div className={styles.column}>
+                      <DaDataSelect 
+                        backgroundColor="#F0F2F5"
+                        name="Гражданство"
+                        isCountries
+                        value={p.account_own_citizenship}
+                        error={!p.account_own_citizenship?.length}
+                        message="Введите страну"
+                        formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
+                        onSelect={(value) => {
+                          data.list_persone[i].account_own_citizenship = value?.value ?? ""
+                          setData({ ...data })
+                        }}
+                      />
+                      {!p.account_own_citizenship?.length && <p style={{ marginTop: "-24px" }} className="text-error">Поле не заполнено</p>}
+                    </div>
+                    <div className={styles.column}>
+                      <DaDataSelect 
+                        backgroundColor="#F0F2F5"
+                        name="Страна проживания"
+                        isCountries
+                        value={p.account_country_residence}
+                        error={!p.account_country_residence?.length}
+                        message="Введите страну"
+                        formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
+                        onSelect={(value) => {
+                          data.list_persone[i].account_country_residence = value?.value ?? ""
+                          setData({ ...data })
+                        }}
+                      />
+                      {!p.account_country_residence?.length && <p style={{ marginTop: "-24px" }} className="text-error">Поле не заполнено</p>}
+
+                    </div>
+                  </div>
+                  <div className={classNames(styles.row, "bg-grey")}>
+                    <div className={styles.input__wrapper} style={{ maxWidth: "calc(50% - 12px)" }}>
+                      <p className={styles.name}>Телефон</p>
+                      <MaskedInput
+                        mask="+7 (999) 999 99 99"
+                        maskChar="_"
+                        placeholder="+7 (__) ___ __ __"
+                        value={p.account_own_phone ?? ""}
+                        style={{margin: 0, padding: "20px 16px" }}
+                        onChange={(e) => {
+                          data.list_persone[i].account_own_phone = e.target.value
                           setData({ ...data })
                         }}
                       />
                     </div>
-
-                    <div className={classNames(styles.row, "bg-grey")}>
-                      <div className={styles.column}>
-                        <DaDataSelect 
-                          backgroundColor="#F0F2F5"
-                          name="Гражданство"
-                          isCountries
-                          value={p.account_own_citizenship}
-                          message="Введите страну"
-                          formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
-                          onSelect={(value) => {
-                            data.list_persone[i].account_own_citizenship = value?.value ?? ""
-                            setData({ ...data })
-                          }}
-                        />
-                      </div>
-                      <div className={styles.column}>
-                        <DaDataSelect 
-                          backgroundColor="#F0F2F5"
-                          name="Страна проживания"
-                          isCountries
-                          value={p.account_country_residence}
-                          message="Введите страну"
-                          formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
-                          onSelect={(value) => {
-                            data.list_persone[i].account_country_residence = value?.value ?? ""
-                            setData({ ...data })
-                          }}
-                        />
-                      </div>
-                    </div>
-                    <div className={classNames(styles.row, "bg-grey")}>
-                      <div className={styles.input__wrapper}>
-                        <p className={styles.name}>Телефон</p>
-                        <MaskedInput
-                          mask="+7 (999) 999 99 99"
-                          maskChar="_"
-                          placeholder="+7 (__) ___ __ __"
-                          value={p.account_own_phone ?? ""}
-                          style={{margin: 0, padding: "20px 16px" }}
-                          onChange={(e) => {
-                            data.list_persone[i].account_own_phone = e.target.value
-                            setData({ ...data })
-                          }}
-                        />
-                      </div>
-                      {p.account_onw_role?.includes("Акционер/учредитель") && <Input 
+                    {p.account_onw_role?.includes("Акционер/учредитель") && 
+                      <div>
+                      <Input 
                         value={p.account_own_piece}
                         name="Доля владения"
                         placeholder="Доля владения"
+                        error={!p.account_own_phone?.length}
                         onChange={(e) => {
                           data.list_persone[i].account_own_piece = e.target.value
                           setData({ ...data })
                         }}
-                      />}
+                      />
+                      <div className={styles.mb24}>
+                      {!p.account_own_phone?.length && <p className="text-error">Поле не заполнено</p>}
+                      </div>
+  
+                      </div>
+                    }
+                  </div>
+                  <div className={styles.mb24}>
+                    <p className={classNames(styles.mb24)}>
+                      Является ли лицо иностранным публичным должностным лицом либо
+                      лицом, связанным с таковым родственными, партнерскими или
+                      иными отношениями?
+                    </p>
+                    <YesOrNo 
+                      value={p.is_person_a_foreign_public} 
+                      toggle={() => {
+                        data.list_persone[i].is_person_a_foreign_public = !data.list_persone[i].is_person_a_foreign_public
+                        setData({ ...data })
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <p className={styles.mb24}>
+                      Степень родства либо статус (супруг или супруга) по отношению
+                      к публичному должностному лицу
+                    </p>
+                    <div className={styles.row}>
+                      <div className={styles.column}>
+                        <SelectRS
+                          nameStyles={{ color: "#8E909B", fontSize: "14px", marginBottom: "8px" }}
+                          value={{ value: p.assigned_publ_pers_relation, label: p.assigned_publ_pers_relation }}
+                          name="Выбрать статус"
+                          placeholder="Выбрать статус"
+                          options={[{ label: 'Супруг', value: 'Супруг' }, { label: 'Супруга', value: 'Супруга' } ]}
+                          onChange={(v) => {
+                            data.list_persone[i].assigned_publ_pers_relation = v?.label ?? ""
+                            setData({ ...data })
+                          }}
+                        />
+                      </div>
                     </div>
-                    <div className={styles.mb24}>
-                      <p className={classNames(styles.mb24)}>
-                        Является ли лицо иностранным публичным должностным лицом либо
-                        лицом, связанным с таковым родственными, партнерскими или
-                        иными отношениями?
-                      </p>
-                      <YesOrNo 
-                        value={p.is_person_a_foreign_public} 
-                        toggle={() => {
-                          data.list_persone[i].is_person_a_foreign_public = !data.list_persone[i].is_person_a_foreign_public
+                  </div>
+                  <div className={classNames(styles.row, "bg-grey")}>
+                    <div className={styles.column}>
+                      <DaDataSelect 
+                        backgroundColor="#F0F2F5"
+                        name="Адрес регистрации"
+                        value={p.account_own_registration}
+                        isAddr={true}
+                        message="Введите адрес"
+                        formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
+                        onSelect={(v) => {
+                          data.list_persone[i].account_own_registration = v?.label ?? ""
                           setData({ ...data })
                         }}
                       />
                     </div>
-                    <div>
-                      <p className={styles.mb24}>
-                        Степень родства либо статус (супруг или супруга) по отношению
-                        к публичному должностному лицу
-                      </p>
-                      <div className={styles.row}>
-                        <div className={styles.column}>
-                          <SelectRS
-                            nameStyles={{ color: "#8E909B", fontSize: "14px", marginBottom: "8px" }}
-                            value={{ value: p.assigned_publ_pers_relation, label: p.assigned_publ_pers_relation }}
-                            name="Выбрать статус"
-                            placeholder="Выбрать статус"
-                            options={[{ label: 'Супруг', value: 'Супруг' }, { label: 'Супруга', value: 'Супруга' } ]}
-                            onChange={(v) => {
-                              data.list_persone[i].assigned_publ_pers_relation = v?.label ?? ""
-                              setData({ ...data })
-                            }}
+                  </div>
+                  <div>
+                    <p className={styles.mb24}>Адрес местонахождения</p>
+                    <div className={styles.row}>
+                      <div className={styles.checks}>
+                        <div
+                          className={styles.checks__item}
+                          onClick={() => {
+                            data.list_persone[i].accownt_own_living = "Совпадает"
+                            setData({ ...data })
+                          }}
+                        >
+                          <RadioButtonRS
+                            isActive={p.accownt_own_living === "Совпадает"}
                           />
+                          <p>Совпадает с адресом регистрации</p>
                         </div>
+                        <div
+                          className={styles.checks__item}
+                          onClick={() => {
+                            data.list_persone[i].accownt_own_living = ""
+                            setData({ ...data })
+                          }}
+                        >
+                          <RadioButtonRS 
+                            isActive={p.accownt_own_living !== "Совпадает"}
+                          />
+                          <p>Не совпадает с адресом регистрации</p>
+                        </div>
+  
                       </div>
                     </div>
+                  </div>
+                  {p.accownt_own_living !== "Совпадает" && 
                     <div className={classNames(styles.row, "bg-grey")}>
                       <div className={styles.column}>
                         <DaDataSelect 
                           backgroundColor="#F0F2F5"
-                          name="Адрес регистрации"
-                          value={p.account_own_registration}
-                          isAddr={true}
+                          name="Адрес местонахождения"
+                          value={p.accownt_own_living}
                           message="Введите адрес"
-                          formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
+                          formatedOptions={formatedOptions}
                           onSelect={(v) => {
-                            data.list_persone[i].account_own_registration = v?.label ?? ""
+                            data.list_persone[i].accownt_own_living = v?.label ?? ""
                             setData({ ...data })
                           }}
                         />
                       </div>
-                    </div>
-                    <div>
-                      <p className={styles.mb24}>Адрес местонахождения</p>
-                      <div className={styles.row}>
-                        <div className={styles.checks}>
-                          <div
-                            className={styles.checks__item}
-                            onClick={() => {
-                              data.list_persone[i].accownt_own_living = "Совпадает"
-                              setData({ ...data })
-                            }}
-                          >
-                            <RadioButtonRS
-                              isActive={p.accownt_own_living === "Совпадает"}
-                            />
-                            <p>Совпадает с адресом регистрации</p>
+                    </div>}
+                  <div className={styles.mb24}>
+                    <p className={styles.mb24}>
+                      Загрузить первую страницу паспорта
+                    </p>
+                    {p.first_passport_page_url?.file &&
+                      <div className={styles.mb24}>
+                        <div className={styles.download__item}>
+                          <div className={styles.icon}>
+                            <p className={styles.format}>
+                              {getFormatFile(p.first_passport_page_url?.file?.name ?? p.first_passport_page_url?.path)}
+                            </p>
+                            <p className={styles.size}>
+                              {getSizeMb(p.first_passport_page_url?.file?.size)}
+                            </p>
                           </div>
-                          <div
-                            className={styles.checks__item}
-                            onClick={() => {
-                              data.list_persone[i].accownt_own_living = ""
-                              setData({ ...data })
-                            }}
-                          >
-                            <RadioButtonRS 
-                              isActive={p.accownt_own_living !== "Совпадает"}
-                            />
-                            <p>Не совпадает с адресом регистрации</p>
-                          </div>
-    
-                        </div>
-                      </div>
-                    </div>
-                    {p.accownt_own_living !== "Совпадает" && 
-                      <div className={classNames(styles.row, "bg-grey")}>
-                        <div className={styles.column}>
-                          <DaDataSelect 
-                            backgroundColor="#F0F2F5"
-                            name="Адрес местонахождения"
-                            value={p.accownt_own_living}
-                            message="Введите адрес"
-                            formatedOptions={formatedOptions}
-                            onSelect={(v) => {
-                              data.list_persone[i].accownt_own_living = v?.label ?? ""
-                              setData({ ...data })
-                            }}
-                          />
+                          <p className={styles.name}>{p.first_passport_page_url?.file?.name ?? p.first_passport_page_url?.path}</p>
                         </div>
                       </div>}
-                    <div className={styles.mb24}>
-                      <p className={styles.mb24}>
-                        Загрузить первую страницу паспорта
-                      </p>
-                      {p.first_passport_page_url?.file &&
-                        <div className={styles.mb24}>
-                          <div className={styles.download__item}>
-                            <div className={styles.icon}>
-                              <p className={styles.format}>
-                                {getFormatFile(p.first_passport_page_url?.file?.name ?? p.first_passport_page_url?.path)}
-                              </p>
-                              <p className={styles.size}>
-                                {getSizeMb(p.first_passport_page_url?.file?.size)}
-                              </p>
-                            </div>
-                            <p className={styles.name}>{p.first_passport_page_url?.file?.name ?? p.first_passport_page_url?.path}</p>
-                          </div>
-                        </div>}
-                      <DownloadButton 
-                        addFile={getPassportPageUrl(i)}
-                      />
-                    </div>
-                    <div className={classNames(styles.row, "bg-grey", "form")}>
-                      <DaDataSelect
-                        backgroundColor="#F0F2F5"
-                        name="Место рождения"
-                        value={p.account_birth_place}
-                        message="Введите адрес"
-                        isAddr={true}
-                        formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
-                        onSelect={(v) => {
-                          data.list_persone[i].account_birth_place = v?.label ?? ""
-                          setData({ ...data })
-                        }}
-                      />
-                      <div className={styles.input__wrapper}>
-                        <p className={styles.name}>Дата рождения</p>
-                        <MaskedInput 
-                          value={p.account_datebirth}
-                          placeholder="Введите дату"
-                          mask="99.99.9999"
-                          onChange={(e) => {
-                            data.list_persone[i].account_datebirth = e.target.value
-                            setData({ ...data })
-                          }}
-                          />
-                      </div>
-                      <SelectRS
-                        value={{ label: p.doc_type, value: p.doc_type }}
-                        name="Тип документа, удостоверяющего личность"
-                        nameStyles={{ color: "#8E909B", fontSize: "14px", marginBottom: "8px" }}
-                        placeholder="Выберите тип"
-                        backgroundColor="#F0F2F5"
-                        options={identityDocOpts}
-                        onChange={(v) => {
-                          data.list_persone[i].doc_type = v?.label ?? ""
-                          setData({ ...data })
-                        }}
-                      />
-                    </div>
-                    <div className={classNames(styles.row, "bg-grey", "form")}>
-                      <Input
-                        value={p.doc_serial}
-                        type="number"
-                        pattern="[0-9]*"
-                        name="Серия документа, удостоверяющего личность (при наличии)"
-                        placeholder="Введите серию документа"
-                        onChange={(e) => {
-                          data.list_persone[i].doc_serial = e.target.value
-                          setData({ ...data })
-                        }}
-                      />
-                      <Input
-                        value={p.doc_number}
-                        type="number"
-                        pattern="[0-9]*"
-                        name="Номер документа, удостоверяющего личность"
-                        placeholder="Введите номер документа"
-                        onChange={(e) => {
-                          data.list_persone[i].doc_number = e.target.value
-                          setData({ ...data })
-                        }}
-                      />
-                      <Input 
-                        value={p.issued_by}
-                        name="Кем выдан"
-                        placeholder="Наименование"
-                        onChange={(e) => {
-                          data.list_persone[i].issued_by = e.target.value
-                          setData({ ...data })
-                        }}
-                      />
-                    </div>
-                    <div className={classNames(styles.row, "bg-grey", "form")}>
-
-                      <DaDataSelect 
-                        backgroundColor="#F0F2F5"
-                        name="Код подразделения (при наличии)"
-                        value={p.division_code}
-                        message="Введите код"
-                        isCode
-                        formatedOptions={(list) => list.map((item) => ({ value: item.data.code, label: item.data.code }))}
-                        onSelect={(v) => {
-                          data.list_persone[i].division_code = v.value
-                          setData({ ...data })
-                        }}
-                      />  
-                      <div className={styles.input__wrapper}>
-                        <p className={styles.name}>Дата выдачи</p>
-                        <MaskedInput 
-                          value={p.date_issue}
-                          placeholder="Введите дату"
-                          mask="99.99.9999"
-                          onChange={(e) => {
-                            data.list_persone[i].date_issue = e.target.value
-                            setData({ ...data })
-                          }}
-                        />
-                      </div>
-  
-                      {/* <DateInput 
-                        value={p.validity}
-                        name="Срок действия"
-                        locale="ru"
-                        dateFormat="dd.MM.yyyy"
-                        onChange={() => {
-                          data.list_persone[i].validity = e.target.value
-                          setData({ ...data })
-                        }}
-                      /> */}
-                    </div>
+                    <DownloadButton 
+                      addFile={getPassportPageUrl(i)}
+                    />
                   </div>
-                )}
-              </Wrapper>
-            </div>
+                  <div className={classNames(styles.row, "bg-grey", "form")}>
+                    <DaDataSelect
+                      backgroundColor="#F0F2F5"
+                      name="Место рождения"
+                      value={p.account_birth_place}
+                      message="Введите адрес"
+                      isAddr={true}
+                      formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
+                      onSelect={(v) => {
+                        data.list_persone[i].account_birth_place = v?.label ?? ""
+                        setData({ ...data })
+                      }}
+                    />
+                    <div className={styles.input__wrapper}>
+                      <p className={styles.name}>Дата рождения</p>
+                      <MaskedInput 
+                        value={p.account_datebirth}
+                        placeholder="Введите дату"
+                        mask="99.99.9999"
+                        onChange={(e) => {
+                          data.list_persone[i].account_datebirth = e.target.value
+                          setData({ ...data })
+                        }}
+                        />
+                    </div>
+                    <SelectRS
+                      value={{ label: p.doc_type, value: p.doc_type }}
+                      name="Тип документа, удостоверяющего личность"
+                      nameStyles={{ color: "#8E909B", fontSize: "14px", marginBottom: "8px" }}
+                      placeholder="Выберите тип"
+                      backgroundColor="#F0F2F5"
+                      options={identityDocOpts}
+                      onChange={(v) => {
+                        data.list_persone[i].doc_type = v?.label ?? ""
+                        setData({ ...data })
+                      }}
+                    />
+                  </div>
+                  <div className={classNames(styles.row, "bg-grey", "form")}>
+                    <Input
+                      value={p.doc_serial}
+                      type="number"
+                      pattern="[0-9]*"
+                      name="Серия документа, удостоверяющего личность (при наличии)"
+                      placeholder="Введите серию документа"
+                      onChange={(e) => {
+                        data.list_persone[i].doc_serial = e.target.value
+                        setData({ ...data })
+                      }}
+                    />
+                    <Input
+                      value={p.doc_number}
+                      type="number"
+                      pattern="[0-9]*"
+                      name="Номер документа, удостоверяющего личность"
+                      placeholder="Введите номер документа"
+                      onChange={(e) => {
+                        data.list_persone[i].doc_number = e.target.value
+                        setData({ ...data })
+                      }}
+                    />
+                    <Input 
+                      value={p.issued_by}
+                      name="Кем выдан"
+                      placeholder="Наименование"
+                      onChange={(e) => {
+                        data.list_persone[i].issued_by = e.target.value
+                        setData({ ...data })
+                      }}
+                    />
+                  </div>
+                  <div className={classNames(styles.row, "bg-grey", "form")}>
+
+                    <DaDataSelect 
+                      backgroundColor="#F0F2F5"
+                      name="Код подразделения (при наличии)"
+                      value={p.division_code}
+                      message="Введите код"
+                      isCode
+                      formatedOptions={(list) => list.map((item) => ({ value: item.data.code, label: item.data.code }))}
+                      onSelect={(v) => {
+                        data.list_persone[i].division_code = v.value
+                        setData({ ...data })
+                      }}
+                    />  
+                    <div className={styles.input__wrapper}>
+                      <p className={styles.name}>Дата выдачи</p>
+                      <MaskedInput 
+                        value={p.date_issue}
+                        placeholder="Введите дату"
+                        mask="99.99.9999"
+                        onChange={(e) => {
+                          data.list_persone[i].date_issue = e.target.value
+                          setData({ ...data })
+                        }}
+                      />
+                    </div>
+
+                    {/* <DateInput 
+                      value={p.validity}
+                      name="Срок действия"
+                      locale="ru"
+                      dateFormat="dd.MM.yyyy"
+                      onChange={() => {
+                        data.list_persone[i].validity = e.target.value
+                        setData({ ...data })
+                      }}
+                    /> */}
+                  </div>
+                </div>
+              )}
+            </Wrapper>
+          </div>
 
           <div className={styles.mb40}>
             <AddButton
@@ -980,6 +1184,8 @@ const Step2 = () => {
                           <p className={styles.name}>{l?.file?.name ?? l.path}</p>
                         </div>)}
                     </div>}
+                    {erroredFields.includes("document_certifying_identity_executive") && <p className="text-error">Поле не заполнено</p>}
+
                   </div>
                   <DownloadButton 
                     addFile={getIdentityDocUrl} 
@@ -1005,6 +1211,8 @@ const Step2 = () => {
                           <p className={styles.name}>{l?.file?.name ?? l.path}</p>
                         </div>)}
                     </div>}
+                    {erroredFields.includes("document_confirming_real_activity") && <p className="text-error">Поле не заполнено</p>}
+
                   </div>
                   <DownloadButton 
                     addFile={getActivityDocUrl} 
@@ -1029,6 +1237,7 @@ const Step2 = () => {
                           <p className={styles.name}>{l?.file?.name ?? l.path}</p>
                         </div>)}
                     </div>}
+                    {erroredFields.includes("document_licenses") && <p className="text-error">Поле не заполнено</p>}
                   </div>
                   <DownloadButton 
                     addFile={getLicenseUrl} 
@@ -1138,11 +1347,13 @@ const Step2 = () => {
                 </div>
                 {customPlannedOper.active && <div>
                   <Input
+                    error={erroredFields.includes("custom_planned_oper")}
                     value={customPlannedOper.value}
                     placeholder=""
                     onChange={onChangeCustomPlannedOper}
                   />
                 </div>}
+                {((customPlannedOper.active && erroredFields.includes("custom_planned_oper")) || erroredFields.includes("planned_operations")) && <p className="text-error">Поле не заполнено</p>}
             </Wrapper>
           </div>
           <div className={styles.mb40}>
@@ -1164,8 +1375,17 @@ const Step2 = () => {
                     value={data.beneficiaries}
                     name="Выгодоприобретатели"
                     placeholder=""
-                    onChange={(e) => setData({ ...data, beneficiaries: e.target.value })}
+                    error={erroredFields.includes("beneficiaries")}
+                    onChange={(e) => {
+                      setData({ ...data, beneficiaries: e.target.value })
+                      e.target.value 
+                      ? setErroredFields(p => p.filter(f => f !== "beneficiaries"))
+                      : setErroredFields(p => ([...p, "beneficiaries"]))                    
+                    } 
+                  }
                   />
+
+                  {erroredFields.includes("beneficiaries") && <p className="text-error">Поле не заполнено</p>}
                 </div>
               </div>}
           </div>
@@ -1182,7 +1402,11 @@ const Step2 = () => {
                 <div className={styles.checks}>
                   <div
                     className={styles.checks__item}
-                    onClick={() => setData({ ...data, account_operations: account_operations[0] })}
+                    onClick={() => {
+                      setData({ ...data, account_operations: account_operations[0] })
+                      setErroredFields(p => p.filter(f => f !== "account_operations"))
+                    } 
+                  }
                   >
                     <RadioButtonRS 
                       isActive={data.account_operations === account_operations[0]} 
@@ -1191,7 +1415,10 @@ const Step2 = () => {
                   </div>
                   <div
                     className={styles.checks__item}
-                    onClick={() => setData({ ...data, account_operations: account_operations[1] })}
+                    onClick={() => {
+                      setData({ ...data, account_operations: account_operations[1] })
+                      setErroredFields(p => p.filter(f => f !== "account_operations"))
+                    }}
                   >
                     <RadioButtonRS 
                       isActive={data.account_operations === account_operations[1]} 
@@ -1204,7 +1431,10 @@ const Step2 = () => {
                 <div className={styles.checks}>
                   <div
                     className={styles.checks__item}
-                    onClick={() => setData({ ...data, account_operations: account_operations[2] })}
+                    onClick={() => {
+                      setData({ ...data, account_operations: account_operations[2] })
+                      setErroredFields(p => p.filter(f => f !== "account_operations"))
+                    }}
                   >
                     <RadioButtonRS 
                       isActive={data.account_operations === account_operations[2]} 
@@ -1213,7 +1443,10 @@ const Step2 = () => {
                   </div>
                   <div
                     className={styles.checks__item}
-                    onClick={() => setData({ ...data, account_operations: account_operations[3] })}
+                    onClick={() => {
+                      setData({ ...data, account_operations: account_operations[2] })
+                      setErroredFields(p => p.filter(f => f !== "account_operations"))
+                    }}
                   >
                     <RadioButtonRS 
                       isActive={data.account_operations === account_operations[3]} 
@@ -1226,7 +1459,10 @@ const Step2 = () => {
                 <div className={styles.checks}>
                   <div
                     className={styles.checks__item}
-                    onClick={() => setData({ ...data, account_operations: account_operations[4] })}
+                    onClick={() => {
+                      setData({ ...data, account_operations: account_operations[4] })
+                      setErroredFields(p => p.filter(f => f !== "account_operations"))
+                    }}
                   >
                     <RadioButtonRS 
                       isActive={data.account_operations === account_operations[4]} 
@@ -1235,7 +1471,10 @@ const Step2 = () => {
                   </div>
                   <div
                     className={styles.checks__item}
-                    onClick={() => setData({ ...data, account_operations: account_operations[5] })}
+                    onClick={() => {
+                      setData({ ...data, account_operations: account_operations[5] })
+                      setErroredFields(p => p.filter(f => f !== "account_operations"))
+                    }}
                   >
                     <RadioButtonRS 
                       isActive={data.account_operations === account_operations[5]} 
@@ -1243,6 +1482,10 @@ const Step2 = () => {
                     <p>{account_operations[5]}</p>
                   </div>
                 </div>
+              </div>
+              <div className={styles.mb24}>
+              {erroredFields.includes("account_operations") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
 
               <div className={styles.mb24}>
@@ -1252,8 +1495,17 @@ const Step2 = () => {
                 <Input 
                   value={data.history_reputation ?? ""}
                   placeholder=""
-                  onChange={(e) => setData({ ...data, history_reputation: e.target.value })}
+                  error={erroredFields.includes("history_reputation")}
+                  onChange={(e) => {
+                    setData({ ...data, history_reputation: e.target.value })
+                    e.target.value 
+                    ? setErroredFields(p => p.filter(f => f !== "history_reputation"))
+                    : setErroredFields(p => ([...p, "history_reputation"]))
+                  } 
+                }
                 />
+              {erroredFields.includes("history_reputation") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
 
               <div className={styles.mb40}>
@@ -1264,7 +1516,13 @@ const Step2 = () => {
                   <div className={styles.mb24}>
                     <YesOrNo
                       value={data?.subject_licensing && data.subject_licensing === "Осуществляет"}
-                      toggle={() => data.subject_licensing === "Не осуществляет" ? setData({ ...data, subject_licensing: "Осуществляет" }) : setData({ ...data, subject_licensing: "Не осуществляет" })}
+                      toggle={() => {
+                        data.subject_licensing === "Не осуществляет" 
+                          ? setData({ ...data, subject_licensing: "Осуществляет" }) 
+                          : setData({ ...data, subject_licensing: "Не осуществляет" })
+                          setErroredFields(p => p.filter(f => f !== "subject_licensing"))
+                      }
+                    }
                     />
                   </div>
                 </div>
@@ -1278,7 +1536,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, week_cash_withdrawal: "0-29" })}
+                      onClick={() => {
+                        setData({ ...data, week_cash_withdrawal: "0-29" })
+                        setErroredFields(p => p.filter(f => f !== "week_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.week_cash_withdrawal === "0-29"}
@@ -1287,7 +1548,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, week_cash_withdrawal: "30-100" })}
+                      onClick={() => {
+                        setData({ ...data, week_cash_withdrawal: "30-100" })
+                        setErroredFields(p => p.filter(f => f !== "week_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.week_cash_withdrawal === "30-100"}
@@ -1296,7 +1560,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, week_cash_withdrawal: ">100" })}
+                      onClick={() => {
+                        setData({ ...data, week_cash_withdrawal: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "week_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.week_cash_withdrawal === ">100"}
@@ -1305,6 +1572,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("week_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1314,7 +1583,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, quarter_cash_withdrawal: "0-29" })}
+                      onClick={() => {
+                        setData({ ...data, quarter_cash_withdrawal: "0-29" })
+                        setErroredFields(p => p.filter(f => f !== "quarter_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.quarter_cash_withdrawal === "0-29"}
@@ -1323,7 +1595,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, quarter_cash_withdrawal: "30-100" })}
+                      onClick={() => {
+                        setData({ ...data, quarter_cash_withdrawal: "30-100" })
+                        setErroredFields(p => p.filter(f => f !== "quarter_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.quarter_cash_withdrawal === "30-100"}
@@ -1332,7 +1607,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, quarter_cash_withdrawal: ">100" })}
+                      onClick={() => {
+                        setData({ ...data, quarter_cash_withdrawal: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "quarter_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.quarter_cash_withdrawal === ">100"}
@@ -1341,6 +1619,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("quarter_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1350,7 +1630,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, age_cash_withdrawal: "0-29" })}
+                      onClick={() => {
+                        setData({ ...data, age_cash_withdrawal: "0-29" })
+                        setErroredFields(p => p.filter(f => f !== "age_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.age_cash_withdrawal === "0-29"}
@@ -1359,7 +1642,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, age_cash_withdrawal: "30-100" })}
+                      onClick={() => {
+                        setData({ ...data, age_cash_withdrawal: "30-100" })
+                        setErroredFields(p => p.filter(f => f !== "age_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.age_cash_withdrawal === "30-100"}
@@ -1368,7 +1654,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, age_cash_withdrawal: ">100" })}
+                      onClick={() => {
+                        setData({ ...data, age_cash_withdrawal: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "age_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.age_cash_withdrawal === ">100"}
@@ -1377,6 +1666,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("age_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1386,7 +1677,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_week_cash_withdrawal: "0 - 99 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_week_cash_withdrawal: "0 - 99 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_week_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_week_cash_withdrawal === "0 - 99 000"}
@@ -1395,7 +1689,11 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_week_cash_withdrawal: "100 000 - 1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_week_cash_withdrawal: "100 000 - 1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_week_cash_withdrawal"))
+                      }}
+
                     >
                       <RadioButtonRS
                         isActive={data.sum_week_cash_withdrawal === "100 000 - 1 000 000"}
@@ -1404,7 +1702,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_week_cash_withdrawal: ">1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_week_cash_withdrawal: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_week_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_week_cash_withdrawal === ">1 000 000"}
@@ -1413,6 +1714,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("sum_week_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1422,7 +1725,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_mouth_cash_withdrawal: "0 - 99 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_mouth_cash_withdrawal: "0 - 99 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_mouth_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_mouth_cash_withdrawal === "0 - 99 000"}
@@ -1431,7 +1737,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_mouth_cash_withdrawal: "100 000 - 1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_mouth_cash_withdrawal: "100 000 - 1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_mouth_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_mouth_cash_withdrawal === "100 000 - 1 000 000"}
@@ -1440,7 +1749,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_mouth_cash_withdrawal: ">1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_mouth_cash_withdrawal: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_mouth_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_mouth_cash_withdrawal === ">1 000 000"}
@@ -1449,6 +1761,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("sum_mouth_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1458,7 +1772,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_quarter_cash_withdrawal: "0 - 99 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_quarter_cash_withdrawal: "0 - 99 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_quarter_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_quarter_cash_withdrawal === "0 - 99 000"}
@@ -1467,7 +1784,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_quarter_cash_withdrawal: "100 000 - 1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_quarter_cash_withdrawal: "100 000 - 1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_quarter_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_quarter_cash_withdrawal === "100 000 - 1 000 000"}
@@ -1476,7 +1796,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_quarter_cash_withdrawal: ">1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_quarter_cash_withdrawal: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_quarter_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_quarter_cash_withdrawal === ">1 000 000"}
@@ -1485,6 +1808,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("sum_quarter_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1494,7 +1819,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_age_cash_withdrawal: "0 - 99 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_age_cash_withdrawal: "0 - 99 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_age_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_age_cash_withdrawal === "0 - 99 000"}
@@ -1503,7 +1831,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_age_cash_withdrawal: "100 000 - 1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_age_cash_withdrawal: "100 000 - 1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_age_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_age_cash_withdrawal === "100 000 - 1 000 000"}
@@ -1512,7 +1843,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_age_cash_withdrawal: ">1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_age_cash_withdrawal: "v" })
+                        setErroredFields(p => p.filter(f => f !== "sum_age_cash_withdrawal"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_age_cash_withdrawal === ">1 000 000"}
@@ -1521,6 +1855,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("sum_age_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1530,7 +1866,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_trade_contracts_week: "0-29" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_week: "0-29" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_week"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_trade_contracts_week === "0-29"}
@@ -1539,7 +1878,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_trade_contracts_week: "30-100" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_week: "30-100" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_week"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_trade_contracts_week === "30-100"}
@@ -1548,7 +1890,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_trade_contracts_week: ">100" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_week: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_week"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_trade_contracts_week === ">100"}
@@ -1557,6 +1902,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("foreign_trade_contracts_week") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1566,7 +1913,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_trade_contracts_month: "0-29" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_month: "0-29" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_month"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_trade_contracts_month === "0-29"}
@@ -1575,7 +1925,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_trade_contracts_month: "30-100" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_month: "30-100" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_month"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_trade_contracts_month === "30-100"}
@@ -1584,7 +1937,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_trade_contracts_month: ">100" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_month: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_month"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_trade_contracts_month === ">100"}
@@ -1593,6 +1949,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("foreign_trade_contracts_month") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1602,7 +1960,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_trade_contracts_quarter: "0-29" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_quarter: "0-29" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_quarter"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_trade_contracts_quarter === "0-29"}
@@ -1611,7 +1972,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_trade_contracts_quarter: "30-100" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_quarter: "30-100" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_quarter"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_trade_contracts_quarter === "30-100"}
@@ -1620,7 +1984,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_trade_contracts_quarter: ">100" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_quarter: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_quarter"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_trade_contracts_quarter === ">100"}
@@ -1629,6 +1996,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("foreign_trade_contracts_quarter") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1638,7 +2007,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_trade_contracts_age: "0-29" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_age: "0-29" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_age"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_trade_contracts_age === "0-29"}
@@ -1647,7 +2019,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_trade_contracts_age: "30-100" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_age: "30-100" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_age"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_trade_contracts_age === "30-100"}
@@ -1656,7 +2031,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_trade_contracts_age: ">100" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_age: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_age"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_trade_contracts_age === ">100"}
@@ -1665,6 +2043,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("foreign_trade_contracts_age") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1674,7 +2054,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, num_transactions_week: "0-29" })}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_week: "0-29" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_week"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.num_transactions_week === "0-29"}
@@ -1683,7 +2066,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, num_transactions_week: "30-100" })}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_week: "30-100" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_week"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.num_transactions_week === "30-100"}
@@ -1692,7 +2078,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, num_transactions_week: ">100" })}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_week: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_week"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.num_transactions_week === ">100"}
@@ -1701,6 +2090,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("num_transactions_week") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1710,7 +2101,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, num_transactions_month: "0-29" })}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_month: "0-29" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_month"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.num_transactions_month === "0-29"}
@@ -1719,7 +2113,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, num_transactions_month: "30-100" })}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_month: "30-100" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_month"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.num_transactions_month === "30-100"}
@@ -1728,7 +2125,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, num_transactions_month: ">100" })}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_month: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_month"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.num_transactions_month === ">100"}
@@ -1737,6 +2137,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("num_transactions_month") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1746,7 +2148,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, num_transactions_quarter: "0-29" })}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_quarter: "0-29" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_quarter"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.num_transactions_quarter === "0-29"}
@@ -1755,7 +2160,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, num_transactions_quarter: "30-100" })}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_quarter: "30-100" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_quarter"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.num_transactions_quarter === "30-100"}
@@ -1764,7 +2172,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, num_transactions_quarter: ">100" })}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_quarter: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_quarter"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.num_transactions_quarter === ">100"}
@@ -1773,6 +2184,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("num_transactions_quarter") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1782,7 +2195,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, num_transactions_age: "0-29" })}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_age: "0-29" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_age"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.num_transactions_age === "0-29"}
@@ -1791,7 +2207,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, num_transactions_age: "30-100" })}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_age: "30-100" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_age"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.num_transactions_age === "30-100"}
@@ -1800,7 +2219,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, num_transactions_age: ">100" })}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_age: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_age"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.num_transactions_age === ">100"}
@@ -1809,6 +2231,7 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("num_transactions_age") && <p className="text-error">Поле не заполнено</p>}
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1818,7 +2241,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_sum_contracts_week: "0 - 99 000" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_week: "0 - 99 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_week"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_sum_contracts_week === "0 - 99 000"}
@@ -1827,7 +2253,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_sum_contracts_week: "100 000 - 1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_week: "100 000 - 1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_week"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_sum_contracts_week === "100 000 - 1 000 000"}
@@ -1836,7 +2265,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_sum_contracts_week: ">1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_week: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_week"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_sum_contracts_week === ">1 000 000"}
@@ -1845,6 +2277,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("foreign_sum_contracts_week") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1854,7 +2288,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_sum_contracts_month: "0 - 99 000" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_month: "0 - 99 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_month"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_sum_contracts_month === "0 - 99 000"}
@@ -1863,7 +2300,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_sum_contracts_month: "100 000 - 1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_month: "100 000 - 1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_month"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_sum_contracts_month === "100 000 - 1 000 000"}
@@ -1872,7 +2312,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_sum_contracts_month: ">1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_month: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_month"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_sum_contracts_month === ">1 000 000"}
@@ -1881,6 +2324,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("foreign_sum_contracts_month") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1890,7 +2335,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_sum_contracts_quarter: "0 - 99 000" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_quarter: "0 - 99 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_quarter"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_sum_contracts_quarter === "0 - 99 000"}
@@ -1899,7 +2347,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_sum_contracts_quarter: "100 000 - 1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_quarter: "100 000 - 1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_quarter"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_sum_contracts_quarter === "100 000 - 1 000 000"}
@@ -1908,7 +2359,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_sum_contracts_quarter: ">1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_quarter: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_quarter"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_sum_contracts_quarter === ">1 000 000"}
@@ -1917,6 +2371,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("foreign_sum_contracts_quarter") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1926,7 +2382,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_sum_contracts_age: "0 - 99 000" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_age: "0 - 99 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_age"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_sum_contracts_age === "0 - 99 000"}
@@ -1935,7 +2394,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_sum_contracts_age: "100 000 - 1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_age: "100 000 - 1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_age"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_sum_contracts_age === "100 000 - 1 000 000"}
@@ -1944,7 +2406,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, foreign_sum_contracts_age: ">1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_age: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_age"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.foreign_sum_contracts_age === ">1 000 000"}
@@ -1953,6 +2418,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("foreign_sum_contracts_age") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1962,7 +2429,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_transactions_week: "0 - 99 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_week: "0 - 99 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_week"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_transactions_week === "0 - 99 000"}
@@ -1971,7 +2441,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_transactions_week: "100 000 - 1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_week: "100 000 - 1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_week"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_transactions_week === "100 000 - 1 000 000"}
@@ -1980,7 +2453,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_transactions_week: ">1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_week: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_week"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_transactions_week === ">1 000 000"}
@@ -1989,6 +2465,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("sum_transactions_week") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1998,7 +2476,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_transactions_month: "0 - 99 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_month: "0 - 99 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_month"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_transactions_month === "0 - 99 000"}
@@ -2007,7 +2488,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_transactions_month: "100 000 - 1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_month: "100 000 - 1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_month"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_transactions_month === "100 000 - 1 000 000"}
@@ -2016,7 +2500,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_transactions_month: ">1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_month: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_month"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_transactions_month === ">1 000 000"}
@@ -2025,6 +2512,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("sum_transactions_month") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -2034,7 +2523,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_transactions_quarter: "0 - 99 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_quarter: "0 - 99 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_quarter"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_transactions_quarter === "0 - 99 000"}
@@ -2043,7 +2535,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_transactions_quarter: "100 000 - 1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_quarter: "100 000 - 1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_quarter"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_transactions_quarter === "100 000 - 1 000 000"}
@@ -2052,7 +2547,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_transactions_quarter: ">1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_quarter: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_quarter"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_transactions_quarter === ">1 000 000"}
@@ -2061,6 +2559,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("sum_transactions_quarter") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -2070,7 +2570,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_transactions_age: "0 - 99 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_age: "0 - 99 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_age"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_transactions_age === "0 - 99 000"}
@@ -2079,7 +2582,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_transactions_age: "100 000 - 1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_age: "100 000 - 1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_age"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_transactions_age === "100 000 - 1 000 000"}
@@ -2088,7 +2594,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, sum_transactions_age: ">1 000 000" })}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_age: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_age"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sum_transactions_age === ">1 000 000"}
@@ -2097,6 +2606,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("sum_transactions_age") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -2105,7 +2616,10 @@ const Step2 = () => {
                 <div className={styles.row}>
                   <div className={styles.checks}>
                     <div className={styles.checks__item}
-                      onClick={() => setData({ ...data, sources_cash_receipts: cash_source[0] })}
+                      onClick={() => {
+                        setData({ ...data, sources_cash_receipts: cash_source[0] })
+                        setErroredFields(p => p.filter(f => f !== "sources_cash_receipts"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sources_cash_receipts === cash_source[0]}
@@ -2113,7 +2627,10 @@ const Step2 = () => {
                       <p>{cash_source[0]}</p>
                     </div>
                     <div className={styles.checks__item}
-                      onClick={() => setData({ ...data, sources_cash_receipts: cash_source[1] })}
+                      onClick={() => {
+                        setData({ ...data, sources_cash_receipts: cash_source[1] })
+                        setErroredFields(p => p.filter(f => f !== "sources_cash_receipts"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.sources_cash_receipts === cash_source[1]}
@@ -2125,7 +2642,10 @@ const Step2 = () => {
                 <div className={styles.row}>
                   <div className={styles.checks}>
                     <div className={styles.checks__item}
-                      onClick={() => setData({ ...data, sources_cash_receipts: cash_source[2] })}
+                      onClick={() => {
+                        setData({ ...data, sources_cash_receipts: cash_source[2] })
+                        setErroredFields(p => p.filter(f => f !== "sources_cash_receipts"))
+                      }}
                       >
                       <RadioButtonRS
                         isActive={data.sources_cash_receipts === cash_source[2]}
@@ -2133,7 +2653,10 @@ const Step2 = () => {
                       <p>{cash_source[2]}</p>
                     </div>
                     <div className={styles.checks__item}
-                      onClick={() => setData({ ...data, sources_cash_receipts: cash_source[3] })}
+                      onClick={() => {
+                        setData({ ...data, sources_cash_receipts: cash_source[3] })
+                        setErroredFields(p => p.filter(f => f !== "sources_cash_receipts"))
+                      }}
                       >
                       <RadioButtonRS
                         isActive={data.sources_cash_receipts === cash_source[3]}
@@ -2142,6 +2665,8 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("sources_cash_receipts") && <p className="text-error">Поле не заполнено</p>}
+
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>Штатная численность сотрудников</p>
@@ -2149,7 +2674,10 @@ const Step2 = () => {
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, headcount: "0-29" })}
+                      onClick={() => {
+                        setData({ ...data, headcount: "0-29" })
+                        setErroredFields(p => p.filter(f => f !== "headcount"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.headcount === "0-29"}
@@ -2158,7 +2686,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, headcount: "30-100" })}
+                      onClick={() => {
+                        setData({ ...data, headcount: "30-100" })
+                        setErroredFields(p => p.filter(f => f !== "headcount"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.headcount === "30-100"}
@@ -2167,7 +2698,10 @@ const Step2 = () => {
                     </div>
                     <div
                       className={styles.checks__item}
-                      onClick={() => setData({ ...data, headcount: ">100" })}
+                      onClick={() => {
+                        setData({ ...data, headcount: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "headcount"))
+                      }}
                     >
                       <RadioButtonRS
                         isActive={data.headcount === ">100"}
@@ -2176,6 +2710,7 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                {erroredFields.includes("headcount") && <p className="text-error">Поле не заполнено</p>}
               </div>
             </Wrapper>
           </div>
@@ -2204,14 +2739,21 @@ const Step2 = () => {
                   {data.information_counterparties && 
                     <div>
                       {data.information_counterparties_two.map((p, i) =>
+                      <div key={i}>
                         <div className={styles.row}>
                           <Input
                             value={p}
+                            error={!p?.length}
                             placeholder="Введите название"
                             onChange={onChangeCounterparties(i)}
                           />
                           <DeleteButton onClick={removeFromCounterparties(i)} />
-                        </div>)}
+                        </div>
+                        <div className={styles.mb24}>
+                        {!p?.length && <p className="text-error">Поле не заполнено</p>}
+                        </div>
+                      </div>
+                        )}
 
                       <AddButton
                         type="button" 

@@ -137,8 +137,14 @@ ul {
   }
 }
 
-.error {
-  border: 1px solid red;
+html {
+  .error {
+    border: 1px solid red;
+  }
+}
+
+.text-error {
+  color: red;
 }
 
 .active::after {
