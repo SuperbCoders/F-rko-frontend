@@ -13,7 +13,6 @@ export const initData = {
   addresses: [],
   salary_debt: 0,
   contact_number: "",
-  is_collegiate_body: false,
   information_goals: [...statementsTexts],
   beneficiaries: "Отсутствуют",
   email: "",

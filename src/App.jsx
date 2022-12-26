@@ -112,6 +112,7 @@ function App() {
         }
 
         delete prevSavedData.is_supervisoty
+        delete prevSavedData.is_collegiate_body
 
         if (!prevSavedData.planned_operations) {
           prevSavedData.planned_operations = []
