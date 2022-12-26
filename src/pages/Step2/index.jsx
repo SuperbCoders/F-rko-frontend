@@ -182,7 +182,7 @@ const Step2 = () => {
     const fd = new FormData();
     fd.append("documents", file)
 
-    documentApi.upload(fd).then(res => {
+    documentApi.upload({ data: fd }).then(res => {
       data.document_certifying_identity_executive.push({ path: res.images[0]?.path, file })
       setData({ ...data })
     })
@@ -191,7 +191,7 @@ const Step2 = () => {
     const fd = new FormData();
     fd.append("documents", file)
 
-    documentApi.upload(file).then(res => {
+    documentApi.upload({ data: fd }).then(res => {
       data.document_confirming_real_activity.push({ path: res.images[0]?.path, file: file })
       setData({ ...data })
     })
@@ -201,7 +201,7 @@ const Step2 = () => {
     const fd = new FormData();
     fd.append("documents", file)
 
-    documentApi.upload(file).then(res => {
+    documentApi.upload({ data: fd }).then(res => {
       data.document_licenses.push({ path: res.images[0]?.path, file: file })
       setData({ ...data })
     })  
@@ -391,8 +391,8 @@ const Step2 = () => {
                     <MaskedInput
                       // mask="https://d{2}"
                       placeholder="https://"
-                      value={data.domainname ?? "https://"}
-                      onChange={(e) => setData({ ...data, domainname: e.target.value}) }
+                      value={data.donaninname ?? "https://"}
+                      onChange={(e) => setData({ ...data, donaninname: e.target.value}) }
                     />
                   </div>
                   <div className={styles.input__wrapper}>
@@ -812,13 +812,13 @@ const Step2 = () => {
                           <div className={styles.download__item}>
                             <div className={styles.icon}>
                               <p className={styles.format}>
-                                {getFormatFile(p.first_passport_page_url?.file[0]?.name)}
+                                {getFormatFile(p.first_passport_page_url?.file?.name ?? p.first_passport_page_url?.path)}
                               </p>
                               <p className={styles.size}>
-                                {getSizeMb(p.first_passport_page_url?.file[0]?.size)}
+                                {getSizeMb(p.first_passport_page_url?.file?.size)}
                               </p>
                             </div>
-                            <p className={styles.name}>{p.first_passport_page_url?.file[0]?.name}</p>
+                            <p className={styles.name}>{p.first_passport_page_url?.file?.name ?? p.first_passport_page_url?.path}</p>
                           </div>
                         </div>}
                       <DownloadButton 

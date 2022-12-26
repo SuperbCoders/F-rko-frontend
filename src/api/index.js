@@ -68,8 +68,8 @@ class DocumentApi extends BaseApi {
     super(config)
   }
 
-  upload = (formdata) => {
-    return this.post("/api/document-load/", { data: formdata })
+  upload = (data) => {
+    return this.post("/api/document-load/", data)
   }
 }
 

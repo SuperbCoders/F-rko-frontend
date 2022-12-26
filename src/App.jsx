@@ -117,6 +117,9 @@ function App() {
         delete prevSavedData.information_counterparties2
         delete prevSavedData.end_date
         delete prevSavedData.start_date
+        delete prevSavedData.collegiate_person
+        delete prevSavedData.supervisoty_board_persone_name
+        delete prevSavedData.domainname
 
         if (!prevSavedData.planned_operations) {
           prevSavedData.planned_operations = []
