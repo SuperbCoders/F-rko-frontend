@@ -2,7 +2,7 @@ import React from 'react';
 import { statementsTexts } from '../pages/Step2';
 
 export const initData = {
-  list_person: [
+  list_persone: [
     {
       accownt_own_living: "Совпадает",
       account_own_mail: "Совпадает с адресом регистрации",
@@ -28,7 +28,8 @@ export const initData = {
   document_confirming_real_activity: [],
   document_licenses: [],
   information_counterparties: false,
-  information_counterparties2: []
+  information_counterparties2: [],
+  subject_licensing: "Не осуществляет",
 }
 
 export const RequisitesContext = React.createContext({

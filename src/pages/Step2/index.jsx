@@ -172,7 +172,7 @@ const Step2 = () => {
     const fd = new FormData();
     fd.append("documents", file)
     documentApi.upload(fd).then(res => {
-      data.list_person[i].first_passport_page_url = { path: res.images[0]?.path, file }
+      data.list_persone[i].first_passport_page_url = { path: res.images[0]?.path, file }
       setData({ ...data })
     })
   }
@@ -265,14 +265,14 @@ const Step2 = () => {
         mail_address: type_adress === "Почтовый" ? address : "",
         address
       })),
-      list_person: [...data.list_person],
+      list_persone: [...data.list_persone],
       planned_operations: customPlannedOper.active ? [...data.planned_operations, customPlannedOper.value] : data.planned_operations,
       document_certifying_identity_executive: data.document_certifying_identity_executive.map(d => d.path),
       document_confirming_real_activity: data.document_confirming_real_activity.map(d => d.path),
       document_licenses: data.document_licenses.map(d => d.path),
     }
 
-    dto.list_person.map(p => ({
+    dto.list_persone.map(p => ({
       ...p,
       accownt_own_living: p.accownt_own_living === "Совпадает" ? p.account_own_registration : p.accownt_own_living,
       first_passport_page_url: p.first_passport_page_url.path
@@ -522,13 +522,13 @@ const Step2 = () => {
               <Wrapper
                 headElement={<p className={styles.title_block}>Сведения о физических лицах организации</p>}
               >
-                {data.list_person?.map((p, i) => 
+                {data.list_persone?.map((p, i) => 
                   <div key={i}>
                     <div style={{ display: "flex", alignItems: "center" }}>
                       <p style={{ margin: 0 }} className={styles.title_block}>{i + 1}</p>
   
                       <DeleteButton onClick={() => {
-                          data.list_person = data.list_person.filter((_, idx) => idx !== i)
+                          data.list_persone = data.list_persone.filter((_, idx) => idx !== i)
                           setData({ ...data })
                         }} 
                       />
@@ -545,8 +545,8 @@ const Step2 = () => {
                           <CheckBoxRS
                             isChecked={p.account_onw_role?.includes(r)}
                             onChange={() => {
-                              const roles = data.list_person[i].account_onw_role ?? []
-                              data.list_person[i].account_onw_role = roles?.includes(r) ? roles.filter(role => role !== r) : [...roles, r]
+                              const roles = data.list_persone[i].account_onw_role ?? []
+                              data.list_persone[i].account_onw_role = roles?.includes(r) ? roles.filter(role => role !== r) : [...roles, r]
                               setData({ ...data })
                             }}
                             >
@@ -562,7 +562,7 @@ const Step2 = () => {
                         name="Фамилия"
                         placeholder="Введите Фамилию"
                         onChange={(e) => {
-                          data.list_person[i].account_own_lastname = e.target.value
+                          data.list_persone[i].account_own_lastname = e.target.value
                           setData({ ...data })
                         }}
                       />
@@ -571,7 +571,7 @@ const Step2 = () => {
                         name="Имя"
                         placeholder="Введите Имя"
                         onChange={(e) => {
-                          data.list_person[i].account_own_name = e.target.value
+                          data.list_persone[i].account_own_name = e.target.value
                           setData({ ...data })
                         }}
                       />
@@ -580,7 +580,7 @@ const Step2 = () => {
                         name="Отчество (при наличии)"
                         placeholder={"Введите Отчество"}
                         onChange={(e) => {
-                          data.list_person[i].account_own_surname = e.target.value
+                          data.list_persone[i].account_own_surname = e.target.value
                           setData({ ...data })
                         }}
                       />
@@ -591,7 +591,7 @@ const Step2 = () => {
                         name="Должность"
                         placeholder="Введите должность"
                         onChange={(e) => {
-                          data.list_person[i].account_own_job_title = e.target.value
+                          data.list_persone[i].account_own_job_title = e.target.value
                           setData({ ...data })
                         }}
                       />
@@ -601,7 +601,7 @@ const Step2 = () => {
                       <div
                         className={styles.checks__item}
                         onClick={() => {
-                          data.list_person[i].account_own_gender = "Мужской"
+                          data.list_persone[i].account_own_gender = "Мужской"
                           setData({ ...data })
                         }}
                       >
@@ -611,7 +611,7 @@ const Step2 = () => {
                       <div
                         className={styles.checks__item}
                         onClick={() => {
-                          data.list_person[i].account_own_gender = "Женский"
+                          data.list_persone[i].account_own_gender = "Женский"
                           setData({ ...data })
                         }}
                       >
@@ -629,7 +629,7 @@ const Step2 = () => {
                         mask="999999999999"
                         placeholder="____________"
                         onChange={(e) => {
-                          data.list_person[i].account_onw_inn = e.target.value
+                          data.list_persone[i].account_onw_inn = e.target.value
                           setData({ ...data })
                         }}
                       />
@@ -641,7 +641,7 @@ const Step2 = () => {
                         pattern="[0-9]*"
                         placeholder="Введите СНИЛС"
                         onChange={(e) => {
-                          data.list_person[i].account_own_snils = e.target.value
+                          data.list_persone[i].account_own_snils = e.target.value
                           setData({ ...data })
                         }}
                       />
@@ -657,7 +657,7 @@ const Step2 = () => {
                           message="Введите страну"
                           formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
                           onSelect={(value) => {
-                            data.list_person[i].account_own_citizenship = value?.value ?? ""
+                            data.list_persone[i].account_own_citizenship = value?.value ?? ""
                             setData({ ...data })
                           }}
                         />
@@ -671,7 +671,7 @@ const Step2 = () => {
                           message="Введите страну"
                           formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
                           onSelect={(value) => {
-                            data.list_person[i].account_country_residence = value?.value ?? ""
+                            data.list_persone[i].account_country_residence = value?.value ?? ""
                             setData({ ...data })
                           }}
                         />
@@ -687,7 +687,7 @@ const Step2 = () => {
                           value={p.account_own_phone ?? ""}
                           style={{margin: 0, padding: "20px 16px" }}
                           onChange={(e) => {
-                            data.list_person[i].account_own_phone = e.target.value
+                            data.list_persone[i].account_own_phone = e.target.value
                             setData({ ...data })
                           }}
                         />
@@ -697,7 +697,7 @@ const Step2 = () => {
                         name="Доля владения"
                         placeholder="Доля владения"
                         onChange={(e) => {
-                          data.list_person[i].account_own_piece = e.target.value
+                          data.list_persone[i].account_own_piece = e.target.value
                           setData({ ...data })
                         }}
                       />}
@@ -711,7 +711,7 @@ const Step2 = () => {
                       <YesOrNo 
                         value={p.is_person_a_foreign_public} 
                         toggle={() => {
-                          data.list_person[i].is_person_a_foreign_public = !data.list_person[i].is_person_a_foreign_public
+                          data.list_persone[i].is_person_a_foreign_public = !data.list_persone[i].is_person_a_foreign_public
                           setData({ ...data })
                         }}
                       />
@@ -730,7 +730,7 @@ const Step2 = () => {
                             placeholder="Выбрать статус"
                             options={[{ label: 'Супруг', value: 'Супруг' }, { label: 'Супруга', value: 'Супруга' } ]}
                             onChange={(v) => {
-                              data.list_person[i].assigned_publ_pers_relation = v.label
+                              data.list_persone[i].assigned_publ_pers_relation = v.label
                               setData({ ...data })
                             }}
                           />
@@ -746,7 +746,7 @@ const Step2 = () => {
                           message="Введите адрес"
                           formatedOptions={formatedOptions}
                           onSelect={(v) => {
-                            data.list_person[i].account_own_registration = v.label
+                            data.list_persone[i].account_own_registration = v.label
                             setData({ ...data })
                           }}
                         />
@@ -759,7 +759,7 @@ const Step2 = () => {
                           <div
                             className={styles.checks__item}
                             onClick={() => {
-                              data.list_person[i].accownt_own_living = "Совпадает"
+                              data.list_persone[i].accownt_own_living = "Совпадает"
                               setData({ ...data })
                             }}
                           >
@@ -771,7 +771,7 @@ const Step2 = () => {
                           <div
                             className={styles.checks__item}
                             onClick={() => {
-                              data.list_person[i].accownt_own_living = ""
+                              data.list_persone[i].accownt_own_living = ""
                               setData({ ...data })
                             }}
                           >
@@ -794,7 +794,7 @@ const Step2 = () => {
                             message="Введите адрес"
                             formatedOptions={formatedOptions}
                             onSelect={(v) => {
-                              data.list_person[i].accownt_own_living = v.label
+                              data.list_persone[i].accownt_own_living = v.label
                               setData({ ...data })
                             }}
                           />
@@ -828,7 +828,7 @@ const Step2 = () => {
                         value={p.account_birth_place}
                         placeholder="Введите адрес"
                         onChange={(e) => {
-                          data.list_person[i].account_birth_place = e.target.value
+                          data.list_persone[i].account_birth_place = e.target.value
                           setData({ ...data })
                         }}
                       />
@@ -839,7 +839,7 @@ const Step2 = () => {
                           placeholder="Введите дату"
                           mask="99.99.9999"
                           onChange={(e) => {
-                            data.list_person[i].account_datebirth = e.target.value
+                            data.list_persone[i].account_datebirth = e.target.value
                             setData({ ...data })
                           }}
                           />
@@ -852,7 +852,7 @@ const Step2 = () => {
                         backgroundColor="#F0F2F5"
                         options={identityDocOpts}
                         onChange={(v) => {
-                          data.list_person[i].doc_type = v.label
+                          data.list_persone[i].doc_type = v.label
                           setData({ ...data })
                         }}
                       />
@@ -865,7 +865,7 @@ const Step2 = () => {
                         name="Серия документа, удостоверяющего личность (при наличии)"
                         placeholder="Введите серию документа"
                         onChange={() => {
-                          data.list_person[i].doc_serial = e.target.value
+                          data.list_persone[i].doc_serial = e.target.value
                           setData({ ...data })
                         }}
                       />
@@ -876,7 +876,7 @@ const Step2 = () => {
                         name="Номер документа, удостоверяющего личность"
                         placeholder="Введите номер документа"
                         onChange={() => {
-                          data.list_person[i].doc_number = e.target.value
+                          data.list_persone[i].doc_number = e.target.value
                           setData({ ...data })
                         }}
                       />
@@ -885,7 +885,7 @@ const Step2 = () => {
                         name="Кем выдан"
                         placeholder="Наименование"
                         onChange={() => {
-                          data.list_person[i].issued_by = e.target.value
+                          data.list_persone[i].issued_by = e.target.value
                           setData({ ...data })
                         }}
                       />
@@ -900,7 +900,7 @@ const Step2 = () => {
                         isCode
                         formatedOptions={(list) => list.map((item) => ({ value: item.data.code, label: item.data.code }))}
                         onSelect={(v) => {
-                          data.list_person[i].division_code = v.value
+                          data.list_persone[i].division_code = v.value
                           setData({ ...data })
                         }}
                       />  
@@ -911,7 +911,7 @@ const Step2 = () => {
                           placeholder="Введите дату"
                           mask="99.99.9999"
                           onChange={(e) => {
-                            data.list_person[i].date_issue = e.target.value
+                            data.list_persone[i].date_issue = e.target.value
                             setData({ ...data })
                           }}
                         />
@@ -923,7 +923,7 @@ const Step2 = () => {
                         locale="ru"
                         dateFormat="dd.MM.yyyy"
                         onChange={() => {
-                          data.list_person[i].validity = e.target.value
+                          data.list_persone[i].validity = e.target.value
                           setData({ ...data })
                         }}
                       /> */}
@@ -937,7 +937,7 @@ const Step2 = () => {
             <AddButton
               type="button" 
               onClick={() => {
-                data.list_person.push({
+                data.list_persone.push({
                   accownt_own_living: "Совпадает",
                   account_own_mail: "Совпадает с адресом регистрации",
                   is_person_a_foreign_public: false,
@@ -1238,6 +1238,21 @@ const Step2 = () => {
                   </div>
                 </div>
               </div>
+
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Компания осуществляет деятельность, подлежащую лицензированию
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.mb24}>
+                    <YesOrNo
+                      value={data.subject_licensing}
+                      toggle={() => data.subject_licensing === "Не осуществляет" ? setData({ ...data, subject_licensing: "Осуществляет" }) : setData({ ...data, subject_licensing: "Не осуществляет" })}
+                    />
+                  </div>
+                </div>
+              </div>
+
 
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -1637,6 +1652,150 @@ const Step2 = () => {
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
+                Общее количество операций в неделю
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, num_transactions_week: "0-29" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_week === "0-29"}
+                      />
+                      <p>0-29</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, num_transactions_week: "30-100" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_week === "30-100"}
+                      />
+                      <p>30-100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, num_transactions_week: ">100" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_week === ">100"}
+                      />
+                      <p>более 100</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Общее количество операций в месяц
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, num_transactions_month: "0-29" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_month === "0-29"}
+                      />
+                      <p>0-29</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, num_transactions_month: "30-100" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_month === "30-100"}
+                      />
+                      <p>30-100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, num_transactions_month: ">100" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_month === ">100"}
+                      />
+                      <p>более 100</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Общее количество операций в квартал
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, num_transactions_quarter: "0-29" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_quarter === "0-29"}
+                      />
+                      <p>0-29</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, num_transactions_quarter: "30-100" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_quarter === "30-100"}
+                      />
+                      <p>30-100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, num_transactions_quarter: ">100" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_quarter === ">100"}
+                      />
+                      <p>более 100</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Общее количество операций в год
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, num_transactions_age: "0-29" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_age === "0-29"}
+                      />
+                      <p>0-29</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, num_transactions_age: "30-100" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_age === "30-100"}
+                      />
+                      <p>30-100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, num_transactions_age: ">100" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_age === ">100"}
+                      />
+                      <p>более 100</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
                   Сумма операций по внешнеторговым контрактам в неделю
                 </p>
                 <div className={styles.row}>
@@ -1773,6 +1932,150 @@ const Step2 = () => {
                     >
                       <RadioButtonRS
                         isActive={data.foreign_sum_contracts_age === ">1 000 000"}
+                      />
+                      <p>более 1 000 000 руб.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Общая сумма операций в неделю
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_transactions_week: "0 - 99 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_week === "0 - 99 000"}
+                      />
+                      <p>0 - 99 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_transactions_week: "100 000 - 1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_week === "100 000 - 1 000 000"}
+                      />
+                      <p>100 000 - 1 000 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_transactions_week: ">1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_week === ">1 000 000"}
+                      />
+                      <p>более 1 000 000 руб.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Общая сумма операций в месяц
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_transactions_month: "0 - 99 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_month === "0 - 99 000"}
+                      />
+                      <p>0 - 99 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_transactions_month: "100 000 - 1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_month === "100 000 - 1 000 000"}
+                      />
+                      <p>100 000 - 1 000 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_transactions_month: ">1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_month === ">1 000 000"}
+                      />
+                      <p>более 1 000 000 руб.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Общая сумма операций в квартал
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_transactions_quarter: "0 - 99 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_quarter === "0 - 99 000"}
+                      />
+                      <p>0 - 99 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_transactions_quarter: "100 000 - 1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_quarter === "100 000 - 1 000 000"}
+                      />
+                      <p>100 000 - 1 000 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_transactions_quarter: ">1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_quarter === ">1 000 000"}
+                      />
+                      <p>более 1 000 000 руб.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Общая сумма операций в год
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_transactions_age: "0 - 99 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_age === "0 - 99 000"}
+                      />
+                      <p>0 - 99 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_transactions_age: "100 000 - 1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_age === "100 000 - 1 000 000"}
+                      />
+                      <p>100 000 - 1 000 000 руб.</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => setData({ ...data, sum_transactions_age: ">1 000 000" })}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_age === ">1 000 000"}
                       />
                       <p>более 1 000 000 руб.</p>
                     </div>

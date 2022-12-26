@@ -33,8 +33,8 @@ function App() {
 
     if (phone && !prevSavedData) {
       userApi.getInfo(phone.replace(/\(|\)+|-|\s|/g, "")).then(data => {
-        if (!data.list_person) {
-          data.list_person = [
+        if (!data.list_persone) {
+          data.list_persone = [
             {
               accownt_own_living: "Совпадает",
               account_own_mail: "Совпадает с адресом регистрации",
@@ -87,7 +87,7 @@ function App() {
           data.document_licenses = []
         }
 
-        data.list_person.forEach(p => {
+        data.list_persone.forEach(p => {
           if (p.account_datebirth) {
             p.account_datebirth = new Date(p.account_datebirth)
           }
@@ -132,8 +132,8 @@ function App() {
         if (!prevSavedData.information_counterparties2) {
           prevSavedData.information_counterparties2 = []
         }
-        if (!prevSavedData.list_person) {
-          prevSavedData.list_person = [
+        if (!prevSavedData.list_persone) {
+          prevSavedData.list_persone = [
             {
               accownt_own_living: "Совпадает",
               account_own_mail: "Совпадает с адресом регистрации",
@@ -143,7 +143,7 @@ function App() {
           ]
         }
         
-        prevSavedData.list_person?.forEach(p => {
+        prevSavedData.list_persone?.forEach(p => {
           if (p.account_datebirth) {
             p.account_datebirth = new Date(p.account_datebirth)
           }
