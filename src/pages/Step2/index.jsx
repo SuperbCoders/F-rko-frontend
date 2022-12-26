@@ -1253,7 +1253,6 @@ const Step2 = () => {
                 </div>
               </div>
 
-
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
                   Количество операций по снятию наличности в неделю

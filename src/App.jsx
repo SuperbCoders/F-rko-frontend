@@ -111,6 +111,8 @@ function App() {
           delete prevSavedData.list_supervisoty_board_persone
         }
 
+        delete prevSavedData.is_supervisoty
+
         if (!prevSavedData.planned_operations) {
           prevSavedData.planned_operations = []
         }
