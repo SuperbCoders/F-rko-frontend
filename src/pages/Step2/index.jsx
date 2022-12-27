@@ -11,7 +11,7 @@ import RadioButtonRS from "../../components/RadioButtonRS";
 import AddressItem from "../../components/Step2Components/AdressItem";
 import Input from "../../components/Step2Components/Input";
 import SelectRS from "../../components/Step2Components/SelectRS";
-import { getFormatFile, getSizeMb, ROUTES } from "../../helpers";
+import { dateIsValid, getFormatFile, getSizeMb, ROUTES } from "../../helpers";
 import DateInput from "../../components/Step2Components/DateInput";
 import DocumentItem from "../DocumentItem";
 import ScanOrPhoto from "../../components/Step2Components/ScanOrPhoto";
@@ -124,6 +124,7 @@ const Step2 = () => {
   const [isBeneficiaries, setIsBeneficiaries] = React.useState(false)
   const [disableUI, setDisableUI] = React.useState(false)
   const [customPlannedOper, setCustomPlannedOper] = React.useState({ active: false, value: "" })
+  const [showErrors, setShowErrors] = React.useState(false)
 
   React.useEffect(() => setIsBeneficiaries(data.beneficiaries !== "Отсутствуют"), [data.beneficiaries])
   React.useEffect(() => setCustomPlannedOper({
@@ -287,11 +288,10 @@ const Step2 = () => {
     data.information_counterparties_two.filter((_, i) => i !== idx)
     setData({ ...data })
   }
-  console.log("data", data);
-
 
   const onSubmit = async (e) => {
     e.preventDefault()
+    setShowErrors(true)
     const fields = [ 
       "email",
       "contact_phone_number",
@@ -335,16 +335,118 @@ const Step2 = () => {
     ]
     const arr = fields.reduce((accum, next) => !data[next] || !data[next]?.length ? ([...accum, next]) : accum, [])
     setErroredFields(arr)
-    if (data.information_counterparties_two.every(str => str === "")) {
+
+    if (data.information_counterparties && data.information_counterparties_two.every(str => str === "")) {
       return
     }
-    if (data.addresses.every(a => a.address === "")) {
+    if (data.addresses.length && data.addresses.every(a => a.address === "")) {
       return
     }
-    if (data.founders.every(a => a.capital === "" && a.label === "")) {
+    if (data.founders.length && data.founders.every(a => a.capital === "" && a.label === "")) {
       return
     }
     if (arr.length) {
+      return
+    }
+
+    let isValid = true
+    data.list_persone.every(p => {
+      if (!p?.account_onw_role.length) {
+        isValid = false
+        return false
+      }
+      if (!p.account_own_lastname?.length) {
+        isValid = false
+        return false
+      }
+      if (!p.account_own_name?.length) {
+        isValid = false
+        return false
+      }
+      if (!p.account_own_surname?.length) {
+        isValid = false
+        return false
+      }
+      if (p.account_onw_role?.includes("ЕИО") && !p.account_own_job_title?.length) {
+        isValid = false
+        return false
+      }
+      if (p.account_own_gender !== "Мужской" && p.account_own_gender !== "Женский") {
+        isValid = false
+        return false
+      }
+      if (!/[0-9]+/.test(p.account_onw_inn?.[11])) {
+        isValid = false
+        return false
+      }
+      if (!p.account_own_snils?.length) {
+        isValid = false
+        return false
+      }
+      if (!p.account_own_citizenship?.length) {
+        isValid = false
+        return false
+      }
+      if (!p.account_country_residence?.length) {
+        isValid = false
+        return false
+      }
+      if (!/[0-9]+/.test(p.account_own_phone?.[17])) {
+        isValid = false
+        return false
+      }
+      if (!p.account_own_piece?.length) {
+        isValid = false
+        return false
+      }
+      if (!p.assigned_publ_pers_relation?.length) {
+        isValid = false
+        return false
+      }
+      if (!p.account_own_registration?.length) {
+        isValid = false
+        return false
+      }
+      if (!p.accownt_own_living?.length) {
+        isValid = false
+        return false
+      }
+      if (!p.first_passport_page_url?.file) {
+        isValid = false
+        return false
+      }
+      if (!p.account_birth_place?.length) {
+        isValid = false
+        return false
+      }
+      if (!p.doc_type?.length) {
+        isValid = false
+        return false
+      }
+      if (!p.doc_serial?.length) {
+        isValid = false
+        return false
+      }
+      if (!p.issued_by?.length) {
+        isValid = false
+        return false
+      }
+      if (!p.division_code?.length) {
+        isValid = false
+        return false
+      }
+      if (!dateIsValid(p.date_issue)) {
+        isValid = false
+        return false
+      }
+      if (!dateIsValid(p.account_datebirth)) {
+        isValid = false
+        return false
+      }
+      return true
+    })
+
+    if (!isValid) {
       return
     }
 
@@ -373,12 +475,15 @@ const Step2 = () => {
     }))
 
     setDisableUI(true)
-    await userApi.postInfo(dto, formattedPhone)
-    
-    localStorage.setItem("rko_active_step", 3)
-    localStorage.removeItem("rko_data")
-    setDisableUI(false)
-    navigate(ROUTES.STEP3)
+    try {
+      await userApi.postInfo(dto, formattedPhone)
+      localStorage.setItem("rko_active_step", 3)
+      localStorage.removeItem("rko_data")
+      setDisableUI(false)
+      navigate(ROUTES.STEP3)  
+    } catch (error) {
+      setDisableUI(false)
+    }
   }
 
   return (
@@ -540,7 +645,7 @@ const Step2 = () => {
                     id={idx}
                     type={type_adress}
                     address={address}
-                    error={!address.length}
+                    error={showErrors && !address.length}
                     onSelectType={onSelectAddressType}
                     onSelectAddress={onSelectAddress}
                   /> 
@@ -576,7 +681,7 @@ const Step2 = () => {
                       }}
                     />
                   </div>
-                  {erroredFields.includes("supreme_management_body") && <p className="text-error">Поле не заполнено</p>}
+                  {erroredFields.includes("supreme_management_body") && <p style={{ marginTop: "-23px" }} className="text-error">Поле не заполнено</p>}
 
                 </div>
               </Wrapper>
@@ -642,23 +747,23 @@ const Step2 = () => {
                         backgroundColor="#F0F2F5"
                         name="Учредитель"
                         value={label}
-                        error={!label.length}
+                        error={showErrors &&!label.length}
                         message="Введите Название или ИНН"
                         formatedOptions={(list) => list.map((item) => ({ value: item.data.inn, label: item.data.name.full_with_opf }))}
                         onSelect={onSelectFounderInn(idx)}
                       />
-                    {!label.length && <p className="text-error">Поле не заполнено</p>}
+                    {showErrors &&!label.length && <p style={{ marginTop: "-23px" }} className="text-error">Поле не заполнено</p>}
 
                     </div>
                     <div className={styles.column}>
                       <Input
                         value={capital}
                         maxLength={6}
-                        error={!capital.length}
+                        error={showErrors &&!capital.length}
                         name="Доля в уставном капитале"
                         onChange={onChangeFounderCapital(idx)}
                       />
-                    {!capital.length && <p className="text-error">Поле не заполнено</p>}
+                    {showErrors &&!capital.length && <p style={{ marginTop: "-23px" }} className="text-error">Поле не заполнено</p>}
                     </div>
                     <div style={{ width: "auto", marginTop: "25px" }} className={styles.column}>
                       <DeleteButton onClick={removeFromFounderList(idx)} />
@@ -713,7 +818,7 @@ const Step2 = () => {
                     </div>
                   </div>
                   <div className={styles.mb24}>
-                  {!p.account_onw_role?.length && <p className="text-error">Поле не заполнено</p>}
+                  {showErrors && !p.account_onw_role?.length && <p className="text-error">Поле не заполнено</p>}
                   </div>
 
                   <div className={classNames(styles.row, "bg-grey")}>
@@ -721,43 +826,41 @@ const Step2 = () => {
                     <Input 
                       value={p.account_own_lastname}
                       name="Фамилия"
-                      error={!p.account_own_lastname?.length}
+                      error={showErrors && !p.account_own_lastname?.length}
                       placeholder="Введите Фамилию"
                       onChange={(e) => {
                         data.list_persone[i].account_own_lastname = e.target.value
                         setData({ ...data })
                       }}
                     />
-                    {!p.account_own_lastname?.length && <p className="text-error">Поле не заполнено</p>}
+                    {showErrors && !p.account_own_lastname?.length && <p className="text-error">Поле не заполнено</p>}
 
                     </div>
                     <div>
                     <Input 
                       value={p.account_own_name}
                       name="Имя"
-                      error={!p.account_own_name?.length}
+                      error={showErrors && !p.account_own_name?.length}
                       placeholder="Введите Имя"
                       onChange={(e) => {
                         data.list_persone[i].account_own_name = e.target.value
                         setData({ ...data })
                       }}
                     />
-                    {!p.account_own_name?.length && <p className="text-error">Поле не заполнено</p>}
-
-
+                    {showErrors && !p.account_own_name?.length && <p className="text-error">Поле не заполнено</p>}
                     </div>
                     <div>
                     <Input
                       value={p.account_own_surname}
                       name="Отчество (при наличии)"
                       placeholder={"Введите Отчество"}
-                      error={!p.account_own_surname?.length}
+                      error={showErrors && !p.account_own_surname?.length}
                       onChange={(e) => {
                         data.list_persone[i].account_own_surname = e.target.value
                         setData({ ...data })
                       }}
                     />
-                    {!p.account_own_surname?.length && <p className="text-error">Поле не заполнено</p>}
+                    {showErrors && !p.account_own_surname?.length && <p className="text-error">Поле не заполнено</p>}
 
                     </div>
                   </div>
@@ -767,18 +870,19 @@ const Step2 = () => {
                         value={p.account_own_job_title}
                         name="Должность"
                         placeholder="Введите должность"
-                        error={!p.account_own_job_title?.length}
+                        error={showErrors && !p.account_own_job_title?.length}
                         onChange={(e) => {
                           data.list_persone[i].account_own_job_title = e.target.value
                           setData({ ...data })
                         }}
                       />
+                      {showErrors && !p.account_own_job_title?.length && 
+                      <div className={styles.mb24} style={{ marginTop: "-24px" }}>
+                      <p className="text-error">Поле не заполнено</p>
+                      </div>
+                      }
+
                   </div>}
-                  {!p.account_own_job_title?.length && 
-                  <div className={styles.mb24} style={{ marginTop: "-24px" }}>
-                  <p className="text-error">Поле не заполнено</p>
-                  </div>
-                  }
                   <div className={styles.checks}>
                     <p className={styles.checks__item}>Пол</p>
                     <div
@@ -802,16 +906,16 @@ const Step2 = () => {
                       <p>Женский</p>
                     </div>
                   </div>
-                  {p.account_own_gender === "Мужской" && p.account_own_gender === "Женский" && <p className="text-error">Поле не заполнено</p>}
+                  {showErrors && p.account_own_gender !== "Мужской" && p.account_own_gender !== "Женский" && <p className="text-error label">Поле не заполнено</p>}
 
                   <div className={classNames(styles.row, "bg-grey")}>
                     <div style={{ maxWidth: "calc(50% - 12px)" }} className={styles.input__wrapper}>
                       <p className={styles.name}>ИНН</p>
                       <MaskedInput
-                        value={p.account_onw_inn}
+                        value={p.account_onw_inn ?? ""}
                         name="ИНН" 
                         maskChar="_"
-                        error={!p.account_onw_inn?.length}
+                        error={showErrors && !/[0-9]+/.test(p.account_onw_inn?.[11])}
                         mask="999999999999"
                         placeholder="____________"
                         onChange={(e) => {
@@ -819,7 +923,7 @@ const Step2 = () => {
                           setData({ ...data })
                         }}
                       />
-                    {!p.account_onw_inn?.length && <p className="text-error">Поле не заполнено</p>}
+                    {showErrors && !/[0-9]+/.test(p.account_onw_inn?.[11]) && <p className="text-error">Поле не заполнено</p>}
                     </div>
                     <div>
                     <Input
@@ -827,14 +931,14 @@ const Step2 = () => {
                       name="СНИЛС (при наличии)"
                       type="number"
                       pattern="[0-9]*"
-                      error={!p.account_own_snils?.length}
+                      error={showErrors && !p.account_own_snils?.length}
                       placeholder="Введите СНИЛС"
                       onChange={(e) => {
                         data.list_persone[i].account_own_snils = e.target.value
                         setData({ ...data })
                       }}
                     />
-                    {!p.account_own_snils?.length && <p className="text-error">Поле не заполнено</p>}
+                    {showErrors && !p.account_own_snils?.length && <p className="text-error">Поле не заполнено</p>}
 
                     </div>
                   </div>
@@ -846,7 +950,7 @@ const Step2 = () => {
                         name="Гражданство"
                         isCountries
                         value={p.account_own_citizenship}
-                        error={!p.account_own_citizenship?.length}
+                        error={showErrors && !p.account_own_citizenship?.length}
                         message="Введите страну"
                         formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
                         onSelect={(value) => {
@@ -854,7 +958,7 @@ const Step2 = () => {
                           setData({ ...data })
                         }}
                       />
-                      {!p.account_own_citizenship?.length && <p style={{ marginTop: "-24px" }} className="text-error">Поле не заполнено</p>}
+                      {showErrors && !p.account_own_citizenship?.length && <p style={{ marginTop: "-24px" }} className="text-error">Поле не заполнено</p>}
                     </div>
                     <div className={styles.column}>
                       <DaDataSelect 
@@ -862,7 +966,7 @@ const Step2 = () => {
                         name="Страна проживания"
                         isCountries
                         value={p.account_country_residence}
-                        error={!p.account_country_residence?.length}
+                        error={showErrors && !p.account_country_residence?.length}
                         message="Введите страну"
                         formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
                         onSelect={(value) => {
@@ -870,7 +974,7 @@ const Step2 = () => {
                           setData({ ...data })
                         }}
                       />
-                      {!p.account_country_residence?.length && <p style={{ marginTop: "-24px" }} className="text-error">Поле не заполнено</p>}
+                      {showErrors && !p.account_country_residence?.length && <p style={{ marginTop: "-24px" }} className="text-error">Поле не заполнено</p>}
 
                     </div>
                   </div>
@@ -881,6 +985,7 @@ const Step2 = () => {
                         mask="+7 (999) 999 99 99"
                         maskChar="_"
                         placeholder="+7 (__) ___ __ __"
+                        error={showErrors && !/[0-9]+/.test(p.account_own_phone?.[17])}
                         value={p.account_own_phone ?? ""}
                         style={{margin: 0, padding: "20px 16px" }}
                         onChange={(e) => {
@@ -888,6 +993,7 @@ const Step2 = () => {
                           setData({ ...data })
                         }}
                       />
+                      {showErrors && !/[0-9]+/.test(p.account_own_phone?.[17]) && <p className="text-error">Поле заполнено некорректно</p>}
                     </div>
                     {p.account_onw_role?.includes("Акционер/учредитель") && 
                       <div>
@@ -895,14 +1001,14 @@ const Step2 = () => {
                         value={p.account_own_piece}
                         name="Доля владения"
                         placeholder="Доля владения"
-                        error={!p.account_own_phone?.length}
+                        error={showErrors && !p.account_own_piece?.length}
                         onChange={(e) => {
                           data.list_persone[i].account_own_piece = e.target.value
                           setData({ ...data })
                         }}
                       />
                       <div className={styles.mb24}>
-                      {!p.account_own_phone?.length && <p className="text-error">Поле не заполнено</p>}
+                      {!p.account_own_piece?.length && <p className="text-error">Поле не заполнено</p>}
                       </div>
   
                       </div>
@@ -933,6 +1039,7 @@ const Step2 = () => {
                           nameStyles={{ color: "#8E909B", fontSize: "14px", marginBottom: "8px" }}
                           value={{ value: p.assigned_publ_pers_relation, label: p.assigned_publ_pers_relation }}
                           name="Выбрать статус"
+                          error={showErrors && !p.assigned_publ_pers_relation?.length}
                           placeholder="Выбрать статус"
                           options={[{ label: 'Супруг', value: 'Супруг' }, { label: 'Супруга', value: 'Супруга' } ]}
                           onChange={(v) => {
@@ -942,6 +1049,7 @@ const Step2 = () => {
                         />
                       </div>
                     </div>
+                    {showErrors && !p.assigned_publ_pers_relation?.length && <p style={{ marginTop: "-23px", marginBottom: "23px" }} className="text-error">Поле не заполнено</p>}
                   </div>
                   <div className={classNames(styles.row, "bg-grey")}>
                     <div className={styles.column}>
@@ -950,6 +1058,7 @@ const Step2 = () => {
                         name="Адрес регистрации"
                         value={p.account_own_registration}
                         isAddr={true}
+                        error={showErrors && !p.account_own_registration?.length}
                         message="Введите адрес"
                         formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
                         onSelect={(v) => {
@@ -959,6 +1068,7 @@ const Step2 = () => {
                       />
                     </div>
                   </div>
+                  {showErrors && !p.account_own_registration?.length && <p className="text-error label">Поле не заполнено</p>}
                   <div>
                     <p className={styles.mb24}>Адрес местонахождения</p>
                     <div className={styles.row}>
@@ -987,11 +1097,12 @@ const Step2 = () => {
                           />
                           <p>Не совпадает с адресом регистрации</p>
                         </div>
-  
                       </div>
                     </div>
+                    {showErrors && p.accownt_own_living === null && <p className="text-error label">Поле не заполнено</p>}
                   </div>
                   {p.accownt_own_living !== "Совпадает" && 
+                    <div>
                     <div className={classNames(styles.row, "bg-grey")}>
                       <div className={styles.column}>
                         <DaDataSelect 
@@ -999,6 +1110,7 @@ const Step2 = () => {
                           name="Адрес местонахождения"
                           value={p.accownt_own_living}
                           message="Введите адрес"
+                          error={showErrors && !p.accownt_own_living?.length}
                           formatedOptions={formatedOptions}
                           onSelect={(v) => {
                             data.list_persone[i].accownt_own_living = v?.label ?? ""
@@ -1006,7 +1118,10 @@ const Step2 = () => {
                           }}
                         />
                       </div>
-                    </div>}
+                    </div>
+                    {showErrors && !p.account_own_registration?.length && <p className="text-error label">Поле не заполнено</p>}
+                    </div>
+                    }
                   <div className={styles.mb24}>
                     <p className={styles.mb24}>
                       Загрузить первую страницу паспорта
@@ -1028,13 +1143,16 @@ const Step2 = () => {
                     <DownloadButton 
                       addFile={getPassportPageUrl(i)}
                     />
+                    {showErrors && !p.first_passport_page_url?.file && <p className="text-error">Поле не заполнено</p>}
                   </div>
                   <div className={classNames(styles.row, "bg-grey", "form")}>
+                    <div>
                     <DaDataSelect
                       backgroundColor="#F0F2F5"
                       name="Место рождения"
                       value={p.account_birth_place}
                       message="Введите адрес"
+                      error={showErrors && !p.account_birth_place?.length}
                       isAddr={true}
                       formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
                       onSelect={(v) => {
@@ -1042,18 +1160,23 @@ const Step2 = () => {
                         setData({ ...data })
                       }}
                     />
+                    {showErrors && !p.account_birth_place?.length && <p className="text-error">Поле не заполнено</p>}
+                    </div>
                     <div className={styles.input__wrapper}>
                       <p className={styles.name}>Дата рождения</p>
                       <MaskedInput 
                         value={p.account_datebirth}
                         placeholder="Введите дату"
                         mask="99.99.9999"
+                        error={showErrors && !dateIsValid(p.account_datebirth)}
                         onChange={(e) => {
                           data.list_persone[i].account_datebirth = e.target.value
                           setData({ ...data })
                         }}
                         />
+                    {showErrors && !dateIsValid(p.account_datebirth) && <p className="text-error">Поле заполнено некорректно</p>}
                     </div>
+                    <div>
                     <SelectRS
                       value={{ label: p.doc_type, value: p.doc_type }}
                       name="Тип документа, удостоверяющего личность"
@@ -1061,17 +1184,22 @@ const Step2 = () => {
                       placeholder="Выберите тип"
                       backgroundColor="#F0F2F5"
                       options={identityDocOpts}
+                      error={showErrors && !p.doc_type?.length}
                       onChange={(v) => {
                         data.list_persone[i].doc_type = v?.label ?? ""
                         setData({ ...data })
                       }}
                     />
+                    {showErrors && !p.doc_type?.length && <p className="text-error">Поле не заполнено</p>}
+                    </div>
                   </div>
                   <div className={classNames(styles.row, "bg-grey", "form")}>
+                    <div>
                     <Input
                       value={p.doc_serial}
                       type="number"
                       pattern="[0-9]*"
+                      error={showErrors && !p.doc_serial?.length}
                       name="Серия документа, удостоверяющего личность (при наличии)"
                       placeholder="Введите серию документа"
                       onChange={(e) => {
@@ -1079,10 +1207,14 @@ const Step2 = () => {
                         setData({ ...data })
                       }}
                     />
+                    {showErrors && !p.doc_serial?.length && <p className="text-error">Поле не заполнено</p>}
+                    </div>
+                    <div>
                     <Input
                       value={p.doc_number}
                       type="number"
                       pattern="[0-9]*"
+                      error={showErrors && !p.doc_number?.length}
                       name="Номер документа, удостоверяющего личность"
                       placeholder="Введите номер документа"
                       onChange={(e) => {
@@ -1090,23 +1222,31 @@ const Step2 = () => {
                         setData({ ...data })
                       }}
                     />
+                    {showErrors && !p.doc_number?.length && <p className="text-error">Поле не заполнено</p>}
+                    </div>
+                    <div>
                     <Input 
                       value={p.issued_by}
                       name="Кем выдан"
                       placeholder="Наименование"
+                      error={showErrors && !p.issued_by?.length}
                       onChange={(e) => {
                         data.list_persone[i].issued_by = e.target.value
                         setData({ ...data })
                       }}
                     />
+                    {showErrors && !p.issued_by?.length && <p className="text-error">Поле не заполнено</p>}
+
+                    </div>
                   </div>
                   <div className={classNames(styles.row, "bg-grey", "form")}>
-
-                    <DaDataSelect 
+                      <div>
+                      <DaDataSelect 
                       backgroundColor="#F0F2F5"
                       name="Код подразделения (при наличии)"
                       value={p.division_code}
                       message="Введите код"
+                      error={showErrors && !p.division_code?.length}
                       isCode
                       formatedOptions={(list) => list.map((item) => ({ value: item.data.code, label: item.data.code }))}
                       onSelect={(v) => {
@@ -1114,10 +1254,13 @@ const Step2 = () => {
                         setData({ ...data })
                       }}
                     />  
+                    {showErrors && !p.division_code?.length && <p className="text-error">Поле не заполнено</p>}
+                    </div>
                     <div className={styles.input__wrapper}>
                       <p className={styles.name}>Дата выдачи</p>
                       <MaskedInput 
                         value={p.date_issue}
+                        error={showErrors && !dateIsValid(p.date_issue)}
                         placeholder="Введите дату"
                         mask="99.99.9999"
                         onChange={(e) => {
@@ -1125,6 +1268,7 @@ const Step2 = () => {
                           setData({ ...data })
                         }}
                       />
+                    {showErrors && !dateIsValid(p.date_issue) && <p className="text-error">Поле заполнено некорректно</p>}
                     </div>
 
                     {/* <DateInput 

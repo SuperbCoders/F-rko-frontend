@@ -63,7 +63,7 @@ const AddressItem = ({ id, type, address, error=false, onSelectType, onSelectAdd
       </div>
 
       <div style={{ width: "100%" }} className={styles.mb24}>
-      {error && <p className="text-error">Поле не заполнено</p>}
+      {error && <p className="text-error label">Поле не заполнено</p>}
       </div>
     </>
   );
