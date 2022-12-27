@@ -6,7 +6,6 @@ export const initData = {
     {
       accownt_own_living: "Совпадает",
       account_own_mail: "Совпадает с адресом регистрации",
-      is_person_a_foreign_public: false,
       roles: []
     },
   ],

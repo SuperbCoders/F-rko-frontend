@@ -1,10 +1,10 @@
 import React from 'react';
 import styles from "./styles.module.scss";
 
-const AddButton = (props) => {
+const AddButton = ({ text="Добавить", ...props }) => {
   return (
     <button className={styles.button_add} {...props}>
-      <p>Добавить</p>
+      <p>{text}</p>
       <span className={styles.icon}>
         <svg
           width="24"

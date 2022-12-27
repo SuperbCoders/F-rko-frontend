@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from "./styles.module.scss";
 
-const DeleteButton = (props) => {
+const DeleteButton = ({ text="Удалить", ...props }) => {
   return (
     <div className={styles.delete_button} {...props}>
       <div className={styles.icon}>
@@ -42,7 +42,7 @@ const DeleteButton = (props) => {
           />
         </svg>
       </div>
-      <p>Удалить</p>
+      <p>{text}</p>
     </div>
   );
 };

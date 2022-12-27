@@ -61,19 +61,12 @@ const Step2 = () => {
   ]
 
   const cash_source = [
-    'Средства, полученные в рамках осуществляемой хозяйственной деятельности',
-    'Собственные средства',
-    'Заемные средства (займы от третьих лиц, учредителей и т.д)',
-    'Иные', 
-  ]
-
-  const account_operations = [
-    'Дистанционное банковское обслуживание',
-    'Внешнеэкономические операции',
-    'Интернет-эквайринг',
-    'Кредитование',
-    'Торговый эквайринг',
-    'Переводы СБП (c2b)',
+    "Финансирование учредителей/участников",
+    "Доходы от основного вида деятельности",
+    "Доходы от дополнительных видов деятельности",
+    "Заемные (кредитные)/привлеченные денежные средства",
+    "Государственное финансирование",
+    "Иное",
   ]
 
   const roles = [
@@ -109,6 +102,13 @@ const Step2 = () => {
       value: "Иные документы, признаваемые документами, удостоверяющими личность гражданина РФ в соответствии с законодательством РФ (Код 28)",
       label: "Иные документы, признаваемые документами, удостоверяющими личность гражданина РФ в соответствии с законодательством РФ (Код 28)"
     },
+  ]
+
+  const headcounts = [
+    "Единственным работником является единоличный исполнительный орган",
+    "2-5",
+    "6-20",
+    "Более 20",
   ]
 
   const formatedOptions = (list) => list.map((item) => ({ value: item.data.address.unrestricted_value, label: item.data.address.unrestricted_value }))
@@ -184,21 +184,21 @@ const Step2 = () => {
     }
   }
 
-  const getPassportPageUrl = (i) => (file) => {
-    const fd = new FormData();
-    fd.append("documents", file)
-    documentApi.upload(fd).then(res => {
-      data.list_persone[i].first_passport_page_url = { path: res.images[0]?.path, file }
-      setData({ ...data })
-    })
-  }
+  // const getPassportPageUrl = (i) => (file) => {
+  //   const fd = new FormData();
+  //   fd.append("documents", file)
+  //   documentApi.upload(fd).then(res => {
+  //     data.list_persone[i].first_passport_page_url = { path: res.images[0]?.path, file }
+  //     setData({ ...data })
+  //   })
+  // }
 
   const getIdentityDocUrl = (file) => {
     const fd = new FormData();
     fd.append("documents", file)
 
-    documentApi.upload({ data: fd }).then(res => {
-      data.document_certifying_identity_executive.push({ path: res.images[0]?.path, file })
+    documentApi.upload(fd).then(res => {
+      data.document_certifying_identity_executive.push({ path: res.images[0]?.path, file, size: getSizeMb(file.size) })
       setData({ ...data })
       setErroredFields(p => p.filter(f => f !== "document_certifying_identity_executive"))
     })
@@ -207,8 +207,8 @@ const Step2 = () => {
     const fd = new FormData();
     fd.append("documents", file)
 
-    documentApi.upload({ data: fd }).then(res => {
-      data.document_confirming_real_activity.push({ path: res.images[0]?.path, file: file })
+    documentApi.upload(fd).then(res => {
+      data.document_confirming_real_activity.push({ path: res.images[0]?.path, file: file, size: getSizeMb(file.size) })
       setData({ ...data })
       setErroredFields(p => p.filter(f => f !== "document_confirming_real_activity"))
     })
@@ -218,8 +218,8 @@ const Step2 = () => {
     const fd = new FormData();
     fd.append("documents", file)
 
-    documentApi.upload({ data: fd }).then(res => {
-      data.document_licenses.push({ path: res.images[0]?.path, file: file })
+    documentApi.upload(fd).then(res => {
+      data.document_licenses.push({ path: res.images[0]?.path, file: file, size: getSizeMb(file.size) })
       setData({ ...data })
       setErroredFields(p => p.filter(f => f !== "document_licenses"))
     })  
@@ -294,6 +294,7 @@ const Step2 = () => {
     setShowErrors(true)
     const fields = [ 
       "email",
+      "codeword",
       "contact_phone_number",
       "planned_operations",
       "donaninname",
@@ -304,7 +305,6 @@ const Step2 = () => {
       "document_certifying_identity_executive",
       "document_confirming_real_activity",
       "document_licenses",
-      "account_operations",
       "history_reputation",
       "week_cash_withdrawal",
       "quarter_cash_withdrawal",
@@ -345,6 +345,9 @@ const Step2 = () => {
     if (data.founders.length && data.founders.every(a => a.capital === "" && a.label === "")) {
       return
     }
+    if (!data.donaninname.includes("https://") || !data.donaninname.includes("www.")) {
+      return
+    }
     if (arr.length) {
       return
     }
@@ -379,10 +382,6 @@ const Step2 = () => {
         isValid = false
         return false
       }
-      if (!p.account_own_snils?.length) {
-        isValid = false
-        return false
-      }
       if (!p.account_own_citizenship?.length) {
         isValid = false
         return false
@@ -395,11 +394,11 @@ const Step2 = () => {
         isValid = false
         return false
       }
-      if (!p.account_own_piece?.length) {
+      if (!/[a-z0-9]+@[a-z]+\.[a-z]{2,6}/.test(p.email)) {
         isValid = false
         return false
       }
-      if (!p.assigned_publ_pers_relation?.length) {
+      if (!p.account_own_piece?.length) {
         isValid = false
         return false
       }
@@ -408,10 +407,6 @@ const Step2 = () => {
         return false
       }
       if (!p.accownt_own_living?.length) {
-        isValid = false
-        return false
-      }
-      if (!p.first_passport_page_url?.file) {
         isValid = false
         return false
       }
@@ -471,7 +466,7 @@ const Step2 = () => {
     dto.list_persone.map(p => ({
       ...p,
       accownt_own_living: p.accownt_own_living === "Совпадает" ? p.account_own_registration : p.accownt_own_living,
-      first_passport_page_url: p.first_passport_page_url?.path
+      // first_passport_page_url: p.first_passport_page_url?.path
     }))
 
     setDisableUI(true)
@@ -577,7 +572,6 @@ const Step2 = () => {
                       }}
                     />
                       {erroredFields.includes("email") && <p className="text-error">Поле заполнено некорректно</p>}
-
                   </div>
                   <div className={styles.input__wrapper}>
                     <p className={styles.name}>Телефон</p>
@@ -603,11 +597,11 @@ const Step2 = () => {
                     <p className={styles.name}>Сайт компании</p>
                     <MaskedInput
                       // mask="https://d{2}"
-                      placeholder="https://"
-                      value={data.donaninname ?? "https://"}
+                      placeholder="www."
+                      value={data?.donaninname ?? "www."}
                       error={erroredFields.includes("donaninname")}
                       onChange={(e) => {
-                        !e.target.value
+                        !e.target.value.includes("https://") || !e.target.value.includes("www.")
                         ? setErroredFields(prev => ([...prev, "donaninname"]))
                         : setErroredFields(prev => prev.filter(f => f !== "donaninname"))
                         setData({ ...data, donaninname: e.target.value}) 
@@ -659,7 +653,7 @@ const Step2 = () => {
               </div>
             </Wrapper>
           </div>
-          {info?.opf?.full !== "Индивидуальный предприниматель" && info?.opf?.code !== "50102" && 
+          {info?.opf?.full?.includes("ИП") && info?.opf?.code !== "50102" && 
             <div className={styles.mb40}>
               <Wrapper
                 headElement={<p className={styles.title_block}>Структура органов управления</p>}
@@ -735,7 +729,7 @@ const Step2 = () => {
             </Wrapper>
           </div>
 
-          {info?.opf?.full !== "Индивидуальный предприниматель" && info?.opf?.code !== "50102" && <div className={styles.mb40}>
+          {info?.opf?.full.includes("ИП") && info?.opf?.code !== "50102" && <div className={styles.mb40}>
             <Wrapper
               headElement={<p className={styles.title_block}>Учредители – юридические лица</p>}
             >
@@ -785,16 +779,7 @@ const Step2 = () => {
               headElement={<p className={styles.title_block}>Сведения о физических лицах организации</p>}
             >
               {data.list_persone?.map((p, i) => 
-                <div key={i}>
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <p style={{ margin: 0 }} className={styles.title_block}>{i + 1}</p>
-                    <DeleteButton onClick={() => {
-                        data.list_persone = data.list_persone.filter((_, idx) => idx !== i)
-                        setData({ ...data })
-                      }} 
-                    />
-                  </div>
-
+                <div key={i} className={styles.mb24}>
                   <p className={styles.mb24}>Роль лица</p>
                   <div className={styles.row}>
                     <div className={styles.checks}>
@@ -881,8 +866,24 @@ const Step2 = () => {
                       <p className="text-error">Поле не заполнено</p>
                       </div>
                       }
-
                   </div>}
+                  {p.account_onw_role?.includes("Акционер/учредитель") && 
+                      <div>
+                      <Input 
+                        value={p.account_own_piece}
+                        name="Доля владения"
+                        placeholder="Доля владения"
+                        error={showErrors && !p.account_own_piece?.length}
+                        onChange={(e) => {
+                          data.list_persone[i].account_own_piece = e.target.value
+                          setData({ ...data })
+                        }}
+                      />
+                      <div className={styles.mb24}>
+                      {!p.account_own_piece?.length && <p className="text-error">Поле не заполнено</p>}
+                      </div>
+                      </div>
+                    }
                   <div className={styles.checks}>
                     <p className={styles.checks__item}>Пол</p>
                     <div
@@ -923,23 +924,7 @@ const Step2 = () => {
                           setData({ ...data })
                         }}
                       />
-                    {showErrors && !/[0-9]+/.test(p.account_onw_inn?.[11]) && <p className="text-error">Поле не заполнено</p>}
-                    </div>
-                    <div>
-                    <Input
-                      value={p.account_own_snils}
-                      name="СНИЛС (при наличии)"
-                      type="number"
-                      pattern="[0-9]*"
-                      error={showErrors && !p.account_own_snils?.length}
-                      placeholder="Введите СНИЛС"
-                      onChange={(e) => {
-                        data.list_persone[i].account_own_snils = e.target.value
-                        setData({ ...data })
-                      }}
-                    />
-                    {showErrors && !p.account_own_snils?.length && <p className="text-error">Поле не заполнено</p>}
-
+                      {showErrors && !/[0-9]+/.test(p.account_onw_inn?.[11]) && <p className="text-error">Поле заполнено некорректно</p>}
                     </div>
                   </div>
 
@@ -995,61 +980,21 @@ const Step2 = () => {
                       />
                       {showErrors && !/[0-9]+/.test(p.account_own_phone?.[17]) && <p className="text-error">Поле заполнено некорректно</p>}
                     </div>
-                    {p.account_onw_role?.includes("Акционер/учредитель") && 
-                      <div>
-                      <Input 
-                        value={p.account_own_piece}
-                        name="Доля владения"
-                        placeholder="Доля владения"
-                        error={showErrors && !p.account_own_piece?.length}
+
+                    <div className={styles.input__wrapper}>
+                      <p className={styles.name}>E-mail</p>
+                      <MaskedInput
+                        // mask="*@*.com"
+                        placeholder="pochta@server.com"
+                        error={showErrors && !/[a-z0-9]+@[a-z]+\.[a-z]{2,6}/.test(p.email)}
+                        value={p?.email ?? ""}
                         onChange={(e) => {
-                          data.list_persone[i].account_own_piece = e.target.value
+                          data.list_persone[i].email = e.target.value
                           setData({ ...data })
                         }}
                       />
-                      <div className={styles.mb24}>
-                      {!p.account_own_piece?.length && <p className="text-error">Поле не заполнено</p>}
-                      </div>
-  
-                      </div>
-                    }
-                  </div>
-                  <div className={styles.mb24}>
-                    <p className={classNames(styles.mb24)}>
-                      Является ли лицо иностранным публичным должностным лицом либо
-                      лицом, связанным с таковым родственными, партнерскими или
-                      иными отношениями?
-                    </p>
-                    <YesOrNo 
-                      value={p.is_person_a_foreign_public} 
-                      toggle={() => {
-                        data.list_persone[i].is_person_a_foreign_public = !data.list_persone[i].is_person_a_foreign_public
-                        setData({ ...data })
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <p className={styles.mb24}>
-                      Степень родства либо статус (супруг или супруга) по отношению
-                      к публичному должностному лицу
-                    </p>
-                    <div className={styles.row}>
-                      <div className={styles.column}>
-                        <SelectRS
-                          nameStyles={{ color: "#8E909B", fontSize: "14px", marginBottom: "8px" }}
-                          value={{ value: p.assigned_publ_pers_relation, label: p.assigned_publ_pers_relation }}
-                          name="Выбрать статус"
-                          error={showErrors && !p.assigned_publ_pers_relation?.length}
-                          placeholder="Выбрать статус"
-                          options={[{ label: 'Супруг', value: 'Супруг' }, { label: 'Супруга', value: 'Супруга' } ]}
-                          onChange={(v) => {
-                            data.list_persone[i].assigned_publ_pers_relation = v?.label ?? ""
-                            setData({ ...data })
-                          }}
-                        />
-                      </div>
+                        {showErrors && !/[a-z0-9]+@[a-z]+\.[a-z]{2,6}/.test(p.email) && <p className="text-error">Поле заполнено некорректно</p>}
                     </div>
-                    {showErrors && !p.assigned_publ_pers_relation?.length && <p style={{ marginTop: "-23px", marginBottom: "23px" }} className="text-error">Поле не заполнено</p>}
                   </div>
                   <div className={classNames(styles.row, "bg-grey")}>
                     <div className={styles.column}>
@@ -1122,41 +1067,15 @@ const Step2 = () => {
                     {showErrors && !p.account_own_registration?.length && <p className="text-error label">Поле не заполнено</p>}
                     </div>
                     }
-                  <div className={styles.mb24}>
-                    <p className={styles.mb24}>
-                      Загрузить первую страницу паспорта
-                    </p>
-                    {p.first_passport_page_url?.file &&
-                      <div className={styles.mb24}>
-                        <div className={styles.download__item}>
-                          <div className={styles.icon}>
-                            <p className={styles.format}>
-                              {getFormatFile(p.first_passport_page_url?.file?.name ?? p.first_passport_page_url?.path)}
-                            </p>
-                            <p className={styles.size}>
-                              {getSizeMb(p.first_passport_page_url?.file?.size)}
-                            </p>
-                          </div>
-                          <p className={styles.name}>{p.first_passport_page_url?.file?.name ?? p.first_passport_page_url?.path}</p>
-                        </div>
-                      </div>}
-                    <DownloadButton 
-                      addFile={getPassportPageUrl(i)}
-                    />
-                    {showErrors && !p.first_passport_page_url?.file && <p className="text-error">Поле не заполнено</p>}
-                  </div>
                   <div className={classNames(styles.row, "bg-grey", "form")}>
                     <div>
-                    <DaDataSelect
-                      backgroundColor="#F0F2F5"
+                    <Input
                       name="Место рождения"
                       value={p.account_birth_place}
-                      message="Введите адрес"
+                      placeholder="Введите адрес"
                       error={showErrors && !p.account_birth_place?.length}
-                      isAddr={true}
-                      formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
-                      onSelect={(v) => {
-                        data.list_persone[i].account_birth_place = v?.label ?? ""
+                      onChange={(e) => {
+                        data.list_persone[i].account_birth_place = e.target.value
                         setData({ ...data })
                       }}
                     />
@@ -1243,7 +1162,7 @@ const Step2 = () => {
                       <div>
                       <DaDataSelect 
                       backgroundColor="#F0F2F5"
-                      name="Код подразделения (при наличии)"
+                      name="Код подразделения"
                       value={p.division_code}
                       message="Введите код"
                       error={showErrors && !p.division_code?.length}
@@ -1270,18 +1189,14 @@ const Step2 = () => {
                       />
                     {showErrors && !dateIsValid(p.date_issue) && <p className="text-error">Поле заполнено некорректно</p>}
                     </div>
-
-                    {/* <DateInput 
-                      value={p.validity}
-                      name="Срок действия"
-                      locale="ru"
-                      dateFormat="dd.MM.yyyy"
-                      onChange={() => {
-                        data.list_persone[i].validity = e.target.value
-                        setData({ ...data })
-                      }}
-                    /> */}
                   </div>
+                  <DeleteButton 
+                      text="Удалить физлицо"
+                      onClick={() => {
+                        data.list_persone = data.list_persone.filter((_, idx) => idx !== i)
+                        setData({ ...data })
+                      }} 
+                    />
                 </div>
               )}
             </Wrapper>
@@ -1289,12 +1204,12 @@ const Step2 = () => {
 
           <div className={styles.mb40}>
             <AddButton
+              text="Добавить физлицо"
               type="button" 
               onClick={() => {
                 data.list_persone.push({
                   accownt_own_living: "Совпадает",
                   account_own_mail: "Совпадает с адресом регистрации",
-                  is_person_a_foreign_public: false,
                   roles: []
                 })
 
@@ -1322,10 +1237,10 @@ const Step2 = () => {
                               {getFormatFile(l?.file?.name ?? l.path)}
                             </p>
                             <p className={styles.size}>
-                              {getSizeMb(l.file.size)}
+                              {l.size}
                             </p>
                           </div>
-                          <p className={styles.name}>{l?.file?.name ?? l.path}</p>
+                          <p className={styles.name}>{l?.file?.name ?? l.path?.replace("/media/documents/", "")}</p>
                         </div>)}
                     </div>}
                     {erroredFields.includes("document_certifying_identity_executive") && <p className="text-error">Поле не заполнено</p>}
@@ -1349,10 +1264,10 @@ const Step2 = () => {
                               {getFormatFile(l?.file?.name ?? l.path)}
                             </p>
                             <p className={styles.size}>
-                              {getSizeMb(l.file.size)}
+                              {l.size}
                             </p>
                           </div>
-                          <p className={styles.name}>{l?.file?.name ?? l.path}</p>
+                          <p className={styles.name}>{l?.file?.name ?? l.path?.replace("/media/documents/", "")}</p>
                         </div>)}
                     </div>}
                     {erroredFields.includes("document_confirming_real_activity") && <p className="text-error">Поле не заполнено</p>}
@@ -1375,10 +1290,10 @@ const Step2 = () => {
                               {getFormatFile(l?.file?.name ?? l.path)}
                             </p>
                             <p className={styles.size}>
-                              {getSizeMb(l.file.size)}
+                              {l.size}
                             </p>
                           </div>
-                          <p className={styles.name}>{l?.file?.name ?? l.path}</p>
+                          <p className={styles.name}>{l?.file?.name ?? l.path?.replace("/media/documents/", "")}</p>
                         </div>)}
                     </div>}
                     {erroredFields.includes("document_licenses") && <p className="text-error">Поле не заполнено</p>}
@@ -1542,701 +1457,76 @@ const Step2 = () => {
                 </p>
               }
             >
-              <div className={styles.row}>
-                <div className={styles.checks}>
-                  <div
-                    className={styles.checks__item}
-                    onClick={() => {
-                      setData({ ...data, account_operations: account_operations[0] })
-                      setErroredFields(p => p.filter(f => f !== "account_operations"))
-                    } 
-                  }
-                  >
-                    <RadioButtonRS 
-                      isActive={data.account_operations === account_operations[0]} 
-                    />
-                    <p>{account_operations[0]}</p>
-                  </div>
-                  <div
-                    className={styles.checks__item}
-                    onClick={() => {
-                      setData({ ...data, account_operations: account_operations[1] })
-                      setErroredFields(p => p.filter(f => f !== "account_operations"))
-                    }}
-                  >
-                    <RadioButtonRS 
-                      isActive={data.account_operations === account_operations[1]} 
-                    />
-                    <p>{account_operations[1]}</p>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.row}>
-                <div className={styles.checks}>
-                  <div
-                    className={styles.checks__item}
-                    onClick={() => {
-                      setData({ ...data, account_operations: account_operations[2] })
-                      setErroredFields(p => p.filter(f => f !== "account_operations"))
-                    }}
-                  >
-                    <RadioButtonRS 
-                      isActive={data.account_operations === account_operations[2]} 
-                    />
-                    <p>{account_operations[2]}</p>
-                  </div>
-                  <div
-                    className={styles.checks__item}
-                    onClick={() => {
-                      setData({ ...data, account_operations: account_operations[2] })
-                      setErroredFields(p => p.filter(f => f !== "account_operations"))
-                    }}
-                  >
-                    <RadioButtonRS 
-                      isActive={data.account_operations === account_operations[3]} 
-                    />
-                    <p>{account_operations[3]}</p>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.row}>
-                <div className={styles.checks}>
-                  <div
-                    className={styles.checks__item}
-                    onClick={() => {
-                      setData({ ...data, account_operations: account_operations[4] })
-                      setErroredFields(p => p.filter(f => f !== "account_operations"))
-                    }}
-                  >
-                    <RadioButtonRS 
-                      isActive={data.account_operations === account_operations[4]} 
-                    />
-                    <p>{account_operations[4]}</p>
-                  </div>
-                  <div
-                    className={styles.checks__item}
-                    onClick={() => {
-                      setData({ ...data, account_operations: account_operations[5] })
-                      setErroredFields(p => p.filter(f => f !== "account_operations"))
-                    }}
-                  >
-                    <RadioButtonRS 
-                      isActive={data.account_operations === account_operations[5]} 
-                    />
-                    <p>{account_operations[5]}</p>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.mb24}>
-              {erroredFields.includes("account_operations") && <p className="text-error">Поле не заполнено</p>}
-
-              </div>
-
-              <div className={styles.mb24}>
-                <p className={styles.mb24}>
-                  История, репутация, сектор рынка и конкуренция
-                </p>
-                <Input 
-                  value={data.history_reputation ?? ""}
-                  placeholder=""
-                  error={erroredFields.includes("history_reputation")}
-                  onChange={(e) => {
-                    setData({ ...data, history_reputation: e.target.value })
-                    e.target.value 
-                    ? setErroredFields(p => p.filter(f => f !== "history_reputation"))
-                    : setErroredFields(p => ([...p, "history_reputation"]))
-                  } 
-                }
-                />
-              {erroredFields.includes("history_reputation") && <p className="text-error">Поле не заполнено</p>}
-
-              </div>
-
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
                 Компания осуществляет деятельность, подлежащую лицензированию
                 </p>
-                <div className={styles.row}>
-                  <div className={styles.mb24}>
-                    <YesOrNo
-                      value={data?.subject_licensing && data.subject_licensing === "Осуществляет"}
-                      toggle={() => {
-                        data.subject_licensing === "Не осуществляет" 
-                          ? setData({ ...data, subject_licensing: "Осуществляет" }) 
-                          : setData({ ...data, subject_licensing: "Не осуществляет" })
-                          setErroredFields(p => p.filter(f => f !== "subject_licensing"))
-                      }
-                    }
-                    />
-                  </div>
-                </div>
-              </div>
 
-              <div className={styles.mb40}>
-                <p className={styles.mb24}>
-                  Количество операций по снятию наличности в неделю
-                </p>
                 <div className={styles.row}>
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
                       onClick={() => {
-                        setData({ ...data, week_cash_withdrawal: "0-29" })
-                        setErroredFields(p => p.filter(f => f !== "week_cash_withdrawal"))
+                        setData({ ...data, subject_licensing: "Осуществляет" })
+                        setErroredFields(p => p.filter(f => f !== "subject_licensing"))
                       }}
                     >
-                      <RadioButtonRS
-                        isActive={data.week_cash_withdrawal === "0-29"}
+                      <RadioButtonRS 
+                        isActive={data.subject_licensing === "Осуществляет"} 
                       />
-                      <p>0-29</p>
+                      <p>Осуществляет</p>
                     </div>
                     <div
                       className={styles.checks__item}
                       onClick={() => {
-                        setData({ ...data, week_cash_withdrawal: "30-100" })
-                        setErroredFields(p => p.filter(f => f !== "week_cash_withdrawal"))
+                        setData({ ...data, subject_licensing: "Не осуществляет" })
+                        setErroredFields(p => p.filter(f => f !== "subject_licensing"))
                       }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.week_cash_withdrawal === "30-100"}
+                      >
+                      <RadioButtonRS 
+                        isActive={data.subject_licensing === "Не осуществляет"} 
                       />
-                      <p>30-100</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, week_cash_withdrawal: ">100" })
-                        setErroredFields(p => p.filter(f => f !== "week_cash_withdrawal"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.week_cash_withdrawal === ">100"}
-                      />
-                      <p>более 100</p>
+                      <p>Не осуществляет</p>
                     </div>
                   </div>
                 </div>
-                {erroredFields.includes("week_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
-
               </div>
-              <div className={styles.mb40}>
+              <div className={styles.mb24}>
                 <p className={styles.mb24}>
-                  Количество операций по снятию наличности в квартал
+                  История, репутация, сектор рынка и конкуренция
                 </p>
+
                 <div className={styles.row}>
                   <div className={styles.checks}>
                     <div
                       className={styles.checks__item}
                       onClick={() => {
-                        setData({ ...data, quarter_cash_withdrawal: "0-29" })
-                        setErroredFields(p => p.filter(f => f !== "quarter_cash_withdrawal"))
+                        setData({ ...data, history_reputation: "Положительная" })
+                        setErroredFields(p => p.filter(f => f !== "history_reputation"))
                       }}
                     >
-                      <RadioButtonRS
-                        isActive={data.quarter_cash_withdrawal === "0-29"}
+                      <RadioButtonRS 
+                        isActive={data.history_reputation === "Положительная"} 
                       />
-                      <p>0-29</p>
+                      <p>Положительная</p>
                     </div>
                     <div
                       className={styles.checks__item}
                       onClick={() => {
-                        setData({ ...data, quarter_cash_withdrawal: "30-100" })
-                        setErroredFields(p => p.filter(f => f !== "quarter_cash_withdrawal"))
+                        setData({ ...data, history_reputation: "Отрицательная" })
+                        setErroredFields(p => p.filter(f => f !== "history_reputation"))
                       }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.quarter_cash_withdrawal === "30-100"}
+                      >
+                      <RadioButtonRS 
+                        isActive={data.history_reputation === "Отрицательная"} 
                       />
-                      <p>30-100</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, quarter_cash_withdrawal: ">100" })
-                        setErroredFields(p => p.filter(f => f !== "quarter_cash_withdrawal"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.quarter_cash_withdrawal === ">100"}
-                      />
-                      <p>более 100</p>
+                      <p>Отрицательная</p>
                     </div>
                   </div>
                 </div>
-                {erroredFields.includes("quarter_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
-
+              {erroredFields.includes("history_reputation") && <p className="text-error">Поле не заполнено</p>}
               </div>
-              <div className={styles.mb40}>
-                <p className={styles.mb24}>
-                  Количество операций по снятию наличности в год
-                </p>
-                <div className={styles.row}>
-                  <div className={styles.checks}>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, age_cash_withdrawal: "0-29" })
-                        setErroredFields(p => p.filter(f => f !== "age_cash_withdrawal"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.age_cash_withdrawal === "0-29"}
-                      />
-                      <p>0-29</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, age_cash_withdrawal: "30-100" })
-                        setErroredFields(p => p.filter(f => f !== "age_cash_withdrawal"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.age_cash_withdrawal === "30-100"}
-                      />
-                      <p>30-100</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, age_cash_withdrawal: ">100" })
-                        setErroredFields(p => p.filter(f => f !== "age_cash_withdrawal"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.age_cash_withdrawal === ">100"}
-                      />
-                      <p>более 100</p>
-                    </div>
-                  </div>
-                </div>
-                {erroredFields.includes("age_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
 
-              </div>
-              <div className={styles.mb40}>
-                <p className={styles.mb24}>
-                  Сумма операций по снятию денежных средств в наличной форме в неделю
-                </p>
-                <div className={styles.row}>
-                  <div className={styles.checks}>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, sum_week_cash_withdrawal: "0 - 99 000" })
-                        setErroredFields(p => p.filter(f => f !== "sum_week_cash_withdrawal"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.sum_week_cash_withdrawal === "0 - 99 000"}
-                      />
-                      <p>0 - 99 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, sum_week_cash_withdrawal: "100 000 - 1 000 000" })
-                        setErroredFields(p => p.filter(f => f !== "sum_week_cash_withdrawal"))
-                      }}
-
-                    >
-                      <RadioButtonRS
-                        isActive={data.sum_week_cash_withdrawal === "100 000 - 1 000 000"}
-                      />
-                      <p>100 000 - 1 000 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, sum_week_cash_withdrawal: ">1 000 000" })
-                        setErroredFields(p => p.filter(f => f !== "sum_week_cash_withdrawal"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.sum_week_cash_withdrawal === ">1 000 000"}
-                      />
-                      <p>более 1 000 000 руб.</p>
-                    </div>
-                  </div>
-                </div>
-                {erroredFields.includes("sum_week_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
-
-              </div>
-              <div className={styles.mb40}>
-                <p className={styles.mb24}>
-                Сумма операций по снятию денежных средств в наличной форме в месяц
-                </p>
-                <div className={styles.row}>
-                  <div className={styles.checks}>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, sum_mouth_cash_withdrawal: "0 - 99 000" })
-                        setErroredFields(p => p.filter(f => f !== "sum_mouth_cash_withdrawal"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.sum_mouth_cash_withdrawal === "0 - 99 000"}
-                      />
-                      <p>0 - 99 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, sum_mouth_cash_withdrawal: "100 000 - 1 000 000" })
-                        setErroredFields(p => p.filter(f => f !== "sum_mouth_cash_withdrawal"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.sum_mouth_cash_withdrawal === "100 000 - 1 000 000"}
-                      />
-                      <p>100 000 - 1 000 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, sum_mouth_cash_withdrawal: ">1 000 000" })
-                        setErroredFields(p => p.filter(f => f !== "sum_mouth_cash_withdrawal"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.sum_mouth_cash_withdrawal === ">1 000 000"}
-                      />
-                      <p>более 1 000 000 руб.</p>
-                    </div>
-                  </div>
-                </div>
-                {erroredFields.includes("sum_mouth_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
-
-              </div>
-              <div className={styles.mb40}>
-                <p className={styles.mb24}>
-                Сумма операций по снятию денежных средств в наличной форме в квартал
-                </p>
-                <div className={styles.row}>
-                  <div className={styles.checks}>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, sum_quarter_cash_withdrawal: "0 - 99 000" })
-                        setErroredFields(p => p.filter(f => f !== "sum_quarter_cash_withdrawal"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.sum_quarter_cash_withdrawal === "0 - 99 000"}
-                      />
-                      <p>0 - 99 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, sum_quarter_cash_withdrawal: "100 000 - 1 000 000" })
-                        setErroredFields(p => p.filter(f => f !== "sum_quarter_cash_withdrawal"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.sum_quarter_cash_withdrawal === "100 000 - 1 000 000"}
-                      />
-                      <p>100 000 - 1 000 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, sum_quarter_cash_withdrawal: ">1 000 000" })
-                        setErroredFields(p => p.filter(f => f !== "sum_quarter_cash_withdrawal"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.sum_quarter_cash_withdrawal === ">1 000 000"}
-                      />
-                      <p>более 1 000 000 руб.</p>
-                    </div>
-                  </div>
-                </div>
-                {erroredFields.includes("sum_quarter_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
-
-              </div>
-              <div className={styles.mb40}>
-                <p className={styles.mb24}>
-                Сумма операций по снятию денежных средств в наличной форме в год
-                </p>
-                <div className={styles.row}>
-                  <div className={styles.checks}>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, sum_age_cash_withdrawal: "0 - 99 000" })
-                        setErroredFields(p => p.filter(f => f !== "sum_age_cash_withdrawal"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.sum_age_cash_withdrawal === "0 - 99 000"}
-                      />
-                      <p>0 - 99 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, sum_age_cash_withdrawal: "100 000 - 1 000 000" })
-                        setErroredFields(p => p.filter(f => f !== "sum_age_cash_withdrawal"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.sum_age_cash_withdrawal === "100 000 - 1 000 000"}
-                      />
-                      <p>100 000 - 1 000 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, sum_age_cash_withdrawal: "v" })
-                        setErroredFields(p => p.filter(f => f !== "sum_age_cash_withdrawal"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.sum_age_cash_withdrawal === ">1 000 000"}
-                      />
-                      <p>более 1 000 000 руб.</p>
-                    </div>
-                  </div>
-                </div>
-                {erroredFields.includes("sum_age_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
-
-              </div>
-              <div className={styles.mb40}>
-                <p className={styles.mb24}>
-                  Количество операций по внешнеторговым контрактам в неделю
-                </p>
-                <div className={styles.row}>
-                  <div className={styles.checks}>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_trade_contracts_week: "0-29" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_week"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_trade_contracts_week === "0-29"}
-                      />
-                      <p>0-29</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_trade_contracts_week: "30-100" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_week"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_trade_contracts_week === "30-100"}
-                      />
-                      <p>30-100</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_trade_contracts_week: ">100" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_week"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_trade_contracts_week === ">100"}
-                      />
-                      <p>более 100</p>
-                    </div>
-                  </div>
-                </div>
-                {erroredFields.includes("foreign_trade_contracts_week") && <p className="text-error">Поле не заполнено</p>}
-
-              </div>
-              <div className={styles.mb40}>
-                <p className={styles.mb24}>
-                  Количество операций по внешнеторговым контрактам в месяц
-                </p>
-                <div className={styles.row}>
-                  <div className={styles.checks}>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_trade_contracts_month: "0-29" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_month"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_trade_contracts_month === "0-29"}
-                      />
-                      <p>0-29</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_trade_contracts_month: "30-100" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_month"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_trade_contracts_month === "30-100"}
-                      />
-                      <p>30-100</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_trade_contracts_month: ">100" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_month"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_trade_contracts_month === ">100"}
-                      />
-                      <p>более 100</p>
-                    </div>
-                  </div>
-                </div>
-                {erroredFields.includes("foreign_trade_contracts_month") && <p className="text-error">Поле не заполнено</p>}
-
-              </div>
-              <div className={styles.mb40}>
-                <p className={styles.mb24}>
-                  Количество операций по внешнеторговым контрактам в квартал
-                </p>
-                <div className={styles.row}>
-                  <div className={styles.checks}>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_trade_contracts_quarter: "0-29" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_quarter"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_trade_contracts_quarter === "0-29"}
-                      />
-                      <p>0-29</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_trade_contracts_quarter: "30-100" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_quarter"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_trade_contracts_quarter === "30-100"}
-                      />
-                      <p>30-100</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_trade_contracts_quarter: ">100" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_quarter"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_trade_contracts_quarter === ">100"}
-                      />
-                      <p>более 100</p>
-                    </div>
-                  </div>
-                </div>
-                {erroredFields.includes("foreign_trade_contracts_quarter") && <p className="text-error">Поле не заполнено</p>}
-
-              </div>
-              <div className={styles.mb40}>
-                <p className={styles.mb24}>
-                  Количество операций по внешнеторговым контрактам в год
-                </p>
-                <div className={styles.row}>
-                  <div className={styles.checks}>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_trade_contracts_age: "0-29" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_age"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_trade_contracts_age === "0-29"}
-                      />
-                      <p>0-29</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_trade_contracts_age: "30-100" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_age"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_trade_contracts_age === "30-100"}
-                      />
-                      <p>30-100</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_trade_contracts_age: ">100" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_age"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_trade_contracts_age === ">100"}
-                      />
-                      <p>более 100</p>
-                    </div>
-                  </div>
-                </div>
-                {erroredFields.includes("foreign_trade_contracts_age") && <p className="text-error">Поле не заполнено</p>}
-
-              </div>
-              <div className={styles.mb40}>
-                <p className={styles.mb24}>
-                Общее количество операций в неделю
-                </p>
-                <div className={styles.row}>
-                  <div className={styles.checks}>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, num_transactions_week: "0-29" })
-                        setErroredFields(p => p.filter(f => f !== "num_transactions_week"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.num_transactions_week === "0-29"}
-                      />
-                      <p>0-29</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, num_transactions_week: "30-100" })
-                        setErroredFields(p => p.filter(f => f !== "num_transactions_week"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.num_transactions_week === "30-100"}
-                      />
-                      <p>30-100</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, num_transactions_week: ">100" })
-                        setErroredFields(p => p.filter(f => f !== "num_transactions_week"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.num_transactions_week === ">100"}
-                      />
-                      <p>более 100</p>
-                    </div>
-                  </div>
-                </div>
-                {erroredFields.includes("num_transactions_week") && <p className="text-error">Поле не заполнено</p>}
-
-              </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
                 Общее количество операций в месяц
@@ -2246,26 +1536,14 @@ const Step2 = () => {
                     <div
                       className={styles.checks__item}
                       onClick={() => {
-                        setData({ ...data, num_transactions_month: "0-29" })
+                        setData({ ...data, num_transactions_month: ">10" })
                         setErroredFields(p => p.filter(f => f !== "num_transactions_month"))
                       }}
                     >
                       <RadioButtonRS
-                        isActive={data.num_transactions_month === "0-29"}
+                        isActive={data.num_transactions_month === ">10"}
                       />
-                      <p>0-29</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, num_transactions_month: "30-100" })
-                        setErroredFields(p => p.filter(f => f !== "num_transactions_month"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.num_transactions_month === "30-100"}
-                      />
-                      <p>30-100</p>
+                      <p>От 10</p>
                     </div>
                     <div
                       className={styles.checks__item}
@@ -2277,12 +1555,69 @@ const Step2 = () => {
                       <RadioButtonRS
                         isActive={data.num_transactions_month === ">100"}
                       />
-                      <p>более 100</p>
+                      <p>От 100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_month: ">1000" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_month"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_month === ">1000"}
+                      />
+                      <p>От 1000</p>
                     </div>
                   </div>
                 </div>
                 {erroredFields.includes("num_transactions_month") && <p className="text-error">Поле не заполнено</p>}
-
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Общее количество операций в неделю
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_week: ">10" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_week"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_week === ">10"}
+                      />
+                      <p>От 10</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_week: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_week"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_week === ">100"}
+                      />
+                      <p>От 100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_week: ">1000" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_week"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_week === ">1000"}
+                      />
+                      <p>От 1000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("num_transactions_week") && <p className="text-error">Поле не заполнено</p>}
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -2293,26 +1628,14 @@ const Step2 = () => {
                     <div
                       className={styles.checks__item}
                       onClick={() => {
-                        setData({ ...data, num_transactions_quarter: "0-29" })
+                        setData({ ...data, num_transactions_quarter: ">10" })
                         setErroredFields(p => p.filter(f => f !== "num_transactions_quarter"))
                       }}
                     >
                       <RadioButtonRS
-                        isActive={data.num_transactions_quarter === "0-29"}
+                        isActive={data.num_transactions_quarter === ">10"}
                       />
-                      <p>0-29</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, num_transactions_quarter: "30-100" })
-                        setErroredFields(p => p.filter(f => f !== "num_transactions_quarter"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.num_transactions_quarter === "30-100"}
-                      />
-                      <p>30-100</p>
+                      <p>От 10</p>
                     </div>
                     <div
                       className={styles.checks__item}
@@ -2324,12 +1647,23 @@ const Step2 = () => {
                       <RadioButtonRS
                         isActive={data.num_transactions_quarter === ">100"}
                       />
-                      <p>более 100</p>
+                      <p>От 100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_quarter: ">1000" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_quarter"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_quarter === ">1000"}
+                      />
+                      <p>От 1000</p>
                     </div>
                   </div>
                 </div>
                 {erroredFields.includes("num_transactions_quarter") && <p className="text-error">Поле не заполнено</p>}
-
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -2340,26 +1674,14 @@ const Step2 = () => {
                     <div
                       className={styles.checks__item}
                       onClick={() => {
-                        setData({ ...data, num_transactions_age: "0-29" })
+                        setData({ ...data, num_transactions_age: ">10" })
                         setErroredFields(p => p.filter(f => f !== "num_transactions_age"))
                       }}
                     >
                       <RadioButtonRS
-                        isActive={data.num_transactions_age === "0-29"}
+                        isActive={data.num_transactions_age === ">10"}
                       />
-                      <p>0-29</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, num_transactions_age: "30-100" })
-                        setErroredFields(p => p.filter(f => f !== "num_transactions_age"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.num_transactions_age === "30-100"}
-                      />
-                      <p>30-100</p>
+                      <p>От 10</p>
                     </div>
                     <div
                       className={styles.checks__item}
@@ -2371,246 +1693,23 @@ const Step2 = () => {
                       <RadioButtonRS
                         isActive={data.num_transactions_age === ">100"}
                       />
-                      <p>более 100</p>
+                      <p>От 100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, num_transactions_age: ">1000" })
+                        setErroredFields(p => p.filter(f => f !== "num_transactions_age"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.num_transactions_age === ">1000"}
+                      />
+                      <p>От 1000</p>
                     </div>
                   </div>
                 </div>
                 {erroredFields.includes("num_transactions_age") && <p className="text-error">Поле не заполнено</p>}
-              </div>
-              <div className={styles.mb40}>
-                <p className={styles.mb24}>
-                  Сумма операций по внешнеторговым контрактам в неделю
-                </p>
-                <div className={styles.row}>
-                  <div className={styles.checks}>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_sum_contracts_week: "0 - 99 000" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_week"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_sum_contracts_week === "0 - 99 000"}
-                      />
-                      <p>0 - 99 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_sum_contracts_week: "100 000 - 1 000 000" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_week"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_sum_contracts_week === "100 000 - 1 000 000"}
-                      />
-                      <p>100 000 - 1 000 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_sum_contracts_week: ">1 000 000" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_week"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_sum_contracts_week === ">1 000 000"}
-                      />
-                      <p>более 1 000 000 руб.</p>
-                    </div>
-                  </div>
-                </div>
-                {erroredFields.includes("foreign_sum_contracts_week") && <p className="text-error">Поле не заполнено</p>}
-
-              </div>
-              <div className={styles.mb40}>
-                <p className={styles.mb24}>
-                Сумма операций по внешнеторговым контрактам в месяц
-                </p>
-                <div className={styles.row}>
-                  <div className={styles.checks}>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_sum_contracts_month: "0 - 99 000" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_month"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_sum_contracts_month === "0 - 99 000"}
-                      />
-                      <p>0 - 99 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_sum_contracts_month: "100 000 - 1 000 000" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_month"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_sum_contracts_month === "100 000 - 1 000 000"}
-                      />
-                      <p>100 000 - 1 000 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_sum_contracts_month: ">1 000 000" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_month"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_sum_contracts_month === ">1 000 000"}
-                      />
-                      <p>более 1 000 000 руб.</p>
-                    </div>
-                  </div>
-                </div>
-                {erroredFields.includes("foreign_sum_contracts_month") && <p className="text-error">Поле не заполнено</p>}
-
-              </div>
-              <div className={styles.mb40}>
-                <p className={styles.mb24}>
-                Сумма операций по внешнеторговым контрактам в квартал
-                </p>
-                <div className={styles.row}>
-                  <div className={styles.checks}>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_sum_contracts_quarter: "0 - 99 000" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_quarter"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_sum_contracts_quarter === "0 - 99 000"}
-                      />
-                      <p>0 - 99 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_sum_contracts_quarter: "100 000 - 1 000 000" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_quarter"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_sum_contracts_quarter === "100 000 - 1 000 000"}
-                      />
-                      <p>100 000 - 1 000 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_sum_contracts_quarter: ">1 000 000" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_quarter"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_sum_contracts_quarter === ">1 000 000"}
-                      />
-                      <p>более 1 000 000 руб.</p>
-                    </div>
-                  </div>
-                </div>
-                {erroredFields.includes("foreign_sum_contracts_quarter") && <p className="text-error">Поле не заполнено</p>}
-
-              </div>
-              <div className={styles.mb40}>
-                <p className={styles.mb24}>
-                Сумма операций по внешнеторговым контрактам в год
-                </p>
-                <div className={styles.row}>
-                  <div className={styles.checks}>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_sum_contracts_age: "0 - 99 000" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_age"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_sum_contracts_age === "0 - 99 000"}
-                      />
-                      <p>0 - 99 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_sum_contracts_age: "100 000 - 1 000 000" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_age"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_sum_contracts_age === "100 000 - 1 000 000"}
-                      />
-                      <p>100 000 - 1 000 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, foreign_sum_contracts_age: ">1 000 000" })
-                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_age"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.foreign_sum_contracts_age === ">1 000 000"}
-                      />
-                      <p>более 1 000 000 руб.</p>
-                    </div>
-                  </div>
-                </div>
-                {erroredFields.includes("foreign_sum_contracts_age") && <p className="text-error">Поле не заполнено</p>}
-
-              </div>
-              <div className={styles.mb40}>
-                <p className={styles.mb24}>
-                Общая сумма операций в неделю
-                </p>
-                <div className={styles.row}>
-                  <div className={styles.checks}>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, sum_transactions_week: "0 - 99 000" })
-                        setErroredFields(p => p.filter(f => f !== "sum_transactions_week"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.sum_transactions_week === "0 - 99 000"}
-                      />
-                      <p>0 - 99 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, sum_transactions_week: "100 000 - 1 000 000" })
-                        setErroredFields(p => p.filter(f => f !== "sum_transactions_week"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.sum_transactions_week === "100 000 - 1 000 000"}
-                      />
-                      <p>100 000 - 1 000 000 руб.</p>
-                    </div>
-                    <div
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, sum_transactions_week: ">1 000 000" })
-                        setErroredFields(p => p.filter(f => f !== "sum_transactions_week"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.sum_transactions_week === ">1 000 000"}
-                      />
-                      <p>более 1 000 000 руб.</p>
-                    </div>
-                  </div>
-                </div>
-                {erroredFields.includes("sum_transactions_week") && <p className="text-error">Поле не заполнено</p>}
-
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -2621,26 +1720,26 @@ const Step2 = () => {
                     <div
                       className={styles.checks__item}
                       onClick={() => {
-                        setData({ ...data, sum_transactions_month: "0 - 99 000" })
+                        setData({ ...data, sum_transactions_month: "<1 000 000" })
                         setErroredFields(p => p.filter(f => f !== "sum_transactions_month"))
                       }}
                     >
                       <RadioButtonRS
-                        isActive={data.sum_transactions_month === "0 - 99 000"}
+                        isActive={data.sum_transactions_month === "<1 000 000"}
                       />
-                      <p>0 - 99 000 руб.</p>
+                      <p>До 1 000 000</p>
                     </div>
                     <div
                       className={styles.checks__item}
                       onClick={() => {
-                        setData({ ...data, sum_transactions_month: "100 000 - 1 000 000" })
+                        setData({ ...data, sum_transactions_month: "<10 000 000" })
                         setErroredFields(p => p.filter(f => f !== "sum_transactions_month"))
                       }}
                     >
                       <RadioButtonRS
-                        isActive={data.sum_transactions_month === "100 000 - 1 000 000"}
+                        isActive={data.sum_transactions_month === "<10 000 000"}
                       />
-                      <p>100 000 - 1 000 000 руб.</p>
+                      <p>До 10 000 000</p>
                     </div>
                     <div
                       className={styles.checks__item}
@@ -2652,12 +1751,82 @@ const Step2 = () => {
                       <RadioButtonRS
                         isActive={data.sum_transactions_month === ">1 000 000"}
                       />
-                      <p>более 1 000 000 руб.</p>
+                      <p>До 100 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_month: ">100 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_month"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_month === ">100 000 000"}
+                      />
+                      <p>Свыше 100 000 000</p>
                     </div>
                   </div>
                 </div>
                 {erroredFields.includes("sum_transactions_month") && <p className="text-error">Поле не заполнено</p>}
 
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Общая сумма операций в неделю
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_week: "<1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_week"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_week === "<1 000 000"}
+                      />
+                      <p>До 1 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_week: "<10 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_week"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_week === "<10 000 000"}
+                      />
+                      <p>До 10 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_week: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_week"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_week === ">1 000 000"}
+                      />
+                      <p>До 100 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_week: ">100 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_week"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_week === ">100 000 000"}
+                      />
+                      <p>Свыше 100 000 000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("sum_transactions_week") && <p className="text-error">Поле не заполнено</p>}
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -2668,26 +1837,26 @@ const Step2 = () => {
                     <div
                       className={styles.checks__item}
                       onClick={() => {
-                        setData({ ...data, sum_transactions_quarter: "0 - 99 000" })
+                        setData({ ...data, sum_transactions_quarter: "<1 000 000" })
                         setErroredFields(p => p.filter(f => f !== "sum_transactions_quarter"))
                       }}
                     >
                       <RadioButtonRS
-                        isActive={data.sum_transactions_quarter === "0 - 99 000"}
+                        isActive={data.sum_transactions_quarter === "<1 000 000"}
                       />
-                      <p>0 - 99 000 руб.</p>
+                      <p>До 1 000 000</p>
                     </div>
                     <div
                       className={styles.checks__item}
                       onClick={() => {
-                        setData({ ...data, sum_transactions_quarter: "100 000 - 1 000 000" })
+                        setData({ ...data, sum_transactions_quarter: "<10 000 000" })
                         setErroredFields(p => p.filter(f => f !== "sum_transactions_quarter"))
                       }}
                     >
                       <RadioButtonRS
-                        isActive={data.sum_transactions_quarter === "100 000 - 1 000 000"}
+                        isActive={data.sum_transactions_quarter === "<10 000 000"}
                       />
-                      <p>100 000 - 1 000 000 руб.</p>
+                      <p>До 10 000 000</p>
                     </div>
                     <div
                       className={styles.checks__item}
@@ -2699,12 +1868,23 @@ const Step2 = () => {
                       <RadioButtonRS
                         isActive={data.sum_transactions_quarter === ">1 000 000"}
                       />
-                      <p>более 1 000 000 руб.</p>
+                      <p>До 100 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_quarter: ">100 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_quarter"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_quarter === ">100 000 000"}
+                      />
+                      <p>Свыше 100 000 000</p>
                     </div>
                   </div>
                 </div>
                 {erroredFields.includes("sum_transactions_quarter") && <p className="text-error">Поле не заполнено</p>}
-
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
@@ -2715,26 +1895,26 @@ const Step2 = () => {
                     <div
                       className={styles.checks__item}
                       onClick={() => {
-                        setData({ ...data, sum_transactions_age: "0 - 99 000" })
+                        setData({ ...data, sum_transactions_age: "<1 000 000" })
                         setErroredFields(p => p.filter(f => f !== "sum_transactions_age"))
                       }}
                     >
                       <RadioButtonRS
-                        isActive={data.sum_transactions_age === "0 - 99 000"}
+                        isActive={data.sum_transactions_age === "<1 000 000"}
                       />
-                      <p>0 - 99 000 руб.</p>
+                      <p>До 1 000 000</p>
                     </div>
                     <div
                       className={styles.checks__item}
                       onClick={() => {
-                        setData({ ...data, sum_transactions_age: "100 000 - 1 000 000" })
+                        setData({ ...data, sum_transactions_age: "<10 000 000" })
                         setErroredFields(p => p.filter(f => f !== "sum_transactions_age"))
                       }}
                     >
                       <RadioButtonRS
-                        isActive={data.sum_transactions_age === "100 000 - 1 000 000"}
+                        isActive={data.sum_transactions_age === "<10 000 000"}
                       />
-                      <p>100 000 - 1 000 000 руб.</p>
+                      <p>До 10 000 000</p>
                     </div>
                     <div
                       className={styles.checks__item}
@@ -2746,13 +1926,857 @@ const Step2 = () => {
                       <RadioButtonRS
                         isActive={data.sum_transactions_age === ">1 000 000"}
                       />
-                      <p>более 1 000 000 руб.</p>
+                      <p>До 100 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_transactions_age: ">100 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_transactions_age"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_transactions_age === ">100 000 000"}
+                      />
+                      <p>Свыше 100 000 000</p>
                     </div>
                   </div>
                 </div>
                 {erroredFields.includes("sum_transactions_age") && <p className="text-error">Поле не заполнено</p>}
-
               </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Количество операций по снятию наличности в месяц
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, monthly_cash_withdrawal: ">10" })
+                        setErroredFields(p => p.filter(f => f !== "monthly_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.monthly_cash_withdrawal === ">10"}
+                      />
+                      <p>От 10</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, monthly_cash_withdrawal: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "monthly_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.monthly_cash_withdrawal === ">100"}
+                      />
+                      <p>От 100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, monthly_cash_withdrawal: ">1000" })
+                        setErroredFields(p => p.filter(f => f !== "monthly_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.monthly_cash_withdrawal === ">1000"}
+                      />
+                      <p>От 1000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("monthly_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Количество операций по снятию наличности в неделю
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, week_cash_withdrawal: ">10" })
+                        setErroredFields(p => p.filter(f => f !== "week_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.week_cash_withdrawal === ">10"}
+                      />
+                      <p>От 10</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, week_cash_withdrawal: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "week_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.week_cash_withdrawal === ">100"}
+                      />
+                      <p>От 100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, week_cash_withdrawal: ">1000" })
+                        setErroredFields(p => p.filter(f => f !== "week_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.week_cash_withdrawal === ">1000"}
+                      />
+                      <p>От 1000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("week_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Количество операций по снятию наличности в квартал
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, quarter_cash_withdrawal: ">10" })
+                        setErroredFields(p => p.filter(f => f !== "quarter_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.quarter_cash_withdrawal === ">10"}
+                      />
+                      <p>От 10</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, quarter_cash_withdrawal: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "quarter_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.quarter_cash_withdrawal === ">100"}
+                      />
+                      <p>От 100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, quarter_cash_withdrawal: ">1000" })
+                        setErroredFields(p => p.filter(f => f !== "quarter_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.quarter_cash_withdrawal === ">1000"}
+                      />
+                      <p>От 1000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("quarter_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Количество операций по снятию наличности в год
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, age_cash_withdrawal: ">10" })
+                        setErroredFields(p => p.filter(f => f !== "age_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.age_cash_withdrawal === ">10"}
+                      />
+                      <p>От 10</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, age_cash_withdrawal: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "age_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.age_cash_withdrawal === ">100"}
+                      />
+                      <p>От 100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, age_cash_withdrawal: ">1000" })
+                        setErroredFields(p => p.filter(f => f !== "age_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.age_cash_withdrawal === ">1000"}
+                      />
+                      <p>От 1000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("age_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Сумма операций по снятию наличности в месяц
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_mouth_cash_withdrawal: "<1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_mouth_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_mouth_cash_withdrawal === "<1 000 000"}
+                      />
+                      <p>До 1 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_mouth_cash_withdrawal: "<10 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_mouth_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_mouth_cash_withdrawal === "<10 000 000"}
+                      />
+                      <p>До 10 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_mouth_cash_withdrawal: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_mouth_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_mouth_cash_withdrawal === ">1 000 000"}
+                      />
+                      <p>До 100 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_mouth_cash_withdrawal: ">100 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_mouth_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_mouth_cash_withdrawal === ">100 000 000"}
+                      />
+                      <p>Свыше 100 000 000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("sum_mouth_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Сумма операций по снятию денежных средств в наличной форме в неделю
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_week_cash_withdrawal: "<1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_week_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_week_cash_withdrawal === "<1 000 000"}
+                      />
+                      <p>До 1 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_week_cash_withdrawal: "<10 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_week_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_week_cash_withdrawal === "<10 000 000"}
+                      />
+                      <p>До 10 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_week_cash_withdrawal: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_week_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_week_cash_withdrawal === ">1 000 000"}
+                      />
+                      <p>До 100 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_week_cash_withdrawal: ">100 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_week_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_week_cash_withdrawal === ">100 000 000"}
+                      />
+                      <p>Свыше 100 000 000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("sum_week_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Сумма операций по снятию денежных средств в наличной форме в квартал
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_quarter_cash_withdrawal: "<1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_quarter_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_quarter_cash_withdrawal === "<1 000 000"}
+                      />
+                      <p>До 1 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_quarter_cash_withdrawal: "<10 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_quarter_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_quarter_cash_withdrawal === "<10 000 000"}
+                      />
+                      <p>До 10 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_quarter_cash_withdrawal: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_quarter_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_quarter_cash_withdrawal === ">1 000 000"}
+                      />
+                      <p>До 100 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_quarter_cash_withdrawal: ">100 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_quarter_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_quarter_cash_withdrawal === ">100 000 000"}
+                      />
+                      <p>Свыше 100 000 000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("sum_quarter_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Сумма операций по снятию денежных средств в наличной форме в год
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_age_cash_withdrawal: "<1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_age_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_age_cash_withdrawal === "<1 000 000"}
+                      />
+                      <p>До 1 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_age_cash_withdrawal: "<10 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_age_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_age_cash_withdrawal === "<10 000 000"}
+                      />
+                      <p>До 10 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_age_cash_withdrawal: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_age_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_age_cash_withdrawal === ">1 000 000"}
+                      />
+                      <p>До 100 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sum_age_cash_withdrawal: ">100 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "sum_age_cash_withdrawal"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.sum_age_cash_withdrawal === ">100 000 000"}
+                      />
+                      <p>Свыше 100 000 000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("sum_age_cash_withdrawal") && <p className="text-error">Поле не заполнено</p>}
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Количество операций по внешнеторговым контрактам в месяц
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_month: ">10" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_month"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_month === ">10"}
+                      />
+                      <p>От 10</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_month: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_month"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_month === ">100"}
+                      />
+                      <p>От 100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_month: ">1000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_month"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_month === ">1000"}
+                      />
+                      <p>От 1000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("foreign_trade_contracts_month") && <p className="text-error">Поле не заполнено</p>}
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Количество операций по внешнеторговым контрактам в неделю
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_week: ">10" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_week"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_week === ">10"}
+                      />
+                      <p>От 10</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_week: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_week"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_week === ">100"}
+                      />
+                      <p>От 100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_week: ">1000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_week"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_week === ">1000"}
+                      />
+                      <p>От 1000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("foreign_trade_contracts_week") && <p className="text-error">Поле не заполнено</p>}
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Количество операций по внешнеторговым контрактам в квартал
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_quarter: ">10" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_quarter"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_quarter === ">10"}
+                      />
+                      <p>От 10</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_quarter: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_quarter"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_quarter === ">100"}
+                      />
+                      <p>От 100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_quarter: ">1000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_quarter"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_quarter === ">1000"}
+                      />
+                      <p>От 1000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("foreign_trade_contracts_quarter") && <p className="text-error">Поле не заполнено</p>}
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Количество операций по внешнеторговым контрактам в год
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_age: ">10" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_age"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_age === ">10"}
+                      />
+                      <p>От 10</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_age: ">100" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_age"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_age === ">100"}
+                      />
+                      <p>От 100</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_trade_contracts_age: ">1000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_trade_contracts_age"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_trade_contracts_age === ">1000"}
+                      />
+                      <p>От 1000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("foreign_trade_contracts_age") && <p className="text-error">Поле не заполнено</p>}
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Сумма операций по внешнеторговым контрактам в месяц
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_month: "<1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_month"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_month === "<1 000 000"}
+                      />
+                      <p>До 1 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_month: "<10 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_month"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_month === "<10 000 000"}
+                      />
+                      <p>До 10 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_month: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_month"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_month === ">1 000 000"}
+                      />
+                      <p>До 100 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_month: ">100 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_month"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_month === ">100 000 000"}
+                      />
+                      <p>Свыше 100 000 000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("foreign_sum_contracts_month") && <p className="text-error">Поле не заполнено</p>}
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Сумма операций по внешнеторговым контрактам в неделю
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_week: "<1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_week"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_week === "<1 000 000"}
+                      />
+                      <p>До 1 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_week: "<10 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_week"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_week === "<10 000 000"}
+                      />
+                      <p>До 10 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_week: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_week"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_week === ">1 000 000"}
+                      />
+                      <p>До 100 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_week: ">100 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_week"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_week === ">100 000 000"}
+                      />
+                      <p>Свыше 100 000 000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("foreign_sum_contracts_week") && <p className="text-error">Поле не заполнено</p>}
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Сумма операций по внешнеторговым контрактам в квартал
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_quarter: "<1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_quarter"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_quarter === "<1 000 000"}
+                      />
+                      <p>До 1 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_quarter: "<10 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_quarter"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_quarter === "<10 000 000"}
+                      />
+                      <p>До 10 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_quarter: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_quarter"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_quarter === ">1 000 000"}
+                      />
+                      <p>До 100 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_quarter: ">100 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_quarter"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_quarter === ">100 000 000"}
+                      />
+                      <p>Свыше 100 000 000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("foreign_sum_contracts_quarter") && <p className="text-error">Поле не заполнено</p>}
+              </div>
+              <div className={styles.mb40}>
+                <p className={styles.mb24}>
+                Сумма операций по внешнеторговым контрактам в год
+                </p>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_age: "<1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_age"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_age === "<1 000 000"}
+                      />
+                      <p>До 1 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_age: "<10 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_age"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_age === "<10 000 000"}
+                      />
+                      <p>До 10 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_age: ">1 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_age"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_age === ">1 000 000"}
+                      />
+                      <p>До 100 000 000</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, foreign_sum_contracts_age: ">100 000 000" })
+                        setErroredFields(p => p.filter(f => f !== "foreign_sum_contracts_age"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.foreign_sum_contracts_age === ">100 000 000"}
+                      />
+                      <p>Свыше 100 000 000</p>
+                    </div>
+                  </div>
+                </div>
+                {erroredFields.includes("foreign_sum_contracts_age") && <p className="text-error">Поле не заполнено</p>}
+              </div>
+
               <div className={styles.mb40}>
                 <p className={styles.mb24}>
                   Источники происхождения денежных средств
@@ -2809,6 +2833,32 @@ const Step2 = () => {
                     </div>
                   </div>
                 </div>
+                <div className={styles.row}>
+                  <div className={styles.checks}>
+                    <div className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sources_cash_receipts: cash_source[4] })
+                        setErroredFields(p => p.filter(f => f !== "sources_cash_receipts"))
+                      }}
+                      >
+                      <RadioButtonRS
+                        isActive={data.sources_cash_receipts === cash_source[4]}
+                      />
+                      <p>{cash_source[4]}</p>
+                    </div>
+                    <div className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, sources_cash_receipts: cash_source[5] })
+                        setErroredFields(p => p.filter(f => f !== "sources_cash_receipts"))
+                      }}
+                      >
+                      <RadioButtonRS
+                        isActive={data.sources_cash_receipts === cash_source[5]}
+                      />
+                      <p>{cash_source[5]}</p>
+                    </div>
+                  </div>
+                </div>
                 {erroredFields.includes("sources_cash_receipts") && <p className="text-error">Поле не заполнено</p>}
 
               </div>
@@ -2819,38 +2869,50 @@ const Step2 = () => {
                     <div
                       className={styles.checks__item}
                       onClick={() => {
-                        setData({ ...data, headcount: "0-29" })
+                        setData({ ...data, headcount: headcounts[0] })
                         setErroredFields(p => p.filter(f => f !== "headcount"))
                       }}
                     >
                       <RadioButtonRS
-                        isActive={data.headcount === "0-29"}
+                        isActive={data.headcount === headcounts[0]}
                       />
-                      <p>0-29</p>
+                      <p>{headcounts[0]}</p>
                     </div>
                     <div
                       className={styles.checks__item}
                       onClick={() => {
-                        setData({ ...data, headcount: "30-100" })
+                        setData({ ...data, headcount: headcounts[1] })
                         setErroredFields(p => p.filter(f => f !== "headcount"))
                       }}
                     >
                       <RadioButtonRS
-                        isActive={data.headcount === "30-100"}
+                        isActive={data.headcount === headcounts[1]}
                       />
-                      <p>30-100</p>
+                      <p>{headcounts[1]}</p>
                     </div>
                     <div
                       className={styles.checks__item}
                       onClick={() => {
-                        setData({ ...data, headcount: ">100" })
+                        setData({ ...data, headcount: headcounts[2] })
                         setErroredFields(p => p.filter(f => f !== "headcount"))
                       }}
                     >
                       <RadioButtonRS
-                        isActive={data.headcount === ">100"}
+                        isActive={data.headcount === headcounts[2]}
                       />
-                      <p>более 100</p>
+                      <p>{headcounts[2]}</p>
+                    </div>
+                    <div
+                      className={styles.checks__item}
+                      onClick={() => {
+                        setData({ ...data, headcount: ">20" })
+                        setErroredFields(p => p.filter(f => f !== "headcount"))
+                      }}
+                    >
+                      <RadioButtonRS
+                        isActive={data.headcount === ">20"}
+                      />
+                      <p>{headcounts[3]}</p>
                     </div>
                   </div>
                 </div>
@@ -2999,6 +3061,23 @@ const Step2 = () => {
               </div>
             </Wrapper>
           </div>
+
+          <p className={styles.title_block}>Кодовое слово</p>
+          <div>
+            <Input
+              value={data.codeword}
+              maxLength={35}
+              error={erroredFields.includes("codeword")}
+              placeholder="Введите кодовое слово"
+              onChange={(e) => {
+                setErroredFields(p => p.filter(f => f !== "codeword"))
+                setData({ ...data,  codeword: e.target.value })
+              }
+            }
+            />
+            {erroredFields.includes("codeword") && <p className="text-error">Поле не заполнено</p>}
+          </div>
+
           {/* {erroredFields.length && showErrors ? <p style={{ color: "red" }}>Часть полей не заполнена или заполнена некорректно</p> : null} */}
           <div style={{ textAlign: "right", margin: "40px 0" }}>
             <ButtonRS

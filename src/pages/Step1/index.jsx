@@ -71,6 +71,19 @@ const Step1 = () => {
     }))
   }
 
+  const onChange = (name) => (e) => {
+    setFields({
+      ...fields,
+      [name]: {
+        ...fields[name],
+        value: e.target.value,
+        valid: fields[name].validateFn(e.target.value),
+      }
+    })
+  
+    name === "name" && localStorage.setItem("rko_name", e.target.value)
+  }
+
   const onSubmit = async (e) => {
     e.preventDefault()
     setShowErrors(true)
@@ -91,19 +104,6 @@ const Step1 = () => {
       setShowErrors(false)
     }
   };
-  
-  const onChange = (name) => (e) => {
-    setFields({
-      ...fields,
-      [name]: {
-        ...fields[name],
-        value: e.target.value,
-        valid: fields[name].validateFn(e.target.value),
-      }
-    })
-  
-    name === "name" && localStorage.setItem("rko_name", e.target.value)
-  }
 
   return (
     <>

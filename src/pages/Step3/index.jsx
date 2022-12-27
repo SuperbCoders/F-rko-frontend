@@ -10,7 +10,6 @@ import { initData, RequisitesContext } from "../../contexts/companyRequisits";
 import { userApi } from "../../api";
 import { Navigate } from "react-router-dom";
 import { ROUTES } from "../../helpers";
-import Input from "../../components/Step2Components/Input";
 
 const TickSymbol = () => {
   return (
@@ -90,7 +89,7 @@ const Step3 = () => {
     },
   ]
 
-  const { data, setData, erroredFields, setErroredFields } = React.useContext(RequisitesContext)
+  const { data, setData } = React.useContext(RequisitesContext)
 
   const [isShowModal, setShowModal] = useState(false);
   const [additionals, setAdditionals] = React.useState(["СМС-оповещение"])
@@ -120,10 +119,6 @@ const Step3 = () => {
   const onCheck = (name) => () => setAdditionals(prev => prev.includes(name) ? prev.filter(a => a !== name ) : [...prev, name] ) 
 
   const onSubmit = async () => {
-    if (!data.codeword?.length) {
-      setErroredFields(p => ([...p, "codeword"]))
-      return
-    }
     const formattedPhone = data.contact_number.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скобки
 
     const dto = {
@@ -302,7 +297,7 @@ const Step3 = () => {
                 >
                   Согласие на получение информационной рассылки
                 </button>
-                <div className={styles.foldable}>
+                <div className={styles.foldable} style={{ maxHeight: "100%" }}>
                   <div className="flex aic">
                     <label className="mr15">
                       <input 
@@ -349,23 +344,6 @@ const Step3 = () => {
               </p>
             </div>
           </div>
-
-          <div>
-            <Input
-              value={data.codeword}
-              name="Кодовое слово"
-              maxLength={35}
-              error={erroredFields.includes("codeword")}
-              placeholder="Введите кодовое слово"
-              onChange={(e) => {
-                setErroredFields(p => p.filter(f => f !== "codeword"))
-                setData({ ...data,  codeword: e.target.value })
-              }
-            }
-            />
-          {erroredFields.includes("codeword") && <p className="text-error">Поле не заполнено</p>}
-          </div>
-
           <div className="mt60" style={{ textAlign: "right" }}>
             <ButtonRS
               title="Отправить"
