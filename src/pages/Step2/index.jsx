@@ -210,7 +210,6 @@ const Step2 = () => {
     documentApi.upload(fd).then(res => {
       data.document_confirming_real_activity.push({ path: res.images[0]?.path, file: file, size: getSizeMb(file.size) })
       setData({ ...data })
-      setErroredFields(p => p.filter(f => f !== "document_confirming_real_activity"))
     })
   }
 
@@ -221,8 +220,20 @@ const Step2 = () => {
     documentApi.upload(fd).then(res => {
       data.document_licenses.push({ path: res.images[0]?.path, file: file, size: getSizeMb(file.size) })
       setData({ ...data })
-      setErroredFields(p => p.filter(f => f !== "document_licenses"))
     })  
+  }
+
+  const deleteFromActivityDocs = (lic) => () => {
+    data.document_confirming_real_activity = data.document_confirming_real_activity.filter(l => l !== lic)
+    setData({ ...data })
+  }
+  const deleteFromIdentityDocs = (lic) => () => {
+    data.document_certifying_identity_executive = data.document_certifying_identity_executive.filter(l => l !== lic)
+    setData({ ...data })
+  }
+  const deleteFromLicense = (lic) => () => {
+    data.document_licenses = data.document_licenses.filter(l => l !== lic)
+    setData({ ...data })
   }
 
   const onSelectBenfs = () => {
@@ -242,7 +253,6 @@ const Step2 = () => {
     value?.label 
       ? setErroredFields(p => p.filter(f => f !==  `founder_inn_${idx}`))
       : setErroredFields(p => ([...p, `founder_inn_${idx}`]))
-
   }
 
   const onChangeFounderCapital = (idx) => (e) => {
@@ -251,7 +261,6 @@ const Step2 = () => {
     e.target.value 
       ? setErroredFields(p => p.filter(f => f !==  `capital_${idx}`))
       : setErroredFields(p => ([...p, `capital_${idx}`]))
-
   }
 
   const removeFromFounderList = (idx) => () => {
@@ -303,8 +312,6 @@ const Step2 = () => {
       "employers_volume",
       "salary_debt",
       "document_certifying_identity_executive",
-      "document_confirming_real_activity",
-      "document_licenses",
       "history_reputation",
       "week_cash_withdrawal",
       "quarter_cash_withdrawal",
@@ -1229,19 +1236,24 @@ const Step2 = () => {
                   </p>
 
                   <div className={styles.mb24}>
-                    {!!data.document_certifying_identity_executive.length && <div className={styles.row}>
+                    {!!data.document_certifying_identity_executive.length && <div className={styles.mb24}>
                       {data.document_certifying_identity_executive.map(l => 
-                        <div className={styles.download__item} key={l.path} style={{ flexGrow: 0 }}>
-                          <div className={styles.icon}>
-                            <p className={styles.format}>
-                              {getFormatFile(l?.file?.name ?? l.path)}
-                            </p>
-                            <p className={styles.size}>
-                              {l.size}
-                            </p>
+                        <div key={l.path} className={styles.row}>
+                          <div className={styles.download__item} style={{ flexGrow: 0 }}>
+                            <div className={styles.icon}>
+                              <p className={styles.format}>
+                                {getFormatFile(l?.file?.name ?? l.path)}
+                              </p>
+                              <p className={styles.size}>
+                                {l.size}
+                              </p>
+                            </div>
+                            <p className={styles.name}>{l?.file?.name ?? l.path?.replace("/media/documents/", "")}</p>
                           </div>
-                          <p className={styles.name}>{l?.file?.name ?? l.path?.replace("/media/documents/", "")}</p>
-                        </div>)}
+
+                          <DeleteButton onClick={deleteFromIdentityDocs(l)} />
+                        </div>
+                        )}
                     </div>}
                     {erroredFields.includes("document_certifying_identity_executive") && <p className="text-error">Поле не заполнено</p>}
 
@@ -1256,22 +1268,25 @@ const Step2 = () => {
                   </p>
 
                   <div className={styles.mb24}>
-                    {!!data.document_confirming_real_activity.length && <div className={styles.row}>
+                    {!!data.document_confirming_real_activity.length && <div className={styles.mb24}>
                       {data.document_confirming_real_activity.map(l => 
-                        <div className={styles.download__item} key={l.path} style={{ flexGrow: 0 }}>
-                          <div className={styles.icon}>
-                            <p className={styles.format}>
-                              {getFormatFile(l?.file?.name ?? l.path)}
-                            </p>
-                            <p className={styles.size}>
-                              {l.size}
-                            </p>
+                        <div key={l.path} className={styles.row}>
+                          <div className={styles.download__item} style={{ flexGrow: 0 }}>
+                            <div className={styles.icon}>
+                              <p className={styles.format}>
+                                {getFormatFile(l?.file?.name ?? l.path)}
+                              </p>
+                              <p className={styles.size}>
+                                {l.size}
+                              </p>
+                            </div>
+                            <p className={styles.name}>{l?.file?.name ?? l.path?.replace("/media/documents/", "")}</p>
                           </div>
-                          <p className={styles.name}>{l?.file?.name ?? l.path?.replace("/media/documents/", "")}</p>
-                        </div>)}
-                    </div>}
-                    {erroredFields.includes("document_confirming_real_activity") && <p className="text-error">Поле не заполнено</p>}
 
+                          <DeleteButton onClick={deleteFromActivityDocs(l)} />
+                        </div>
+                        )}
+                    </div>}
                   </div>
                   <DownloadButton 
                     addFile={getActivityDocUrl} 
@@ -1282,21 +1297,25 @@ const Step2 = () => {
                     Лицензии
                   </p>
                   <div className={styles.mb24}>
-                    {!!data.document_licenses.length && <div className={styles.row}>
+                    {!!data.document_licenses.length && <div className={styles.mb24}>
                       {data.document_licenses.map(l => 
-                        <div className={styles.download__item} key={l.path} style={{ flexGrow: 0 }}>
-                          <div className={styles.icon}>
-                            <p className={styles.format}>
-                              {getFormatFile(l?.file?.name ?? l.path)}
-                            </p>
-                            <p className={styles.size}>
-                              {l.size}
-                            </p>
+                        <div key={l.path} className={styles.row}>
+                          <div className={styles.download__item} style={{ flexGrow: 0 }}>
+                            <div className={styles.icon}>
+                              <p className={styles.format}>
+                                {getFormatFile(l?.file?.name ?? l.path)}
+                              </p>
+                              <p className={styles.size}>
+                                {l.size}
+                              </p>
+                            </div>
+                            <p className={styles.name}>{l?.file?.name ?? l.path?.replace("/media/documents/", "")}</p>
                           </div>
-                          <p className={styles.name}>{l?.file?.name ?? l.path?.replace("/media/documents/", "")}</p>
-                        </div>)}
+
+                          <DeleteButton onClick={deleteFromLicense(l)} />
+                        </div>
+                        )}
                     </div>}
-                    {erroredFields.includes("document_licenses") && <p className="text-error">Поле не заполнено</p>}
                   </div>
                   <DownloadButton 
                     addFile={getLicenseUrl} 

@@ -3,8 +3,9 @@
   border-radius: 8px;
   padding: 16px 32px;
   border: none;
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   outline: none;
   cursor: pointer;
   transition: .25s;
