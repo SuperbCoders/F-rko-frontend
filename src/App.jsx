@@ -12,17 +12,17 @@ function App() {
 
   const helpingInfo = React.useRef({ opf: "", custom_planned_operation: {} })
 
-  // React.useEffect(() => {
-  //   const saveData = () => setRequisits(prev => {
-  //     if (isObject(prev)) {
-  //       localStorage.setItem('rko_data', JSON.stringify(prev));
-  //       localStorage.setItem('rko_info', JSON.stringify(helpingInfo.current));
-  //     } 
-  //     return prev
-  //   })
-  //   window.addEventListener('beforeunload', saveData);
-  //   return () => window.removeEventListener('beforeunload', saveData)
-  // }, [])
+  React.useEffect(() => {
+    const saveData = () => setRequisits(prev => {
+      if (isObject(prev)) {
+        localStorage.setItem('rko_data', JSON.stringify(prev));
+        localStorage.setItem('rko_info', JSON.stringify(helpingInfo.current));
+      } 
+      return prev
+    })
+    window.addEventListener('beforeunload', saveData);
+    return () => window.removeEventListener('beforeunload', saveData)
+  }, [])
 
   React.useEffect(() => {
     const phone = localStorage.getItem("contact_number") ?? ""

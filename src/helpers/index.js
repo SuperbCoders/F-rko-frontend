@@ -21,3 +21,25 @@ export function isObject(val) {
   if (typeof val === 'function') { return false }
   return typeof val === 'object'
 }
+
+
+export function dateIsValid(dateStr="") {
+  if (!dateStr || typeof dateStr !== "string") {
+    return false
+  }
+
+  const [day, month, year] = dateStr?.split('.');
+
+  // 👇️ format Date string as `yyyy-mm-dd`
+  const isoFormattedStr = `${year}-${month}-${day}`;
+
+  const date = new Date(isoFormattedStr);
+
+  const timestamp = date.getTime();
+
+  if (typeof timestamp !== 'number' || Number.isNaN(timestamp)) {
+    return false;
+  }
+
+  return date.toISOString().startsWith(isoFormattedStr);
+}

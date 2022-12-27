@@ -63,7 +63,7 @@ const DaDataSelect = ({
     } else if (isCode) {
       requestCodes(text.trim())
         .then((data) => data.json())
-        .then((data) => { console.log(data.suggestions); setOptionsList(data.suggestions) })
+        .then((data) => setOptionsList(data.suggestions))
 
     } else if (isAddr) {
       requestAddress(text.trim())

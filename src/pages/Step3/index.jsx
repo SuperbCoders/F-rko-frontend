@@ -90,7 +90,7 @@ const Step3 = () => {
     },
   ]
 
-  const { data, setData } = React.useContext(RequisitesContext)
+  const { data, setData, erroredFields, setErroredFields } = React.useContext(RequisitesContext)
 
   const [isShowModal, setShowModal] = useState(false);
   const [additionals, setAdditionals] = React.useState(["СМС-оповещение"])
@@ -120,6 +120,10 @@ const Step3 = () => {
   const onCheck = (name) => () => setAdditionals(prev => prev.includes(name) ? prev.filter(a => a !== name ) : [...prev, name] ) 
 
   const onSubmit = async () => {
+    if (!data.codeword?.length) {
+      setErroredFields(p => ([...p, "codeword"]))
+      return
+    }
     const formattedPhone = data.contact_number.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скобки
 
     const dto = {
@@ -136,15 +140,19 @@ const Step3 = () => {
       is_finished: true
     }
 
-    setDisableUI(true)
-    await userApi.postInfo(dto, formattedPhone)
-    localStorage.removeItem("rko_name")
-    localStorage.removeItem("rko_info")
-    localStorage.removeItem("rko_data")
-    localStorage.setItem("rko_active_step", 1)
-    setData(initData)
-    setDisableUI(false)
-    setShowModal(true)
+    try {
+      setDisableUI(true)
+      await userApi.postInfo(dto, formattedPhone)
+      localStorage.removeItem("rko_name")
+      localStorage.removeItem("rko_info")
+      localStorage.removeItem("rko_data")
+      localStorage.setItem("rko_active_step", 1)
+      setData(initData)
+      setDisableUI(false)
+      setShowModal(true)
+    } catch (error) {
+      setDisableUI(false)
+    }
   }
   
   return (
@@ -347,9 +355,15 @@ const Step3 = () => {
               value={data.codeword}
               name="Кодовое слово"
               maxLength={35}
+              error={erroredFields.includes("codeword")}
               placeholder="Введите кодовое слово"
-              onChange={(e) => setData({ ...data, codeword: e.target.value })}
+              onChange={(e) => {
+                setErroredFields(p => p.filter(f => f !== "codeword"))
+                setData({ ...data,  codeword: e.target.value })
+              }
+            }
             />
+          {erroredFields.includes("codeword") && <p className="text-error">Поле не заполнено</p>}
           </div>
 
           <div className="mt60" style={{ textAlign: "right" }}>
