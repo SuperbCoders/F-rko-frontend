@@ -355,6 +355,9 @@ const Step2 = () => {
     if (!data.donaninname.includes("https://") || !data.donaninname.includes("www.")) {
       return
     }
+    if (!/^[а-яА-ЯёЁ\s]+$/.test(data.codeword)) {
+      return
+    }
     if (arr.length) {
       return
     }
@@ -660,7 +663,7 @@ const Step2 = () => {
               </div>
             </Wrapper>
           </div>
-          {info?.opf?.full?.includes("ИП") && info?.opf?.code !== "50102" && 
+          {info.current.type && info.current.type !== "INDIVIDUAL" && info.current.code !== "50102" && 
             <div className={styles.mb40}>
               <Wrapper
                 headElement={<p className={styles.title_block}>Структура органов управления</p>}
@@ -736,7 +739,7 @@ const Step2 = () => {
             </Wrapper>
           </div>
 
-          {info?.opf?.full.includes("ИП") && info?.opf?.code !== "50102" && <div className={styles.mb40}>
+          {info.current.type && info.current.type !== "INDIVIDUAL" && info.current.code !== "50102" && <div className={styles.mb40}>
             <Wrapper
               headElement={<p className={styles.title_block}>Учредители – юридические лица</p>}
             >
@@ -2963,7 +2966,7 @@ const Step2 = () => {
                   </div>
                   {data.information_counterparties && 
                     <div>
-                      {data.information_counterparties_two.map((p, i) =>
+                      {data.information_counterparties_two?.map((p, i) =>
                       <div key={i}>
                         <div className={styles.row}>
                           <Input
@@ -2983,7 +2986,7 @@ const Step2 = () => {
                       <AddButton
                         type="button" 
                         onClick={() => {
-                          data.information_counterparties_two.push("")
+                          data.information_counterparties_two?.push("")
                           setData({ ...data })
                         }} 
                       />
@@ -3089,12 +3092,14 @@ const Step2 = () => {
               error={erroredFields.includes("codeword")}
               placeholder="Введите кодовое слово"
               onChange={(e) => {
-                setErroredFields(p => p.filter(f => f !== "codeword"))
+                /^[а-яА-ЯёЁ\s]+$/.test(e.target.value) 
+                  ? setErroredFields(p => p.filter(f => f !== "codeword"))
+                  : setErroredFields(p => ([ ...p, "codeword" ]))
                 setData({ ...data,  codeword: e.target.value })
               }
             }
             />
-            {erroredFields.includes("codeword") && <p className="text-error">Поле не заполнено</p>}
+            {erroredFields.includes("codeword") && <p className="text-error">Поле заполнено некорректно</p>}
           </div>
 
           {/* {erroredFields.length && showErrors ? <p style={{ color: "red" }}>Часть полей не заполнена или заполнена некорректно</p> : null} */}

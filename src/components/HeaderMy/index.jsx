@@ -15,6 +15,7 @@ const HeaderMy = () => {
     localStorage.removeItem("login_number")
     localStorage.removeItem("rko_name")
     localStorage.removeItem("rko_data")
+    localStorage.removeItem("rko_info")
     localStorage.setItem("rko_active_step", 1)
     setData(initData)
     navigate(ROUTES.STEP1)

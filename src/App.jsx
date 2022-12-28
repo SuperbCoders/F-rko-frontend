@@ -10,7 +10,7 @@ function App() {
   const [requisits, setRequisits] = React.useState(initData)
   const [erroredFields, setErroredFields] = React.useState([])
 
-  const helpingInfo = React.useRef({ opf: "", custom_planned_operation: {} })
+  const helpingInfo = React.useRef({ type: "", code: "", custom_planned_operation: {} })
 
   React.useEffect(() => {
     const saveData = () => setRequisits(prev => {

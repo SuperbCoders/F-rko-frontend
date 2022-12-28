@@ -52,7 +52,8 @@ const Step1 = () => {
   })
 
   const onSelect = (a) => {
-    info.current.opf = a?.value?.data?.opf ?? ""
+    info.current.type = a?.value?.data?.type ?? ""
+    info.current.code = a?.value?.data?.opf?.code ?? ""
     const { value } = a || {}
     const { data } = value || {}
 

@@ -22,7 +22,7 @@ const DaDataSelect = ({
   if (!formatedOptions) {
     formatedOptions = (list) => list.map((item) => ({ value: item, label: `${item.value} ${item.data.address.unrestricted_value}` }))
   }
-  
+
   const noOptionsMessage = ({ inputValue }) => inputValue ? "Нет результатов" : message
 
   const styles = {
@@ -53,7 +53,7 @@ const DaDataSelect = ({
       requestCountries(text.trim())
       .then((data) => data.json())
       .then((data) => {
-        const russiaOption = data.suggestions.find(s => s.value === "Россия") 
+        const russiaOption = data.suggestions.find(s => s.value === "Россия")
         setOptionsList(
           russiaOption
           ? [ russiaOption, ...data.suggestions.filter(s => s.value !== "Россия") ]
