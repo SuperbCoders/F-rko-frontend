@@ -2966,22 +2966,22 @@ const Step2 = () => {
                   </div>
                   {data.information_counterparties && 
                     <div>
-                      {data.information_counterparties_two?.map((p, i) =>
-                      <div key={i}>
-                        <div className={styles.row}>
-                          <Input
-                            value={p}
-                            error={!p?.length}
-                            placeholder="Введите название"
-                            onChange={onChangeCounterparties(i)}
-                          />
-                          <DeleteButton onClick={removeFromCounterparties(i)} />
+                      {data.information_counterparties_two?.map?.((p, i) =>
+                        <div key={i}>
+                          <div className={styles.row}>
+                            <Input
+                              value={p}
+                              error={showErrors && !p?.length}
+                              placeholder="Введите название"
+                              onChange={onChangeCounterparties(i)}
+                            />
+                            <DeleteButton onClick={removeFromCounterparties(i)} />
+                          </div>
+                          <div className={styles.mb24}>
+                          {!p?.length && showErrors && <p className="text-error">Поле не заполнено</p>}
+                          </div>
                         </div>
-                        <div className={styles.mb24}>
-                        {!p?.length && <p className="text-error">Поле не заполнено</p>}
-                        </div>
-                      </div>
-                        )}
+                      )}
 
                       <AddButton
                         type="button" 
