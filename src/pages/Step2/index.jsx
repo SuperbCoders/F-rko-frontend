@@ -113,7 +113,7 @@ const Step2 = () => {
 
   const formatedOptions = (list) => list.map((item) => ({ value: item.data.address.unrestricted_value, label: item.data.address.unrestricted_value }))
 
-  const { data, info, setData, erroredFields, setErroredFields } = React.useContext(RequisitesContext)
+  const { data, info, setData, erroredFields=[], setErroredFields } = React.useContext(RequisitesContext)
 
   const regDate = data?.registration_date ? new Date(parseInt(data.registration_date)) : ""
   const formatedRegDate = regDate ? `${regDate.getFullYear?.()}-${regDate?.getMonth?.() + 1}-${regDate?.getDate?.()}` : ""
@@ -128,9 +128,9 @@ const Step2 = () => {
 
   React.useEffect(() => setIsBeneficiaries(data.beneficiaries !== "Отсутствуют"), [data.beneficiaries])
   React.useEffect(() => setCustomPlannedOper({
-    active: info.current.custom_planned_operation?.active ?? false,
-    value: info.current.custom_planned_operation?.value ?? ""
-  }), [info.current.custom_planned_operation])
+    active: info.current?.custom_planned_operation?.active ?? false,
+    value: info.current?.custom_planned_operation?.value ?? ""
+  }), [info.current?.custom_planned_operation])
 
   const addToAddressList = () => setData({
     ...data,
@@ -305,7 +305,6 @@ const Step2 = () => {
       "email",
       "codeword",
       "contact_phone_number",
-      "planned_operations",
       "donainname",
       "fax",
       "supreme_management_body",
@@ -341,6 +340,9 @@ const Step2 = () => {
       "supreme_management_body"
     ]
     const arr = fields.reduce((accum, next) => !data[next] || !data[next]?.length ? ([...accum, next]) : accum, [])
+    if (!data.planned_operations.length && !info.current.custom_planned_operation.active) {
+      arr.push("planned_operations")
+    }
     setErroredFields(arr)
 
     if (data.information_counterparties && data.information_counterparties_two.every(str => str === "")) {
@@ -352,7 +354,7 @@ const Step2 = () => {
     if (data.founders.length && data.founders.every(a => a.capital === "" && a.label === "")) {
       return
     }
-    if (!data.donainname.includes("https://") || !data.donainname.includes("www.")) {
+    if (!(data.donainname.includes?.("https://") || data.donainname.includes?.("www."))) {
       return
     }
     if (!/^[а-яА-ЯёЁ\s]+$/.test(data.codeword)) {
@@ -380,7 +382,7 @@ const Step2 = () => {
         isValid = false
         return false
       }
-      if (p.account_onw_role?.includes("ЕИО") && !p.account_own_job_title?.length) {
+      if (p.account_onw_role?.includes?.("ЕИО") && !p.account_own_job_title?.length) {
         isValid = false
         return false
       }
@@ -606,14 +608,13 @@ const Step2 = () => {
                   <div className={styles.input__wrapper}>
                     <p className={styles.name}>Сайт компании</p>
                     <MaskedInput
-                      // mask="https://d{2}"
                       placeholder="www."
                       value={data?.donainname ?? "www."}
                       error={erroredFields.includes("donainname")}
                       onChange={(e) => {
                         !e.target.value.includes("https://") || !e.target.value.includes("www.")
-                        ? setErroredFields(prev => ([...prev, "donainname"]))
-                        : setErroredFields(prev => prev.filter(f => f !== "donainname"))
+                          ? setErroredFields(prev => ([...prev, "donainname"]))
+                          : setErroredFields(prev => prev.filter(f => f !== "donainname"))
                         setData({ ...data, donainname: e.target.value}) 
                       }}
                     />
@@ -643,7 +644,7 @@ const Step2 = () => {
           <div className={styles.mb64}>
             <Wrapper headElement={<p className={styles.title_block}>Адреса</p>}>
               <div className={styles.content}>
-                {data.addresses.map(({ type_adress, address }, idx) => 
+                {data?.addresses?.map?.(({ type_adress, address }, idx) => 
                   <AddressItem
                     key={idx}
                     id={idx}
@@ -663,7 +664,7 @@ const Step2 = () => {
               </div>
             </Wrapper>
           </div>
-          {info.current.type && info.current.type !== "INDIVIDUAL" && info.current.code !== "50102" && 
+          {info.current?.type && info.current?.type !== "INDIVIDUAL" && info.current?.code !== "50102" && 
             <div className={styles.mb40}>
               <Wrapper
                 headElement={<p className={styles.title_block}>Структура органов управления</p>}
@@ -739,7 +740,7 @@ const Step2 = () => {
             </Wrapper>
           </div>
 
-          {info.current.type && info.current.type !== "INDIVIDUAL" && info.current.code !== "50102" && <div className={styles.mb40}>
+          {info.current?.type && info.current?.type !== "INDIVIDUAL" && info.current?.code !== "50102" && <div className={styles.mb40}>
             <Wrapper
               headElement={<p className={styles.title_block}>Учредители – юридические лица</p>}
             >
@@ -799,10 +800,10 @@ const Step2 = () => {
                         className={styles.checks__item}
                         >
                         <CheckBoxRS
-                          isChecked={p.account_onw_role?.includes(r)}
+                          isChecked={p.account_onw_role?.includes?.(r)}
                           onChange={() => {
                             const roles = data.list_persone[i].account_onw_role ?? []
-                            data.list_persone[i].account_onw_role = roles?.includes(r) ? roles.filter(role => role !== r) : [...roles, r]
+                            data.list_persone[i].account_onw_role = roles?.includes?.(r) ? roles.filter(role => role !== r) : [...roles, r]
                             setData({ ...data })
                           }}
                         >
@@ -859,7 +860,7 @@ const Step2 = () => {
 
                     </div>
                   </div>
-                    {p.account_onw_role?.includes("ЕИО") && 
+                    {p.account_onw_role?.includes?.("ЕИО") && 
                     <div className={classNames(styles.row, "bg-grey")}>
                       <Input 
                         value={p.account_own_job_title}
@@ -877,7 +878,7 @@ const Step2 = () => {
                       </div>
                       }
                   </div>}
-                  {p.account_onw_role?.includes("Акционер/учредитель") && 
+                  {p.account_onw_role?.includes?.("Акционер/учредитель") && 
                       <div>
                       <Input 
                         value={p.account_own_piece}
@@ -1239,8 +1240,8 @@ const Step2 = () => {
                   </p>
 
                   <div className={styles.mb24}>
-                    {!!data.document_certifying_identity_executive.length && <div className={styles.mb24}>
-                      {data.document_certifying_identity_executive.map(l => 
+                    {!!data?.document_certifying_identity_executive?.length && <div className={styles.mb24}>
+                      {data?.document_certifying_identity_executive?.map?.(l => 
                         <div key={l.path} className={styles.row}>
                           <div className={styles.download__item} style={{ flexGrow: 0 }}>
                             <div className={styles.icon}>
@@ -1271,7 +1272,7 @@ const Step2 = () => {
                   </p>
 
                   <div className={styles.mb24}>
-                    {!!data.document_confirming_real_activity.length && <div className={styles.mb24}>
+                    {!!data?.document_confirming_real_activity?.length && <div className={styles.mb24}>
                       {data.document_confirming_real_activity.map(l => 
                         <div key={l.path} className={styles.row}>
                           <div className={styles.download__item} style={{ flexGrow: 0 }}>
@@ -1300,8 +1301,8 @@ const Step2 = () => {
                     Лицензии
                   </p>
                   <div className={styles.mb24}>
-                    {!!data.document_licenses.length && <div className={styles.mb24}>
-                      {data.document_licenses.map(l => 
+                    {!!data?.document_licenses?.length && <div className={styles.mb24}>
+                      {data.document_licenses?.map?.(l => 
                         <div key={l.path} className={styles.row}>
                           <div className={styles.download__item} style={{ flexGrow: 0 }}>
                             <div className={styles.icon}>
@@ -1339,7 +1340,7 @@ const Step2 = () => {
                 <div className={styles.checks}>
                   <div className={styles.checks__item}>
                     <CheckBoxRS
-                      isChecked={data.planned_operations.includes(planned_operations[0])}
+                      isChecked={data?.planned_operations?.includes?.(planned_operations[0])}
                       onChange={onSelectOper(planned_operations[0])}
                       >
                       <p>{planned_operations[0]}</p>
@@ -1347,7 +1348,7 @@ const Step2 = () => {
                   </div>
                   <div className={styles.checks__item}>
                     <CheckBoxRS
-                      isChecked={data.planned_operations.includes(planned_operations[1])}
+                      isChecked={data?.planned_operations?.includes?.(planned_operations[1])}
                       onChange={onSelectOper(planned_operations[1])}
                       >
                       <p>{planned_operations[1]}</p>
@@ -1355,7 +1356,7 @@ const Step2 = () => {
                   </div>
                   <div className={styles.checks__item}>
                     <CheckBoxRS
-                      isChecked={data.planned_operations.includes(planned_operations[2])}
+                      isChecked={data?.planned_operations?.includes?.(planned_operations[2])}
                       onChange={onSelectOper(planned_operations[2])}
                       >
                       <p>{planned_operations[2]}</p>
@@ -1365,7 +1366,7 @@ const Step2 = () => {
                 <div className={styles.checks}>
                   <div className={styles.checks__item}>
                     <CheckBoxRS
-                      isChecked={data.planned_operations.includes(planned_operations[3])}
+                      isChecked={data?.planned_operations?.includes?.(planned_operations[3])}
                       onChange={onSelectOper(planned_operations[3])}
                       >
                       <p>{planned_operations[3]}</p>
@@ -1374,7 +1375,7 @@ const Step2 = () => {
 
                   <div className={styles.checks__item}>
                     <CheckBoxRS
-                      isChecked={data.planned_operations.includes(planned_operations[4])}
+                      isChecked={data?.planned_operations?.includes?.(planned_operations[4])}
                       onChange={onSelectOper(planned_operations[4])}
                       >
                       <p>{planned_operations[4]}</p>
@@ -1382,7 +1383,7 @@ const Step2 = () => {
                   </div>
                   <div className={styles.checks__item}>
                     <CheckBoxRS
-                      isChecked={data.planned_operations.includes(planned_operations[5])}
+                      isChecked={data?.planned_operations?.includes?.(planned_operations[5])}
                       onChange={onSelectOper(planned_operations[5])}
                       >
                       <p>{planned_operations[5]}</p>
@@ -1392,7 +1393,7 @@ const Step2 = () => {
                 <div className={styles.checks}>
                   <div className={styles.checks__item}>
                     <CheckBoxRS
-                      isChecked={data.planned_operations.includes(planned_operations[6])}
+                      isChecked={data?.planned_operations?.includes?.(planned_operations[6])}
                       onChange={onSelectOper(planned_operations[6])}
                       >
                       <p>{planned_operations[6]}</p>
@@ -1401,7 +1402,7 @@ const Step2 = () => {
 
                   <div className={styles.checks__item}>
                     <CheckBoxRS
-                      isChecked={data.planned_operations.includes(planned_operations[7])}
+                      isChecked={data?.planned_operations?.includes?.(planned_operations[7])}
                       onChange={onSelectOper(planned_operations[7])}
                       >
                       <p>{planned_operations[7]}</p>
@@ -1409,7 +1410,7 @@ const Step2 = () => {
                   </div>
                   <div className={styles.checks__item}>
                     <CheckBoxRS
-                      isChecked={data.planned_operations.includes(planned_operations[8])}
+                      isChecked={data?.planned_operations?.includes?.(planned_operations[8])}
                       onChange={onSelectOper(planned_operations[8])}
                       >
                       <p>{planned_operations[8]}</p>
@@ -1434,7 +1435,7 @@ const Step2 = () => {
                     onChange={onChangeCustomPlannedOper}
                   />
                 </div>}
-                {((customPlannedOper.active && erroredFields.includes("custom_planned_oper")) || erroredFields.includes("planned_operations")) && <p className="text-error">Поле не заполнено</p>}
+                {erroredFields.includes("custom_planned_oper") && <p className="text-error">Поле не заполнено</p>}
             </Wrapper>
           </div>
           <div className={styles.mb40}>
@@ -3005,7 +3006,7 @@ const Step2 = () => {
                   <div className={styles.column}>
                     <div className={styles.checks__item}>
                       <CheckBoxRS
-                        isChecked={data.information_goals.includes(statementsTexts[0])}
+                        isChecked={data.information_goals.includes?.(statementsTexts[0])}
                         onChange={onSelect(statementsTexts[0])}
                         >
                         <p>{statementsTexts[0]}</p>
@@ -3015,7 +3016,7 @@ const Step2 = () => {
                   <div className={styles.column}>
                     <div className={styles.checks__item}>
                       <CheckBoxRS
-                        isChecked={data.information_goals.includes(statementsTexts[1])}
+                        isChecked={data.information_goals.includes?.(statementsTexts[1])}
                         onChange={onSelect(statementsTexts[1])}
                         >
                         <p>{statementsTexts[1]}</p>
@@ -3028,7 +3029,7 @@ const Step2 = () => {
                   <div className={styles.column}>
                     <div className={styles.checks__item}>
                       <CheckBoxRS
-                        isChecked={data.information_goals.includes(statementsTexts[2])}
+                        isChecked={data.information_goals.includes?.(statementsTexts[2])}
                         onChange={onSelect(statementsTexts[2])}
                       >
                         <p>{statementsTexts[2]}</p>
@@ -3038,7 +3039,7 @@ const Step2 = () => {
                   <div className={styles.column}>
                     <div className={styles.checks__item}>
                       <CheckBoxRS 
-                        isChecked={data.information_goals.includes(statementsTexts[3])}
+                        isChecked={data.information_goals.includes?.(statementsTexts[3])}
                         onChange={onSelect(statementsTexts[3])}
                       >
                         <p>{statementsTexts[3]}</p>
@@ -3050,7 +3051,7 @@ const Step2 = () => {
                   <div className={styles.column}>
                     <div className={styles.checks__item}>
                       <CheckBoxRS 
-                        isChecked={data.information_goals.includes(statementsTexts[4])}
+                        isChecked={data.information_goals.includes?.(statementsTexts[4])}
                         onChange={onSelect(statementsTexts[4])}
                         >
                         <p>{statementsTexts[4]}</p>
@@ -3060,7 +3061,7 @@ const Step2 = () => {
                   <div className={styles.column}>
                     <div className={styles.checks__item}>
                       <CheckBoxRS 
-                        isChecked={data.information_goals.includes(statementsTexts[5])}
+                        isChecked={data.information_goals.includes?.(statementsTexts[5])}
                         onChange={onSelect(statementsTexts[5])}
                         >
                         <p>{statementsTexts[5]}</p>
@@ -3072,7 +3073,7 @@ const Step2 = () => {
                   <div className={styles.column}>
                     <div className={styles.checks__item}>
                       <CheckBoxRS 
-                        isChecked={data.information_goals.includes(statementsTexts[6])}
+                        isChecked={data.information_goals.includes?.(statementsTexts[6])}
                         onChange={onSelect(statementsTexts[6])}
                         >
                         <p>{statementsTexts[6]}</p>
@@ -3101,8 +3102,6 @@ const Step2 = () => {
             />
             {erroredFields.includes("codeword") && <p className="text-error">Поле заполнено некорректно</p>}
           </div>
-
-          {/* {erroredFields.length && showErrors ? <p style={{ color: "red" }}>Часть полей не заполнена или заполнена некорректно</p> : null} */}
           <div style={{ textAlign: "right", margin: "40px 0" }}>
             <ButtonRS
               title="Продолжить"
@@ -3111,7 +3110,6 @@ const Step2 = () => {
               onClick={onSubmit}
             />
           </div>
-
         </form>
       </div>
     </>

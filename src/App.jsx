@@ -148,18 +148,6 @@ function App() {
             }
           ]
         }
-        
-        prevSavedData.list_persone?.forEach(p => {
-          if (p.account_datebirth) {
-            p.account_datebirth = new Date(p.account_datebirth)
-          }
-          if (p.date_issue) {
-            p.date_issue = new Date(p.date_issue)
-          }
-          if (p.validity) {
-            p.validity = new Date(p.validity)
-          }
-        })
 
         return { ...prev, ...prevSavedData }
       })
