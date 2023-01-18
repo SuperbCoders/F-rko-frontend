@@ -306,7 +306,7 @@ const Step2 = () => {
       "codeword",
       "contact_phone_number",
       "planned_operations",
-      "donaninname",
+      "donainname",
       "fax",
       "supreme_management_body",
       "employers_volume",
@@ -352,7 +352,7 @@ const Step2 = () => {
     if (data.founders.length && data.founders.every(a => a.capital === "" && a.label === "")) {
       return
     }
-    if (!data.donaninname.includes("https://") || !data.donaninname.includes("www.")) {
+    if (!data.donainname.includes("https://") || !data.donainname.includes("www.")) {
       return
     }
     if (!/^[а-яА-ЯёЁ\s]+$/.test(data.codeword)) {
@@ -608,16 +608,16 @@ const Step2 = () => {
                     <MaskedInput
                       // mask="https://d{2}"
                       placeholder="www."
-                      value={data?.donaninname ?? "www."}
-                      error={erroredFields.includes("donaninname")}
+                      value={data?.donainname ?? "www."}
+                      error={erroredFields.includes("donainname")}
                       onChange={(e) => {
                         !e.target.value.includes("https://") || !e.target.value.includes("www.")
-                        ? setErroredFields(prev => ([...prev, "donaninname"]))
-                        : setErroredFields(prev => prev.filter(f => f !== "donaninname"))
-                        setData({ ...data, donaninname: e.target.value}) 
+                        ? setErroredFields(prev => ([...prev, "donainname"]))
+                        : setErroredFields(prev => prev.filter(f => f !== "donainname"))
+                        setData({ ...data, donainname: e.target.value}) 
                       }}
                     />
-                      {erroredFields.includes("donaninname") && <p className="text-error">Поле заполнено некорректно</p>}
+                      {erroredFields.includes("donainname") && <p className="text-error">Поле заполнено некорректно</p>}
                   </div>
                   <div className={styles.input__wrapper}>
                     <p className={styles.name}>Факс</p>
