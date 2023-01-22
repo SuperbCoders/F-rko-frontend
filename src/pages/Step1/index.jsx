@@ -27,8 +27,9 @@ const Step1 = () => {
     code: {
       value: "",
       valid: false,
-      validateFn: str => str.length > 0,
-      required: false
+      validateFn: str => str.length === 6,
+      required: true,
+      correct: false
     },
     agree: {
       value: true,
@@ -39,9 +40,28 @@ const Step1 = () => {
 
   const [fields, setFields] = React.useState(initFields)
   const [showErrors, setShowErrors] = React.useState(false)
+  const [seconds, setSeconds] = React.useState(0)
   const [disableUI, setDisableUI] = React.useState(false)
+  const [disableButton, setDisableButton] = React.useState(false)
+  const [disableInput, setDisableInput] = React.useState(true)
+  const sentTypedCode = React.useRef(false)
 
   React.useEffect(() => window.scrollTo(0, 0), []);
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      if (seconds > 0) {
+        setSeconds(seconds - 1);
+      }
+  
+      if (seconds === 0) {
+        clearInterval(interval);
+        setDisableButton(false)
+      }
+    }, 1000);
+  
+    return () => clearInterval(interval)
+  }, [seconds])
 
   const onAgree = () => setFields({
     ...fields,
@@ -50,6 +70,37 @@ const Step1 = () => {
       valid: !fields.agree.valid
     }
   })
+
+  const onGetCode = () => {
+    setDisableButton(true)
+    setSeconds(60)
+    setDisableInput(false)
+    userApi.sendSmsCode(data.contact_number)
+      .then()
+      .catch()
+  }
+
+  const onChangeCode = (e) => {
+    setFields({
+      ...fields,
+      code: {
+        ...fields.code,
+        value: e.target.value,
+        valid: fields.code.validateFn(e.target.value),
+      }
+    })
+    if (e.target.value?.[5] && !isNaN(e.target.value[5])) {
+      userApi.checkForValidity(data.contact_number, fields.code.value)
+        .then(res => {
+          console.log("res", res, res?.status)
+          if (res.status === 200) {
+            fields.code.correct = true
+          }
+        })
+        .catch(e => {})
+      sentTypedCode.current = true
+    }
+  }
 
   const onSelect = (a) => {
     info.current.type = a?.value?.data?.type ?? ""
@@ -89,13 +140,15 @@ const Step1 = () => {
     e.preventDefault()
     setShowErrors(true)
 
-    const formattedPhone = data.contact_number.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скоблки
+    // if (!fields.code.correct) {
+    //   return
+    // }
 
     localStorage.setItem("contact_number", data.contact_number)
     setDisableUI(true)
 
     try {
-      await userApi.postInfo(data, formattedPhone)
+      await userApi.postInfo(data, data.contact_number)
       setDisableUI(false)
       setShowErrors(false)
       localStorage.setItem("rko_active_step", 2)
@@ -162,8 +215,9 @@ const Step1 = () => {
                     <ButtonRS
                       title="Получить код"
                       type="button"
-                      disable={!/[0-9]+/.test(data.contact_number?.[17])}
+                      disable={!/[0-9]+/.test(data.contact_number?.[17]) || disableButton}
                       style={{ marginLeft: "24px", maxWidth: "267px" }}
+                      onClick={onGetCode}
                     />
                   </div>
                 </div>
@@ -174,19 +228,25 @@ const Step1 = () => {
                   <p className={styles.input__name}>Код проверки из СМС</p>
                   <div className={styles.input__container}>
                     <div>
-                      <InputRS
+                      <MaskedInput 
                         name="Код проверки из СМС"
+                        type="tel"
+                        mask="999999"
+                        maskChar="_"
+                        error={sentTypedCode.current && !fields.code.correct}
+                        disabled={disableInput}
+                        placeholder="______"
                         value={fields.code.value}
-                        inputStyle={{ maxWidth: "267px" }}
-                        required={false}
-                        onChange={onChange("code")}
+                        required={fields.code.required}
+                        onChange={onChangeCode}
                       />
                     </div>
 
-                    <p className={styles.form__notify}>
-                      Повторно можно <br /> отправить код через 59 сек
-                    </p>
+                    {!!seconds && <p className={styles.form__notify}>
+                      Повторно можно <br /> отправить код через {seconds} сек
+                    </p>}
                   </div>
+                  {sentTypedCode.current && !fields.code.correct && <p className="text-error mt10">Некорректный код</p>}
                 </div>
                 <div className={styles.checkbox__container}>
                   <CheckBoxRS

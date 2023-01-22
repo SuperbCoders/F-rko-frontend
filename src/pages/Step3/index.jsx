@@ -119,8 +119,6 @@ const Step3 = () => {
   const onCheck = (name) => () => setAdditionals(prev => prev.includes(name) ? prev.filter(a => a !== name ) : [...prev, name] ) 
 
   const onSubmit = async () => {
-    const formattedPhone = data.contact_number.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скобки
-
     const dto = {
       ...data,
       addresses: data.addresses.map(({ type_adress, address }) => ({ 
@@ -137,7 +135,7 @@ const Step3 = () => {
 
     try {
       setDisableUI(true)
-      await userApi.postInfo(dto, formattedPhone)
+      await userApi.postInfo(dto, data.contact_number)
       localStorage.removeItem("rko_name")
       localStorage.removeItem("rko_info")
       localStorage.removeItem("rko_data")

@@ -12,9 +12,6 @@ import AddressItem from "../../components/Step2Components/AdressItem";
 import Input from "../../components/Step2Components/Input";
 import SelectRS from "../../components/Step2Components/SelectRS";
 import { dateIsValid, getFormatFile, getSizeMb, ROUTES } from "../../helpers";
-import DateInput from "../../components/Step2Components/DateInput";
-import DocumentItem from "../DocumentItem";
-import ScanOrPhoto from "../../components/Step2Components/ScanOrPhoto";
 import Wrapper from "../../components/Step2Components/Wrapper";
 import InputLock from "../../components/InputLock";
 import DeleteButton from "../../components/DeleteButton";
@@ -183,15 +180,6 @@ const Step2 = () => {
       setErroredFields(p => p.filter(f => f !== "planned_operations"))
     }
   }
-
-  // const getPassportPageUrl = (i) => (file) => {
-  //   const fd = new FormData();
-  //   fd.append("documents", file)
-  //   documentApi.upload(fd).then(res => {
-  //     data.list_persone[i].first_passport_page_url = { path: res.images[0]?.path, file }
-  //     setData({ ...data })
-  //   })
-  // }
 
   const getIdentityDocUrl = (file) => {
     const fd = new FormData();
@@ -457,8 +445,6 @@ const Step2 = () => {
       return
     }
 
-    const formattedPhone = data.contact_number.replace(/\(|\)+|-|\s|/g, "") // убираем пробелы, дефисы, скоблки
-
     const dto = {
       ...data,
       addresses: data.addresses.map(({ type_adress, address }) => ({ 
@@ -478,12 +464,11 @@ const Step2 = () => {
     dto.list_persone.map(p => ({
       ...p,
       accownt_own_living: p.accownt_own_living === "Совпадает" ? p.account_own_registration : p.accownt_own_living,
-      // first_passport_page_url: p.first_passport_page_url?.path
     }))
 
     setDisableUI(true)
     try {
-      await userApi.postInfo(dto, formattedPhone)
+      await userApi.postInfo(dto, data.contact_number)
       localStorage.setItem("rko_active_step", 3)
       localStorage.removeItem("rko_data")
       setDisableUI(false)
@@ -891,7 +876,7 @@ const Step2 = () => {
                         }}
                       />
                       <div className={styles.mb24}>
-                      {!p.account_own_piece?.length && <p className="text-error">Поле не заполнено</p>}
+                      {!p.account_own_piece?.length && showErrors && <p className="text-error">Поле не заполнено</p>}
                       </div>
                       </div>
                     }
