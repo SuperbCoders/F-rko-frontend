@@ -8,7 +8,7 @@ import classNames from "classnames";
 import HeaderMy from "../../components/HeaderMy";
 import { initData, RequisitesContext } from "../../contexts/companyRequisits";
 import { userApi } from "../../api";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { ROUTES } from "../../helpers";
 
 const TickSymbol = () => {
@@ -89,6 +89,8 @@ const Step3 = () => {
     },
   ]
 
+  const navigate = useNavigate();
+
   const { data, setData } = React.useContext(RequisitesContext)
 
   const [isShowModal, setShowModal] = useState(false);
@@ -139,6 +141,7 @@ const Step3 = () => {
       localStorage.removeItem("rko_name")
       localStorage.removeItem("rko_info")
       localStorage.removeItem("rko_data")
+      localStorage.removeItem("contact_number")
       localStorage.setItem("rko_active_step", 1)
       setData(initData)
       setDisableUI(false)
@@ -353,7 +356,10 @@ const Step3 = () => {
         </div>
       </div>
       {isShowModal && (
-        <Modal onClick={() => setShowModal(false)}>
+        <Modal onClick={() => {
+          setShowModal(false)
+          navigate(ROUTES.STEP1)
+        }}>
           <div className={styles.success}>
             <div className={styles.icon}>
               <svg

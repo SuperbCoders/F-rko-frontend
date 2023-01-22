@@ -297,7 +297,6 @@ const Step2 = () => {
       "fax",
       "supreme_management_body",
       "employers_volume",
-      "salary_debt",
       "document_certifying_identity_executive",
       "history_reputation",
       "week_cash_withdrawal",
@@ -325,7 +324,8 @@ const Step2 = () => {
       "sum_transactions_age",
       "sources_cash_receipts",
       "headcount",
-      "supreme_management_body"
+      "supreme_management_body",
+      "monthly_cash_withdrawal"
     ]
     const arr = fields.reduce((accum, next) => !data[next] || !data[next]?.length ? ([...accum, next]) : accum, [])
     if (!data.planned_operations.length && !info.current.custom_planned_operation.active) {
@@ -342,7 +342,7 @@ const Step2 = () => {
     if (data.founders.length && data.founders.every(a => a.capital === "" && a.label === "")) {
       return
     }
-    if (!(data.donainname.includes?.("https://") || data.donainname.includes?.("www."))) {
+    if (!(data?.donainname?.includes?.("https://") || data?.donainname?.includes?.("www."))) {
       return
     }
     if (!/^[а-яА-ЯёЁ\s]+$/.test(data.codeword)) {
@@ -597,8 +597,8 @@ const Step2 = () => {
                       value={data?.donainname ?? "www."}
                       error={erroredFields.includes("donainname")}
                       onChange={(e) => {
-                        !e.target.value.includes("https://") || !e.target.value.includes("www.")
-                          ? setErroredFields(prev => ([...prev, "donainname"]))
+                        !(e.target.value.includes("https://") || e.target.value.includes("www."))
+                          ? setErroredFields(prev =>  prev.includes("donainname") ? prev : [...prev, "donainname"])
                           : setErroredFields(prev => prev.filter(f => f !== "donainname"))
                         setData({ ...data, donainname: e.target.value}) 
                       }}
@@ -707,18 +707,10 @@ const Step2 = () => {
                     name="Задолженность по з/п"
                     type="number"
                     pattern="[0-9]*"
-                    error={erroredFields.includes("salary_debt")}
                     placeholder="Укажите сумму"
                     rightElement={<p>₽</p>}
-                    onChange={(e) => {
-                      setData({ ...data, salary_debt: e.target.value })
-                      e.target.value 
-                        ? setErroredFields(p => p.filter(f => f !== "salary_debt"))
-                        : setErroredFields(p => ([...p, "salary_debt"]))
-                    }}
+                    onChange={(e) => setData({ ...data, salary_debt: e.target.value })}
                   />
-                    {erroredFields.includes("salary_debt") && <p className="text-error">Поле не заполнено</p>}
-
                   </div>
                 </div>
               </div>
