@@ -49,6 +49,16 @@ const Step1 = () => {
   React.useEffect(() => window.scrollTo(0, 0), []);
 
   React.useEffect(() => {
+    if (
+        (data.contact_number.length === 11 && /[0-9]+/.test(data.contact_number?.[10]))
+        || (data.contact_number.length === 18 && /[0-9]+/.test(data.contact_number?.[17]))
+    ) {
+      setDisableButton(false)
+      setDisableInput(false)
+    }
+  }, [data.contact_number])
+
+  React.useEffect(() => {
     const interval = setInterval(() => {
       if (seconds > 0) {
         setSeconds(seconds - 1);
@@ -140,7 +150,8 @@ const Step1 = () => {
     e.preventDefault()
     setShowErrors(true)
 
-    // if (!fields.code.correct) {
+    // const step = localStorage.getItem("rko_active_step") ?? 1
+    // if (step === 1 && !fields.code.correct) {
     //   return
     // }
 
@@ -270,7 +281,6 @@ const Step1 = () => {
                     type="button"
                     title="Отказаться"
                     style={{ maxWidth: "152px" }}
-                    onClick={() => navigate("/account")}
                   />
                   <ButtonRS
                     title="Продолжить"
