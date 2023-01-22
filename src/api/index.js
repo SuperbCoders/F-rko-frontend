@@ -59,7 +59,13 @@ class UserApi extends BaseApi {
     return this.get(`/api/loan-application/current/${tel}/`)
   }
   postInfo = (values, tel="") => {
-    return this.post(`/api/loan-application/current/${tel}/`, values)
+    return this.post(`/api/loan-application/current/${tel.replace(/\(|\)+|-|\s|/g, "")}/`, values) //убираем пробелы, дефисы, скобки
+  }
+  sendSmsCode = (tel="") => {
+    return this.get(`/api/sms_code/${tel.replace(/\(|\)+|-|\s|/g, "")}/`)
+  }
+  checkForValidity = (tel, code) => {
+    return this.post(`/api/sms_code/${tel.replace(/\(|\)+|-|\s|/g, "")}/`, { code })
   }
 }
 
