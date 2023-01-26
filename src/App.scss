@@ -214,6 +214,22 @@ html {
   display: flex;
 }
 
+.iflex {
+  display: inline-flex;
+}
+
+.grid {
+  display: grid;
+}
+
+.gg30 {
+  grid-gap: 30px;
+}
+
+.frfr {
+  grid-template-columns: 1fr 1fr;
+}
+
 .aic {
   align-items: center;
 }
@@ -222,14 +238,30 @@ html {
   justify-content: center;
 }
 
+.fcol {
+  flex-direction: column;
+}
+
 .mt10 {
   margin-top: 10px;
+}
+
+.mt25 {
+  margin-top: 25px;
 }
 
 .mr15 {
   margin-right: 15px;
 }
 
+.mt40 {
+  margin-top: 40px;
+}
+
 .mt60 {
   margin-top: 60px;
+}
+
+.mta {
+  margin-top: auto;
 }

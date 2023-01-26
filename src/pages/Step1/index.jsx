@@ -99,7 +99,7 @@ const Step1 = () => {
         valid: fields.code.validateFn(e.target.value),
       }
     })
-    if (e.target.value?.[5] && !isNaN(e.target.value[5])) {
+    if (e.target.value?.[3] && !isNaN(e.target.value[3])) {
       userApi.checkForValidity(data.contact_number, fields.code.value)
         .then(res => {
           console.log("res", res, res?.status)
@@ -242,11 +242,11 @@ const Step1 = () => {
                       <MaskedInput 
                         name="Код проверки из СМС"
                         type="tel"
-                        mask="999999"
+                        mask="9999"
                         maskChar="_"
                         error={sentTypedCode.current && !fields.code.correct}
                         disabled={disableInput}
-                        placeholder="______"
+                        placeholder="____"
                         value={fields.code.value}
                         required={fields.code.required}
                         onChange={onChangeCode}
