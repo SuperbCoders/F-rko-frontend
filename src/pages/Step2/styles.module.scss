@@ -214,6 +214,7 @@ input[type=number] {
 .download {
   &__item {
     width: fit-content;
+    max-width: 170px;
 
     .icon {
       flex-direction: column;
@@ -224,6 +225,9 @@ input[type=number] {
       align-items: center;
       justify-content: center;
       margin-bottom: 8px;
+      max-width: 70px;
+      margin-left: auto;
+      margin-right: auto;
 
       .format {
         font-size: 18px;
@@ -240,14 +244,12 @@ input[type=number] {
     }
 
     .name {
-      max-width: 70px;
       white-space: nowrap;
       overflow: hidden;
       font-size: 12px;
       line-height: 18px;
       color: #8E909B;
       text-wrap: none;
-      text-overflow: ellipsis;
     }
   }
 
