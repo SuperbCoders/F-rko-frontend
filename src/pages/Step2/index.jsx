@@ -57,15 +57,6 @@ const Step2 = () => {
     "Иное (укажите)",
   ]
 
-  const cash_source = [
-    "Финансирование учредителей/участников",
-    "Доходы от основного вида деятельности",
-    "Доходы от дополнительных видов деятельности",
-    "Заемные (кредитные)/привлеченные денежные средства",
-    "Государственное финансирование",
-    "Иное",
-  ]
-
   const roles = [
     "Акционер/учредитель",
     "Бенефициарный владелец",
@@ -121,6 +112,15 @@ const Step2 = () => {
     { value: ">100 000 000", label: "Свыше 100 000 000" },
   ]
 
+  const cashSources = [
+    { value: "Финансирование учредителей/участников", label: "Финансирование учредителей/участников" },
+    { value: "Доходы от основного вида деятельности", label: "Доходы от основного вида деятельности" },
+    { value: "Доходы от дополнительных видов деятельности", label: "Доходы от дополнительных видов деятельности" },
+    { value: "Заемные (кредитные)/привлеченные денежные средства", label: "Заемные (кредитные)/привлеченные денежные средства" },
+    { value: "Государственное финансирование", label: "Государственное финансирование" },
+    { value: "Иное", label: "Иное" },
+  ]
+
   const formatedOptions = (list) => list.map((item) => ({ value: item.data.address.unrestricted_value, label: item.data.address.unrestricted_value }))
 
   const { data, info, setData, erroredFields=[], setErroredFields } = React.useContext(RequisitesContext)
@@ -134,6 +134,7 @@ const Step2 = () => {
   const [isBeneficiaries, setIsBeneficiaries] = React.useState(false)
   const [disableUI, setDisableUI] = React.useState(false)
   const [customPlannedOper, setCustomPlannedOper] = React.useState({ active: false, value: "" })
+  const [customSource, setCustomSource] = React.useState({ active: false, value: "" })
   const [showErrors, setShowErrors] = React.useState(false)
 
   React.useEffect(() => setIsBeneficiaries(data.beneficiaries !== "Отсутствуют"), [data.beneficiaries])
@@ -141,6 +142,13 @@ const Step2 = () => {
     active: info.current?.custom_planned_operation?.active ?? false,
     value: info.current?.custom_planned_operation?.value ?? ""
   }), [info.current?.custom_planned_operation])
+
+  React.useEffect(() =>  {
+    setCustomSource({ 
+      active : data.sources_cash_receipts === "Иное",
+      value: info.current.custom_source
+    })
+  }, [info.current.custom_source])
 
   const addToAddressList = () => data.addresses.length < 2 && setData({
     ...data,
@@ -167,7 +175,11 @@ const Step2 = () => {
 
   const onSelectAddressType = (type, idx) => () => {
     const curr = data.addresses[idx]
-    curr.type_adress = curr.type_adress.includes(type) ? curr.type_adress.filter(t => t !== type) : [...curr.type_adress, type]
+    if (curr.type_adress.includes(type) && curr.type_adress.length > 1) {
+      curr.type_adress = curr.type_adress.filter(t => t !== type)
+    } else if (!curr.type_adress.includes(type)) {
+      curr.type_adress = [...curr.type_adress, type]
+    }
     setData({ ...data })
   }
 
@@ -285,8 +297,8 @@ const Step2 = () => {
     info.current.custom_planned_operation = { active: true, value: e.target.value }
     setCustomPlannedOper({ active: true, value: e.target.value })
     e.target.value 
-    ? setErroredFields(p => p.filter(f => f !== "custom_planned_oper"))
-    : setErroredFields(p => ([...p, "custom_planned_oper"]))
+      ? setErroredFields(p => p.filter(f => f !== "custom_planned_oper"))
+      : setErroredFields(p => ([...p, "custom_planned_oper"]))
   }
 
   const onChangeCounterparties = (i) => (e) => {
@@ -475,9 +487,9 @@ const Step2 = () => {
       document_certifying_identity_executive: data.document_certifying_identity_executive.map(d => d?.path),
       document_confirming_real_activity: data.document_confirming_real_activity.map(d => d?.path),
       document_licenses: data.document_licenses.map(d => d?.path),
-      information_counterparties_two: data.information_counterparties ? data.information_counterparties_two : []
+      information_counterparties_two: data.information_counterparties ? data.information_counterparties_two : [],
+      sources_cash_receipts: customSource.active ? customSource.value : data.sources_cash_receipts
     }
-
     dto.list_persone.map(p => ({
       ...p,
       accownt_own_living: p.accownt_own_living === "Совпадает" ? p.account_own_registration : p.accownt_own_living,
@@ -574,9 +586,8 @@ const Step2 = () => {
                   <div className={styles.input__wrapper}>
                     <p className={styles.name}>E-mail</p>
                     <MaskedInput
-                      // mask="*@*.com"
                       placeholder="pochta@server.com"
-                      error={erroredFields.includes("email")}
+                      error={showErrors && !/[a-z0-9]+@[a-z]+\.[a-z]{2,6}/.test(data.email)}
                       value={data.email ?? ""}
                       onChange={(e) => setData({ ...data, email: e.target.value })}
                     />
@@ -596,7 +607,7 @@ const Step2 = () => {
                       placeholder="+7 (__) ___ __ __"
                       maskChar="_"
                       value={data?.contact_phone_number ?? ""}
-                      error={erroredFields.includes("contact_phone_number")}
+                      error={showErrors && erroredFields.includes("contact_phone_number")}
                       onChange={(e) => {
                         !/[0-9]+/.test(e.target.value?.[17])
                           ? setErroredFields(prev => ([...prev, "contact_phone_number"]))
@@ -643,7 +654,7 @@ const Step2 = () => {
                       mask="+7 (999) 999 99 99"
                       placeholder="+7 (__) ___ __ __"
                       maskChar="_"
-                      error={erroredFields.includes("fax")}
+                      error={showErrors && erroredFields.includes("fax")}
                       value={data.fax ?? ""}
                       onChange={(e) => {
                         !/[0-9]+/.test(e.target.value?.[17])
@@ -747,7 +758,11 @@ const Step2 = () => {
                     pattern="[0-9]*"
                     placeholder="Укажите сумму"
                     rightElement={<p>₽</p>}
-                    onChange={(e) => setData({ ...data, salary_debt: e.target.value })}
+                    onChange={(e) => {
+                      if (!e.target.value.split(".")[1] || e.target.value.split(".")[1]?.length < 3) {
+                        setData({ ...data, salary_debt: e.target.value })
+                      }
+                    } }
                   />
                   </div>
                 </div>
@@ -881,7 +896,7 @@ const Step2 = () => {
                   </div>
                     {p.account_onw_role?.includes?.("ЕИО") && 
                     <div>
-                      <div className={classNames(styles.row, "bg-grey")}>
+                      <div>
                         <Input 
                           value={p.account_own_job_title}
                           name="Должность"
@@ -901,16 +916,18 @@ const Step2 = () => {
                     </div>}
 
                   {p.account_onw_role?.includes?.("Акционер/учредитель") && 
-                      <div>
+                      <div className="mt25">
                       <Input 
                         value={p.account_own_piece}
                         name="Доля владения (%)"
                         placeholder="Доля владения"
-                        type="number"
+                        type="text" pattern="\d*"
                         error={showErrors && !p.account_own_piece?.length}
                         onChange={(e) => {
-                          data.list_persone[i].account_own_piece = e.target.value
-                          setData({ ...data })
+                          if (e.target.value >= 0 && e.target.value <= 100) {
+                            data.list_persone[i].account_own_piece = e.target.value.replace(".", "")
+                            setData({ ...data })
+                          }
                         }}
                       />
                       <div className={styles.mb24}>
@@ -2041,7 +2058,6 @@ const Step2 = () => {
                           : setErroredFields(prev => ([ ...prev, "foreign_sum_contracts_age" ]))
                       }}
                     />
-
                   </div>
                     {erroredFields.includes("foreign_sum_contracts_age") && <p className="text-error">Поле не заполнено</p>}
                 </div>
@@ -2049,92 +2065,36 @@ const Step2 = () => {
               <div className={styles.mb40} />
               <div className={styles.mb40}>
                 <p className={styles.mb24}>Источники происхождения денежных средств</p>
-                  <div className={styles.checks}>
-                    <div 
-                      className={styles.checks__item}
-                      onClick={() => {
-                        setData({ ...data, sources_cash_receipts: cash_source[0] })
-                        setErroredFields(p => p.filter(f => f !== "sources_cash_receipts"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.sources_cash_receipts === cash_source[0]}
-                      />
-                      <p>{cash_source[0]}</p>
-                    </div>
-                  </div>
-                  <div className={styles.checks}>
-                    <div 
-                      className={`${styles.checks__item}`}
-                      onClick={() => {
-                        setData({ ...data, sources_cash_receipts: cash_source[1] })
-                        setErroredFields(p => p.filter(f => f !== "sources_cash_receipts"))
-                      }}
-                    >
-                      <RadioButtonRS
-                        isActive={data.sources_cash_receipts === cash_source[1]}
-                      />
-                      <p>{cash_source[1]}</p>
-                    </div>
-                  </div>
-                  <div className={styles.checks}>
-                    <div 
-                      className={`${styles.checks__item} `}
-                      onClick={() => {
-                        setData({ ...data, sources_cash_receipts: cash_source[2] })
-                        setErroredFields(p => p.filter(f => f !== "sources_cash_receipts"))
-                      }}
-                      >
-                      <RadioButtonRS
-                        isActive={data.sources_cash_receipts === cash_source[2]}
-                      />
-                      <p>{cash_source[2]}</p>
-                    </div>
-                  </div>
-                  <div className={styles.checks}>
-                    <div 
-                      className={`${styles.checks__item} `}
-                      onClick={() => {
-                        setData({ ...data, sources_cash_receipts: cash_source[3] })
-                        setErroredFields(p => p.filter(f => f !== "sources_cash_receipts"))
-                      }}
-                      >
-                      <RadioButtonRS
-                        isActive={data.sources_cash_receipts === cash_source[3]}
-                      />
-                      <p>{cash_source[3]}</p>
-                    </div>
-                  </div>
-                  <div className={styles.checks}>
-                    <div 
-                      className={`${styles.checks__item} `}
-                      onClick={() => {
-                        setData({ ...data, sources_cash_receipts: cash_source[4] })
-                        setErroredFields(p => p.filter(f => f !== "sources_cash_receipts"))
-                      }}
-                      >
-                      <RadioButtonRS
-                        isActive={data.sources_cash_receipts === cash_source[4]}
-                      />
-                      <p>{cash_source[4]}</p>
-                    </div>
-                  </div>
-                  <div className={styles.checks}>
-                    <div 
-                      className={`${styles.checks__item}`}
-                      onClick={() => {
-                        setData({ ...data, sources_cash_receipts: cash_source[5] })
-                        setErroredFields(p => p.filter(f => f !== "sources_cash_receipts"))
-                      }}
-                      >
-                      <RadioButtonRS
-                        isActive={data.sources_cash_receipts === cash_source[5]}
-                      />
-                      <p>{cash_source[5]}</p>
-                    </div>
-                  </div>
+                <SelectRS
+                  nameStyles={{ color: "#8E909B", fontSize: "14px", marginBottom: "8px" }}
+                  value={{ value: data.sources_cash_receipts, label: data.sources_cash_receipts }}
+                  error={erroredFields.includes("sources_cash_receipts")}
+                  options={cashSources}
+                  onChange={(v) => {
+                    setData({ ...data, sources_cash_receipts: v.label  })
+                    if (v.value === "Иное" ) {
+                      setCustomSource(p => ({ ...p, active: true }))
+                    } else if (customSource.active) {
+                      setCustomSource(p => ({ ...p, active: false }))
+                    }
+                    v.label 
+                      ? setErroredFields(prev => prev.filter(f => f !== "sources_cash_receipts")) 
+                      : setErroredFields(prev => ([ ...prev, "sources_cash_receipts" ]))
+                  }}
+                />
                 {erroredFields.includes("sources_cash_receipts") && <p className="text-error">Поле не заполнено</p>}
-
+                {customSource.active && <div className="mt25">
+                  <Input
+                    value={customSource.value}
+                    placeholder="Введите источник средств"
+                    error={showErrors && !customSource.value?.length}
+                    onChange={(e) => {
+                      info.current.custom_source = e.target.value
+                      setCustomSource(p => ({ ...p, value: e.target.value }))
+                    }}
+                  />
+                </div>}
+                {showErrors && customSource.active && !customSource.value?.length && <p className="text-error">Поле не заполнено</p>}
               </div>
               <div className={styles.mb40}>
                 <p className={styles.mb24}>Штатная численность сотрудников</p>
