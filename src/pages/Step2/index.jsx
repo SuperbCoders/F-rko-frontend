@@ -739,7 +739,7 @@ const Step2 = () => {
                       type="text"
                       name="Численность персонала"
                       placeholder="Напишите значение"
-                      error={erroredFields.includes("employers_volume")}
+                      error={showErrors && !data.employers_volume}
                       onChange={(e) => {
                         setData({ ...data, employers_volume: e.target.value.replace(/[^0-9]/g,'') })
                         e.target.value 
@@ -747,8 +747,7 @@ const Step2 = () => {
                           : setErroredFields(p => ([...p, "employers_volume"]))
                       }}
                     />
-                    {erroredFields.includes("employers_volume") && <p className="text-error">Поле не заполнено</p>}
-
+                    {showErrors && !data.employers_volume && <p className="text-error">Поле не заполнено</p>}
                   </div>
                   <div>
                   <Input
@@ -851,7 +850,7 @@ const Step2 = () => {
                   {showErrors && !p.account_onw_role?.length && <p className="text-error">Поле не заполнено</p>}
                   </div>
 
-                  <div className={classNames(styles.row, "bg-grey")}>
+                  <div className={styles.row}>
                     <div>
                     <Input 
                       value={p.account_own_lastname}
@@ -918,7 +917,7 @@ const Step2 = () => {
                   {p.account_onw_role?.includes?.("Акционер/учредитель") && 
                       <div className="mt25">
                       <Input 
-                        value={p.account_own_piece}
+                        value={p.account_own_piece ?? ""}
                         name="Доля владения (%)"
                         placeholder="Доля владения"
                         type="text" pattern="\d*"
@@ -960,7 +959,7 @@ const Step2 = () => {
                   </div>
                   {showErrors && p.account_own_gender !== "Мужской" && p.account_own_gender !== "Женский" && <p className="text-error label">Поле не заполнено</p>}
 
-                  <div className={classNames(styles.row, "bg-grey")}>
+                  <div className={styles.row}>
                     <div style={{ maxWidth: "calc(50% - 12px)" }} className={styles.input__wrapper}>
                       <p className={styles.name}>ИНН</p>
                       <MaskedInput
@@ -986,10 +985,10 @@ const Step2 = () => {
                     </div>
                   </div>
 
-                  <div className={classNames(styles.row, "bg-grey")}>
+                  <div className={styles.row}>
                     <div className={styles.column}>
                       <DaDataSelect 
-                        backgroundColor="#F0F2F5"
+                        backgroundColor="transparent"
                         name="Гражданство"
                         isCountries
                         value={p.account_own_citizenship}
@@ -1005,7 +1004,7 @@ const Step2 = () => {
                     </div>
                     <div className={styles.column}>
                       <DaDataSelect 
-                        backgroundColor="#F0F2F5"
+                        backgroundColor="transparent"
                         name="Страна проживания"
                         isCountries
                         value={p.account_country_residence}
@@ -1021,7 +1020,7 @@ const Step2 = () => {
 
                     </div>
                   </div>
-                  <div className={classNames(styles.row, "bg-grey")}>
+                  <div className={styles.row}>
                     <div className={styles.input__wrapper} style={{ maxWidth: "calc(50% - 12px)" }}>
                       <p className={styles.name}>Телефон</p>
                       <MaskedInput
@@ -1042,7 +1041,6 @@ const Step2 = () => {
                     <div className={styles.input__wrapper}>
                       <p className={styles.name}>E-mail</p>
                       <MaskedInput
-                        // mask="*@*.com"
                         placeholder="pochta@server.com"
                         error={showErrors && (!p.email?.length || !/[a-z0-9]+@[a-z]+\.[a-z]{2,6}/.test(p.email))}
                         value={p?.email ?? ""}
@@ -1061,15 +1059,16 @@ const Step2 = () => {
                         }
                     </div>
                   </div>
-                  <div className={classNames(styles.row, "bg-grey")}>
+                  <div className={styles.row}>
                     <div className={styles.column}>
                       <DaDataSelect 
-                        backgroundColor="#F0F2F5"
+                        backgroundColor="transparent"
                         name="Адрес регистрации"
                         value={p.account_own_registration}
                         isAddr={true}
                         error={showErrors && !p.account_own_registration?.length}
                         message="Введите адрес"
+                        filterOption={() => true}
                         formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
                         onSelect={(v) => {
                           data.list_persone[i].account_own_registration = v?.label ?? ""
@@ -1113,15 +1112,17 @@ const Step2 = () => {
                   </div>
                   {p.accownt_own_living !== "Совпадает" && 
                     <div>
-                    <div className={classNames(styles.row, "bg-grey")}>
+                    <div className={styles.row}>
                       <div className={styles.column}>
                         <DaDataSelect 
-                          backgroundColor="#F0F2F5"
+                          backgroundColor="transparent"
                           name="Адрес местонахождения"
                           value={p.accownt_own_living}
                           message="Введите адрес"
+                          isAddr={true}
                           error={showErrors && !p.accownt_own_living?.length}
-                          formatedOptions={formatedOptions}
+                          filterOption={() => true}
+                          formatedOptions={(list) => list.map((item) => ({ value: item.unrestricted_value, label: item.unrestricted_value }))}
                           onSelect={(v) => {
                             data.list_persone[i].accownt_own_living = v?.label ?? ""
                             setData({ ...data })
@@ -1129,10 +1130,10 @@ const Step2 = () => {
                         />
                       </div>
                     </div>
-                    {showErrors && !p.account_own_registration?.length && <p className="text-error label">Поле не заполнено</p>}
+                    {showErrors && !p.accownt_own_living?.length && <p className="text-error label">Поле не заполнено</p>}
                     </div>
                     }
-                  <div className={classNames(styles.row, "bg-grey", "form")}>
+                  <div className={classNames(styles.row, "form")}>
                     <div>
                     <Input
                       name="Место рождения"
@@ -1149,7 +1150,7 @@ const Step2 = () => {
                     <div className={styles.input__wrapper}>
                       <p className={styles.name}>Дата рождения</p>
                       <MaskedInput 
-                        value={p.account_datebirth}
+                        value={p.account_datebirth ?? ""}
                         mask="99.99.9999"
                         placeholder="DD.MM.YYYY"
                         error={showErrors && !dateIsValid(p.account_datebirth)}
@@ -1171,7 +1172,7 @@ const Step2 = () => {
                       name="Тип документа, удостоверяющего личность"
                       nameStyles={{ color: "#8E909B", fontSize: "14px", marginBottom: "8px" }}
                       placeholder="Выберите тип"
-                      backgroundColor="#F0F2F5"
+                      backgroundColor="transparent"
                       options={identityDocOpts}
                       error={showErrors && !p.doc_type?.length}
                       onChange={(v) => {
@@ -1182,11 +1183,11 @@ const Step2 = () => {
                     {showErrors && !p.doc_type?.length && <p className="text-error">Поле не заполнено</p>}
                     </div>
                   </div>
-                  <div className={classNames(styles.row, "bg-grey", "form")}>
+                  <div className={classNames(styles.row, "form")}>
                     <div className={styles.input__wrapper}>
                     <p className={styles.name}>Серия документа, удостоверяющего личность (при наличии)</p>
                     <MaskedInput
-                      value={p.doc_serial}
+                      value={p.doc_serial ?? ""}
                       mask="9999"
                       maskChar="_"
                       placeholder="____"
@@ -1208,7 +1209,7 @@ const Step2 = () => {
                     <div className={styles.input__wrapper}>
                     <p className={styles.name}>Номер документа, удостоверяющего личность</p>
                     <MaskedInput
-                      value={p.doc_number}
+                      value={p.doc_number ?? ""}
                       error={showErrors && (isNaN(p.doc_number?.[0]) || isNaN(p.doc_number?.[5]))}
                       placeholder="______"
                       mask="999999"
@@ -1241,10 +1242,10 @@ const Step2 = () => {
                       {showErrors && !p.issued_by?.length && <p className="text-error">Поле не заполнено</p>}
                     </div>
                   </div>
-                  <div className={classNames(styles.row, "bg-grey", "form")}>
+                  <div className={classNames(styles.row, "form")}>
                       <div>
                       <DaDataSelect 
-                        backgroundColor="#F0F2F5"
+                        backgroundColor="transparent"
                         name="Код подразделения"
                         value={p.division_code}
                         message="Введите код"
@@ -1262,7 +1263,7 @@ const Step2 = () => {
                     <div className={styles.input__wrapper}>
                       <p className={styles.name}>Дата выдачи</p>
                       <MaskedInput 
-                        value={p.date_issue}
+                        value={p.date_issue ?? ""}
                         error={showErrors && !dateIsValid(p.date_issue)}
                         placeholder="DD.MM.YYYY"
                         mask="99.99.9999"
