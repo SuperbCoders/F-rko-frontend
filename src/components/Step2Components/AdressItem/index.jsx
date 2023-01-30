@@ -57,9 +57,7 @@ const AddressItem = ({ id, type, address, error=false, onSelectType, onSelectAdd
             />
           </div>
         </div>
-        <div style={{ width: "auto" }} className={styles.column}>
-          <DeleteButton onClick={removeFromAddressList(id)} />
-        </div>
+        <DeleteButton onClick={removeFromAddressList(id)} />
       </div>
 
       <div style={{ width: "100%" }} className={styles.mb24}>

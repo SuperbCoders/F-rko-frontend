@@ -67,8 +67,12 @@ const DaDataSelect = ({
 
     } else if (isAddr) {
       requestAddress(text.trim())
-      .then((data) => data.json())
-      .then((data) => setOptionsList(data.suggestions))
+        .then((data) => data.json())
+        .then((data) => {
+          if (!(optionsList.length && !data.suggestions)) {
+            setOptionsList(data.suggestions)
+          }
+        })
     } else {
       requestDaData(text.trim())
       .then((data) => data.json())
