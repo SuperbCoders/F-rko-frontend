@@ -184,6 +184,14 @@
     background-repeat: no-repeat;
     background-size: contain;
   }
+
+  &__plain {
+    position: static;
+
+    &::after {
+      display: none;
+    }
+  }
 }
 
 .p {
